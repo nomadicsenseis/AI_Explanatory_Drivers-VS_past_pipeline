@@ -24,13 +24,13 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ## Sagemaker Notebooks [Jupyter]
 
-Amazon SageMaker Notebook es un servicio de Jupyter notebooks integrado en la nube, diseñado para simplificar el desarrollo y la ejecución de código en Amazon SageMaker. Permite a los desarrolladores y científicos de datos crear y ejecutar notebooks de Jupyter en un entorno seguro y administrado, con acceso a los recursos y la capacidad de procesamiento de AWS.
+Amazon SageMaker Notebook is a cloud-integrated Jupyter notebook service designed to simplify development and code execution on Amazon SageMaker. It enables developers and data scientists to create and run Jupyter notebooks in a secure, managed environment, with access to AWS resources and processing power.
 
-Los notebooks de SageMaker están basados en Amazon Elastic Container Service (ECS) y se ejecutan en instancias dedicadas. SageMaker administra la infraestructura subyacente, lo que significa que los usuarios pueden centrarse en el código y los datos, en lugar de preocuparse por la configuración de la infraestructura.
+SageMaker notebooks are based on Amazon Elastic Container Service (ECS) and run on dedicated instances. SageMaker manages the underlying infrastructure, which means users can focus on code and data, rather than worrying about infrastructure configuration.
 
-Los notebooks de SageMaker también ofrecen una integración fluida con otras características de SageMaker, como el almacenamiento de datos y los servicios de entrenamiento y despliegue. Los usuarios pueden acceder a los recursos de AWS, como S3, EC2 y ECR, desde dentro del notebook, lo que les permite utilizar herramientas y servicios de AWS para construir y entrenar modelos de aprendizaje automático y crear flujos de trabajo de análisis de datos completos.
+SageMaker notebooks also offer seamless integration with other SageMaker features, such as data warehousing and training and deployment services. Users can access AWS resources, such as S3, EC2 and ECR, from within the notebook, allowing them to use AWS tools and services to build and train machine learning models and create comprehensive data analytics workflows.
 
-En resumen, el entorno de notebooks de AWS SageMaker es una plataforma de desarrollo en la nube segura y administrada para crear, ejecutar y distribuir aplicaciones de aprendizaje automático y análisis de datos.
+In short, the AWS SageMaker notebook environment is a secure, managed cloud development platform for building, running and distributing machine learning and data analytics applications.
 
 //TODO: FOTOS, COMENTARIOS DEL LAYOUT, ETC
 
@@ -38,31 +38,31 @@ En resumen, el entorno de notebooks de AWS SageMaker es una plataforma de desarr
 
 ### Instances
 
-AWS SageMaker ofrece varias instancias principales que se pueden utilizar dependiendo del caso de uso:
+AWS SageMaker offers several main instances that can be used depending on the use case:
 
-ml.t2.medium: Es una instancia de bajo costo que se puede utilizar para fines de desarrollo y pruebas.
+ml.t2.medium: This is a low-cost instance that can be used for development and testing purposes.
 
-ml.m4.xlarge: Es una instancia más potente que se puede utilizar para tareas de entrenamiento y procesamiento intensivo.
+ml.m4.xlarge: This is a more powerful instance that can be used for training and intensive processing tasks.
 
-ml.p2.xlarge: Es una instancia diseñada para tareas de procesamiento de GPU, como el entrenamiento de modelos de aprendizaje profundo.
+ml.p2.xlarge: This is an instance designed for GPU processing tasks, such as training deep learning models.
 
-ml.g4dn.xlarge: Es una instancia con GPU diseñada para tareas de gráficos intensivos, como la visualización de datos y la generación de imágenes.
+ml.g4dn.xlarge: This is a GPU instance designed for graphics-intensive tasks, such as data visualization and image generation.
 
-ml.c5.large: Es una instancia diseñada para tareas de procesamiento intensivo que requieren un gran ancho de banda de red, como la transferencia de datos a gran escala.
+ml.c5.large: An instance designed for processing-intensive tasks that require high network bandwidth, such as large-scale data transfer.
 
-Recomendación de caso de uso para cada instancia:
+Use case recommendation for each instance:
 
-ml.t2.medium: Ideal para pruebas y desarrollo de código.
+ml.t2.medium: Ideal for testing and code development.
 
-ml.m4.xlarge: Ideal para entrenamiento de modelos y procesamiento intensivo.
+ml.m4.xlarge: Ideal for model training and intensive processing.
 
-ml.p2.xlarge: Ideal para entrenamiento de modelos de aprendizaje profundo y otras tareas de procesamiento de GPU.
+ml.p2.xlarge: Ideal for deep learning model training and other GPU processing tasks.
 
-ml.g4dn.xlarge: Ideal para visualización de datos y generación de imágenes.
+ml.g4dn.xlarge: Ideal for data visualization and image generation.
 
-ml.c5.large: Ideal para transferencia de datos a gran escala y otras tareas de procesamiento intensivo que requieren un gran ancho de banda de red.
+ml.c5.large: Ideal for large-scale data transfer and other processing-intensive tasks requiring high network bandwidth.
 
-Estas son solo recomendaciones generales. El uso final de cada instancia dependerá del caso de uso específico y de las necesidades de rendimiento y costo. La elección de la instancia adecuada depende de muchos factores, como el tamaño del modelo, el tamaño de los datos de entrenamiento, la velocidad y la eficiencia deseadas, entre otros. Es importante evaluar cuidadosamente las necesidades y los requisitos antes de seleccionar una instancia para usar con Amazon SageMaker.
+These are only general recommendations. The final use of each instance will depend on the specific use case and the performance and cost requirements. The choice of the appropriate instance depends on many factors, such as the size of the model, the size of the training data, the desired speed and efficiency, among others. It is important to carefully evaluate the needs and requirements before selecting an instance for use with Amazon SageMaker.
 
 //TODO: Foto de como seleccionarlo y donde ver los costos
 
@@ -70,25 +70,25 @@ Estas son solo recomendaciones generales. El uso final de cada instancia depende
 
 ##### Installing libraries
 
-Instalación de bibliotecas en una máquina SageMaker Notebook:
+Installation of libraries on a SageMaker Notebook machine:
 
-Abra un terminal en el notebook de Jupyter.
-Utilice el comando !pip install para instalar las bibliotecas necesarias. Por ejemplo, !pip install pandas matplotlib.
-Tenga en cuenta que algunas bibliotecas, como las bibliotecas de análisis de datos, pueden requerir más memoria y capacidad de procesamiento que la que se proporciona por defecto en una máquina SageMaker Notebook. En estos casos, es posible que sea necesario aumentar la memoria y la capacidad de procesamiento de la máquina antes de instalar las bibliotecas.
+Open a terminal on the Jupyter notebook.
+Use the !pip install command to install the required libraries. For example, !pip install pandas matplotlib.
+Note that some libraries, such as the data analysis libraries, may require more memory and processing power than is provided by default on a SageMaker Notebook machine. In these cases, it may be necessary to increase the memory and processing power of the machine before installing the libraries.
 
-Se pueden encontrar los siguientes problemas al intentar instalar librerias en SageMaker:
+The following problems may be encountered when attempting to install libraries on SageMaker:
 
-Permisos insuficientes: Si el usuario no tiene permisos suficientes para instalar librerias en el entorno de SageMaker, puede recibir un mensaje de error que indica que no tiene permisos para instalar librerias.
+Insufficient permissions: If the user does not have sufficient permissions to install libraries in the SageMaker environment, they may receive an error message indicating that they do not have permissions to install libraries.
 
-Conflictos de dependencias: Las librerias a menudo dependen de otras librerias para funcionar correctamente. Si una libreria depende de una versión específica de otra libreria, pero la versión actualmente instalada es diferente, puede ocurrir un conflicto de dependencias que resulte en un error al instalar la libreria.
+Dependency conflicts: Libraries often depend on other libraries to function properly. If a library depends on a specific version of another library, but the currently installed version is different, a dependency conflict may occur resulting in an error when installing the library.
 
-Problemas de conexión a Internet: Si el entorno de SageMaker no tiene acceso a Internet, es posible que no se puedan descargar las librerias necesarias durante la instalación.
+Internet connection problems: If the SageMaker environment does not have Internet access, it may not be able to download the required libraries during installation.
 
-Problemas de compatibilidad: Las librerias a menudo son desarrolladas para funcionar con versiones específicas de Python y otras tecnologías. Si una libreria no es compatible con la versión de Python o tecnología que se ejecuta en el entorno de SageMaker, puede ocurrir un error al intentar instalar la libreria.
+Compatibility issues: Libraries are often developed to work with specific versions of Python and other technologies. If a library is not compatible with the version of Python or technology running in the SageMaker environment, an error may occur when attempting to install the library.
 
-Problemas de recursos: Algunas librerias pueden requerir una gran cantidad de recursos para funcionar correctamente. Si el entorno de SageMaker no tiene suficientes recursos disponibles, puede ocurrir un error al intentar instalar la libreria.
+Resource issues: Some libraries may require a large amount of resources to function properly. If the SageMaker environment does not have sufficient resources available, an error may occur when attempting to install the library.
 
-Estos son algunos de los problemas más comunes que un usuario puede encontrar al intentar instalar librerias en SageMaker. Para resolver estos problemas, es importante investigar el mensaje de error, revisar la documentación y consultar a la comunidad de usuarios.
+These are some of the most common problems a user may encounter when trying to install libraries in SageMaker. To resolve these problems, it is important to investigate the error message, review the documentation and consult the user community.
 
 ##### Tips
 
@@ -96,85 +96,85 @@ Estos son algunos de los problemas más comunes que un usuario puede encontrar a
 
 ##### Installing libraries
 
-La instalación de bibliotecas en un cluster Apache Spark y en una máquina SageMaker Notebook es un proceso diferente, dependiendo de la forma en que se esté utilizando Spark.
+Installing libraries on an Apache Spark cluster and on a SageMaker Notebook machine is a different process, depending on how Spark is being used.
 
-Instalación de bibliotecas en un cluster de Spark:
+Installing libraries on a Spark cluster:
 
-Cree un archivo de dependencias de Python, como un archivo requirements.txt, que contenga las bibliotecas que desea instalar.
-Suba el archivo de dependencias a S3 o a otro almacenamiento de archivos accesible desde Spark.
-Inicie un cluster Spark en Amazon EMR, que incluirá una opción para especificar la ubicación del archivo de dependencias.
-Una vez que el cluster esté activo, puede instalar las bibliotecas en el cluster utilizando !pip install -r y proporcionando la ubicación del archivo de dependencias en S3.
+Create a Python dependencies file, such as a requirements.txt file, containing the libraries you want to install.
+Upload the dependencies file to S3 or other Spark-accessible file storage.
+Start a Spark cluster on Amazon EMR, which will include an option to specify the location of the dependency file.
+Once the cluster is active, you can install the libraries on the cluster by using !pip install -r and providing the location of the dependency file in S3.
 
-Otra opcion de la que dispone el usuario es el uso del comando //TODO
+Another option available to the user is the use of the command//TODO
 
 ##### SparkMagic
 
-SparkMagic es un conjunto de comandos que permiten a los usuarios ejecutar código en un cluster Apache Spark desde dentro de un notebook de Jupyter. Estos comandos están diseñados para facilitar la integración de Spark con Jupyter y proporcionar una interfaz de línea de comandos para interactuar con Spark desde el notebook.
+SparkMagic is a set of commands that allow users to run code on an Apache Spark cluster from within a Jupyter notebook. These commands are designed to facilitate the integration of Spark with Jupyter and provide a command line interface for interacting with Spark from the notebook.
 
-Con SparkMagic, los usuarios pueden ejecutar código en Spark desde el notebook sin tener que abandonar la interfaz de Jupyter. Además, SparkMagic también permite a los usuarios visualizar y explorar los resultados de los comandos de Spark en el mismo notebook.
+With SparkMagic, users can run code in Spark from the notebook without having to leave the Jupyter interface. In addition, SparkMagic also allows users to visualize and explore the results of Spark commands on the notebook itself.
 
-SparkMagic también proporciona una integración fluida con otras herramientas y servicios de AWS, como S3, EC2 y EMR. Esto significa que los usuarios pueden acceder a datos almacenados en S3 y procesarlos con Spark, utilizar EC2 para ejecutar el cluster Spark y utilizar EMR para gestionar la infraestructura subyacente.
+SparkMagic also provides seamless integration with other AWS tools and services, such as S3, EC2 and EMR. This means users can access data stored in S3 and process it with Spark, use EC2 to run the Spark cluster, and use EMR to manage the underlying infrastructure.
 
-En resumen, los comandos SparkMagic proporcionan una forma sencilla y eficiente de interactuar con Apache Spark desde un notebook de Jupyter, y también permiten a los usuarios utilizar las características y recursos de AWS para procesar y analizar datos en grandes volúmenes.
+In short, SparkMagic commands provide a simple and efficient way to interact with Apache Spark from a Jupyter notebook, and also allow users to use AWS features and resources to process and analyze data in large volumes.
 
-Los comandos de SparkMagic incluyen los siguientes:
+SparkMagic commands include the following:
 
-%spark configure: Este comando permite a los usuarios configurar la conexión a un cluster Spark. Los usuarios pueden especificar la dirección URL del cluster, el puerto, el usuario y la contraseña, entre otros detalles.
+%spark configure: This command allows users to configure the connection to a Spark cluster. Users can specify the cluster URL, port, user and password, among other details.
 
-%spark: Este comando permite a los usuarios crear una sesión Spark en el cluster especificado mediante %spark configure. Después de crear la sesión, los usuarios pueden escribir y ejecutar código en Spark directamente desde el notebook.
+%spark: This command allows users to create a Spark session on the specified cluster using %spark configure. After creating the session, users can write and execute code in Spark directly from the notebook.
 
-%spark info: Este comando muestra información sobre la sesión Spark actual, incluyendo el ID de la sesión, el cluster al que está conectado y el estado de la sesión.
+%spark info: This command displays information about the current Spark session, including the session ID, the cluster to which it is connected, and the session status.
 
-%spark log: Este comando muestra los registros de la sesión Spark actual. Estos registros pueden ser útiles para depurar errores y comprender mejor lo que sucede en el cluster.
+%spark log: This command displays logs for the current Spark session. These logs can be useful for debugging errors and better understanding what is happening in the cluster.
 
-%spark cleanup: Este comando cierra la sesión Spark actual y libera los recursos asociados con la sesión.
+%spark cleanup: This command closes the current Spark session and frees the resources associated with the session.
 
-%spark add: Este comando permite a los usuarios agregar archivos a la sesión Spark actual. Los usuarios pueden agregar archivos locales o remotos a la sesión para que puedan ser accedidos y utilizados por Spark.
+%spark add: This command allows users to add files to the current Spark session. Users can add local or remote files to the session so that they can be accessed and used by Spark.
 
-%spark load: Este comando permite a los usuarios cargar datos en Spark desde un archivo local o remoto.
+%spark load: This command allows users to load data into Spark from a local or remote file.
 
-%spark display: Este comando permite a los usuarios visualizar los resultados de los comandos Spark en el notebook. Los resultados se muestran en un formato amigable para el usuario, como una tabla o un gráfico.
+%spark display: This command allows users to display the results of Spark commands on the notebook. The results are displayed in a user-friendly format, such as a table or a graph.
 
-Estos son los comandos principales de SparkMagic, y juntos proporcionan una forma eficiente y fácil de interactuar con Spark desde el notebook de Jupyter.
+These are the main SparkMagic commands, and together they provide an efficient and easy way to interact with Spark from the Jupyter notebook.
 
 ##### Tips
 
 ### Plotting
 
-En Amazon SageMaker, los usuarios pueden generar gráficos y visualizaciones para explorar y comprender sus datos de entrenamiento y modelos de aprendizaje automático. Esto se puede hacer utilizando diferentes herramientas y bibliotecas de visualización, como Matplotlib, Seaborn, Plotly, entre otras.
+In Amazon SageMaker, users can generate graphs and visualizations to explore and understand their training data and machine learning models. This can be done using different visualization tools and libraries, such as Matplotlib, Seaborn, Plotly, among others.
 
-Sin embargo, al generar gráficos en Amazon SageMaker, es posible que los usuarios se encuentren con algunos problemas, tales como:
+However, when generating charts in Amazon SageMaker, users may encounter some issues, such as:
 
-Configuración de los paquetes de visualización: Asegurarse de que los paquetes necesarios para generar gráficos estén instalados y configurados correctamente en el entorno de Amazon SageMaker puede ser un desafío para algunos usuarios.
+Configuration of visualization packages: Ensuring that the packages needed to generate charts are installed and configured correctly in the Amazon SageMaker environment can be a challenge for some users.
 
-Problemas de rendimiento: Generar gráficos con grandes cantidades de datos puede requerir muchos recursos de procesamiento y puede causar problemas de rendimiento en el entorno de Amazon SageMaker.
+Performance issues: Generating charts with large amounts of data can require a lot of processing resources and can cause performance issues in the Amazon SageMaker environment.
 
-Problemas de visualización: Algunas veces, los gráficos generados pueden no verse de la manera esperada debido a problemas de formato o de configuración.
+Display issues: Sometimes, generated charts may not look as expected due to formatting or configuration issues.
 
-Por lo tanto, es importante que los usuarios tengan en cuenta estos posibles problemas al generar gráficos en Amazon SageMaker y tomen las medidas necesarias para solucionarlos. Esto incluye la documentación y el uso de las herramientas y bibliotecas de visualización adecuadas, así como la optimización de los recursos de procesamiento y la configuración correcta de los paquetes necesarios.
+Therefore, it is important for users to be aware of these potential issues when generating charts in Amazon SageMaker and take steps to address them. This includes documenting and using the appropriate visualization tools and libraries, as well as optimizing processing resources and configuring the necessary packages correctly.
 
-Dependiendo de la herramienta o biblioteca que desee utilizar, quí hay algunos ejemplos:
+Depending on the tool or library you want to use, here are some examples:
 
-Matplotlib: es una biblioteca de visualización de datos de código abierto que se puede utilizar para generar gráficos en Amazon SageMaker. Puede importar y usar Matplotlib en un notebook de Amazon SageMaker y usar sus funciones para generar gráficos.
+Matplotlib: is an open source data visualization library that can be used to generate charts in Amazon SageMaker. You can import and use Matplotlib in an Amazon SageMaker notebook and use its functions to generate charts.
 
 ```
 !pip install matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Generamos datos de ejemplo
-data = [3, 4, 1, 5, 2]
+# We generate example data
+data = [3, 4, 1, 1, 5, 2]
 
-# Crear gráfico de barras
+# Create bar chart
 plt.bar(np.arange(len(data)), data)
 
-# Mostrar gráfico
+# Show chart
 plt.show()
 ```
 
-Este código primero instala el paquete de Matplotlib, luego importa la biblioteca y crea un gráfico de barras con datos de ejemplo. La función plt.show() muestra el gráfico en el notebook.
+This code first installs the Matplotlib package, then imports the library and creates a bar chart with example data. The plt.show() function displays the chart on the notebook.
 
-Seaborn: es otra biblioteca de visualización de datos de código abierto que se puede utilizar para generar gráficos en Amazon SageMaker. Seaborn proporciona una interfaz fácil de usar para crear gráficos complejos utilizando Matplotlib.
+Seaborn: is another open source data visualization library that can be used to generate charts in Amazon SageMaker. Seaborn provides an easy-to-use interface for creating complex charts using Matplotlib.
 
 ```
 !pip install seaborn
@@ -182,44 +182,44 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Generamos datos de ejemplo
+# We generate example data
 data = np.random.rand(50, 2)
 
-# Crear gráfico de dispersión
+# Create scatterplot
 sns.scatterplot(data[:, 0], data[:, 1])
 
-# Mostrar gráfico
+# Show plot
 plt.show()
 ```
 
-Este código primero instala el paquete de Seaborn, luego importa la biblioteca y crea un gráfico de dispersión con datos de ejemplo. La función plt.show() muestra el gráfico en el notebook.
+This code first installs the Seaborn package, then imports the library and creates a scatterplot with sample data. The plt.show() function displays the plot on the notebook.
 
-Plotly: es una biblioteca de visualización interactiva de código abierto que se puede utilizar para generar gráficos en Amazon SageMaker. Con Plotly, los usuarios pueden crear gráficos interactivos con una amplia variedad de características y estilos.
+Plotly: is an open source interactive visualization library that can be used to generate charts in Amazon SageMaker. With Plotly, users can create interactive charts with a wide variety of features and styles.
 
 ```
 !pip install plotly
 import plotly.express as px
 import pandas as pd
 
-# Generamos datos de ejemplo
+# We generate example data
 data = {'Fruit': ['Apple', 'Banana', 'Cherry', 'Date'],
         'Count': [3, 4, 1, 5]}
 
-# Crear DataFrame
+# Create DataFrame
 df = pd.DataFrame(data)
 
-# Crear gráfico de barras
+# Create bar chart
 fig = px.bar(df, x='Fruit', y='Count')
 
-# Mostrar gráfico
+# Show graph
 fig.show()
 ```
 
-Este código primero instala el paquete de Plotly, luego importa la biblioteca y crea un gráfico de barras con datos de ejemplo en un DataFrame de Pandas. La función fig.show() muestra el gráfico en el notebook.
+This code first installs the Plotly package, then imports the library and creates a bar chart with example data in a Pandas DataFrame. The fig.show() function displays the chart in the notebook.
 
-Para utilizar cualquiera de estas herramientas o bibliotecas, los usuarios primero deben instalar y configurar los paquetes necesarios en su entorno de Amazon SageMaker. Luego, pueden importar la biblioteca en su notebook y utilizar sus funciones para generar gráficos.
+To use any of these tools or libraries, users must first install and configure the necessary packages in their Amazon SageMaker environment. Then, they can import the library into their notebook and use its functions to generate charts.
 
-Es importante tener en cuenta que la generación de gráficos puede requerir muchos recursos de procesamiento y puede causar problemas de rendimiento en el entorno de Amazon SageMaker, por lo que es importante optimizar los recursos y configurar correctamente los paquetes necesarios.
+It is important to note that chart generation can require a lot of processing resources and can cause performance issues in the Amazon SageMaker environment, so it is important to optimize resources and properly configure the necessary packages.
 
 ### boto3 [s3]
 
