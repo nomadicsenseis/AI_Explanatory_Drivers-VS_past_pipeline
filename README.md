@@ -48,6 +48,20 @@ Abra un terminal en el notebook de Jupyter.
 Utilice el comando !pip install para instalar las bibliotecas necesarias. Por ejemplo, !pip install pandas matplotlib.
 Tenga en cuenta que algunas bibliotecas, como las bibliotecas de análisis de datos, pueden requerir más memoria y capacidad de procesamiento que la que se proporciona por defecto en una máquina SageMaker Notebook. En estos casos, es posible que sea necesario aumentar la memoria y la capacidad de procesamiento de la máquina antes de instalar las bibliotecas.
 
+Se pueden encontrar los siguientes problemas al intentar instalar librerias en SageMaker:
+
+Permisos insuficientes: Si el usuario no tiene permisos suficientes para instalar librerias en el entorno de SageMaker, puede recibir un mensaje de error que indica que no tiene permisos para instalar librerias.
+
+Conflictos de dependencias: Las librerias a menudo dependen de otras librerias para funcionar correctamente. Si una libreria depende de una versión específica de otra libreria, pero la versión actualmente instalada es diferente, puede ocurrir un conflicto de dependencias que resulte en un error al instalar la libreria.
+
+Problemas de conexión a Internet: Si el entorno de SageMaker no tiene acceso a Internet, es posible que no se puedan descargar las librerias necesarias durante la instalación.
+
+Problemas de compatibilidad: Las librerias a menudo son desarrolladas para funcionar con versiones específicas de Python y otras tecnologías. Si una libreria no es compatible con la versión de Python o tecnología que se ejecuta en el entorno de SageMaker, puede ocurrir un error al intentar instalar la libreria.
+
+Problemas de recursos: Algunas librerias pueden requerir una gran cantidad de recursos para funcionar correctamente. Si el entorno de SageMaker no tiene suficientes recursos disponibles, puede ocurrir un error al intentar instalar la libreria.
+
+Estos son algunos de los problemas más comunes que un usuario puede encontrar al intentar instalar librerias en SageMaker. Para resolver estos problemas, es importante investigar el mensaje de error, revisar la documentación y consultar a la comunidad de usuarios.
+
 ##### Tips
 
 #### Distributed based [EMR]
