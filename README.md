@@ -223,6 +223,114 @@ It is important to note that chart generation can require a lot of processing re
 
 ### boto3 [s3]
 
+Boto3 is a software library developed by Amazon Web Services (AWS) that provides an application programming interface (API) for interacting with different AWS services. Boto3 makes it easy to work with AWS services from Python.
+
+In Sagemaker, Boto3 is used to manage and automate tasks related to the creation and use of machine learning models. For example, Boto3 can be used to create and manage Sagemaker resources, such as training and production instances, and to send and receive data to and from Sagemaker.
+
+Boto3 is built on top of a library called Botocore, which it shares with AWS CLI. Botocore provides the low-level client, session, and credential and configuration data. Boto 3 builds on Botocore by providing its own session, resources, and collections.
+
+Modules generally fall into two categories, those that include a high-level object-oriented interface and those that include only a low-level interface that matches the Amazon Web Services API (These interfaces are resources and clients respectively. a look at both shortly).
+Some modules are completely high-level (such as Amazon S3 or EC2), some include high-level code over a low-level connection (such as Amazon DynamoDB), and some are 100% low-level (such as Amazon Elastic Transcoder).
+Clients: are low-level service connections with the following main characteristics:
+
+Supports all services.
+Outputs are returned using Python dictionaries.
+We have to traverse these dictionaries ourselves
+Automatic pagination of responses (Paginators)
+A way to block until a certain state has been reached (Waiters)
+
+Along with these core features, Boto 3 also provides sessions and per-session credentials and configuration, as well as basic components such as authentication, parameter and response handling, an event system for customizations, and logic for retrying failed requests.
+
+Some code examples of using Boto3 with Sagemaker are described below:
+
+Read files present with pandas from S3:
+```
+import boto3
+
+s3 = boto3.client('s3')
+
+response = s3.list_objects(
+    Bucket='my-bucket',
+    Prefix='path/to/my/files/'
+)
+
+files = [content['Key'] for content in response.get('Contents', [])]
+
+print(files)
+```
+
+Create a Sagemaker trainer:
+
+```
+import boto3
+
+sagemaker = boto3.client('sagemaker')
+
+training_image = '012345678910.dkr.ecr.us-west-2.amazonaws.com/image-classification:latest'
+role = 'arn:aws:iam::012345678910:role/service-role/AmazonSageMaker-ExecutionRole-20181129T121160'
+
+response = sagemaker.create_training_job(
+    TrainingJobName='my-training-job',
+    AlgorithmSpecification={
+        'TrainingImage': training_image,
+        'TrainingInputMode': 'File'
+    },
+    RoleArn=role,
+    InputDataConfig=[
+        {
+            'ChannelName': 'train',
+            'DataSource': {
+                'S3DataSource': {
+                    'S3DataType': 'S3Prefix',
+                    'S3Uri': 's3://my-bucket/train',
+                    { 'S3DataDistributionType': 'FullyReplicated'.
+                }
+            },
+            'ContentType': 'application/x-record',
+            'CompressionType': 'None'
+        }
+    ],
+    OutputDataConfig={
+        'S3OutputPath': 's3://my-bucket/output'
+    },
+    ResourceConfig={
+        'InstanceType': 'ml.c4.xlarge',
+        'InstanceCount': 1,
+        'VolumeSizeInGB': 50
+    },
+    StoppingCondition={
+        'MaxRuntimeInSeconds': 3600
+    },
+    HyperParameters={
+        'image_shape': '3,224,224',
+        'num_classes': '2',
+        'num_training_samples': '15420',
+        'mini_batch_size': '10',
+        'epochs': '10',
+        'learning_rate': '0.01'
+    }
+)
+
+```
+Create a Sagemaker endpoint:
+
+```
+import boto3
+
+sagemaker = boto3.client('sagemaker')
+
+response = sagemaker.create_endpoint(
+    EndpointName='my-endpoint',
+    EndpointConfigName='my-endpoint-config', EndpointConfigName='my-endpoint-config'.
+)
+
+print(response)
+```
+In this example, an endpoint with the name my-endpoint is created and associated with a previously created endpoint configuration named my-endpoint-config. The API response will include information about the created endpoint, such as the ID and the current status.
+
+Note: Before creating an endpoint, you must first create an endpoint configuration that specifies details about how the model will be used in production.
+
+
 ## Production
 
 ### Project structure
