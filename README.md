@@ -64,7 +64,16 @@ ml.c5.large: Ideal for large-scale data transfer and other processing-intensive 
 
 These are only general recommendations. The final use of each instance will depend on the specific use case and the performance and cost requirements. The choice of the appropriate instance depends on many factors, such as the size of the model, the size of the training data, the desired speed and efficiency, among others. It is important to carefully evaluate the needs and requirements before selecting an instance for use with Amazon SageMaker.
 
-//TODO: Foto de como seleccionarlo y donde ver los costos
+To select a machine, you must perform the following steps
+
+![How to select image for notebook ](src\setup\instances\HowToSelectMachine.png)
+
+Once selected, a menu will be displayed in which you can filter the machines that have quick access. It should be noted that the access times to any machine is affordable, being only a few minutes in most cases.
+
+![Menu for machine selection](src\setup\instances\MachinesAllow.png)
+
+To check the prices associated with each of the machines that can be selected, you can go to the following address: https://aws.amazon.com/es/sagemaker/pricing/
+
 
 #### Memory/CPU based
 
