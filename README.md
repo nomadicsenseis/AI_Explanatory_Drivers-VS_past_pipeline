@@ -66,11 +66,11 @@ These are only general recommendations. The final use of each instance will depe
 
 To select a machine, you must perform the following steps
 
-![How to select image for notebook ](src\setup\instances\HowToSelectMachine.png)
+![How to select image for notebook ](\sagemaker-template\src\setup\instances\HowToSelectMachine.png)
 
 Once selected, a menu will be displayed in which you can filter the machines that have quick access. It should be noted that the access times to any machine is affordable, being only a few minutes in most cases.
 
-![Menu for machine selection](src\setup\instances\MachinesAllow.png)
+![Menu for machine selection](\sagemaker-template\src\setup\instances\MachinesAllow.png)
 
 To check the prices associated with each of the machines that can be selected, you can go to the following address: https://aws.amazon.com/es/sagemaker/pricing/
 
