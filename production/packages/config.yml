@@ -1,0 +1,341 @@
+VARIABLES:
+  COLUMNS_TO_READ:
+    - cid
+    - coupon_usage_code
+    - prime_ticket_num
+    - coupon_num
+    - pnr_resiber
+    - pnr_amadeus
+    - gross_revenue_eur
+    - ticket_sale_date
+    - date_creation_pnr_resiber
+    - num_bags
+    - eur_bags
+    - num_seats
+    - eur_seats
+    - num_upgs
+    - eur_upgs
+    - num_others
+    - eur_others
+    - ff_num
+    - birth_date
+    - pax_type_ind
+    - num_days_anticipation
+    - ind_reason_business
+    - num_hours_in_destination
+    - loc_dep_date
+    - loc_arr_date
+    - loc_arr_time
+    - loc_dep_time
+    - itinerary_od
+    - date_creation_idgoldenrecord
+    - haul
+    - sold_class_code
+    - ff_tier
+    - pax_demand_space
+    - ff_group
+    - op_carrier_code
+    - op_flight_num
+    - flag_misconnection_misc
+    - flag_dng
+    - delayed_minutes_arrival
+    - cancelled
+    - mkt_permission
+    - purchases_2015
+    - purchases_2016
+    - purchases_2017
+    - ind_direct_sale
+    - destination_city_od
+    - is_corporate
+    - revenue_avios
+    - pax_type_seg
+    - op_carrier_code
+    - email_operative
+    - point_of_sale
+  DOUBLE_CAST:
+    - gross_revenue_eur
+    - eur_bags
+    - eur_seats
+    - eur_upgs
+    - eur_others
+    - revenue_avios
+  INT_CAST:
+    - num_bags
+    - num_seats
+    - num_upgs
+    - num_others
+    - mkt_permission
+    - is_corporate
+    - delayed_minutes_arrival
+  INDIRECT_CAST:
+    - flag_misconnection_misc
+    - flag_dng
+    - cancelled
+    - delayed_minutes_arrival
+  DATE_CAST:
+    - ticket_sale_date
+    - birth_date
+    - loc_dep_date
+    - loc_arr_date
+    - date_creation_idgoldenrecord
+    - date_creation_pnr_resiber
+  TARGET: churn
+  ID: cid
+ETL:
+  HAULS:
+    - SH
+    - MH
+    - LH
+  BLACK_LIST_AGENCIES:
+    - viaje
+    - trip
+    - flight
+    - viaxe
+    - halcon
+    - emisiones
+    - reserva
+    - booking
+    - billete
+    - travel
+    - tour
+    - venta
+    - agencia
+    - crew
+    - hotel
+    - viaggi
+    - junta
+    - xunta
+    - dreamgo
+    - enjoyebre
+    - airtip
+    - melisur
+    - ltnspain
+    - unififi
+    - triporate
+    - book
+    - fly
+    - viaja
+    - pentamundos
+    - vacaciones
+    - ndc-communication
+    - mundoterra
+    - embarcate
+    - agency
+    - grupogea
+    - vectalia
+    - partocrs
+    - '@airbus'
+    - '@aer'
+    - millenniummenorca
+    - '@reattiva'
+    - compras
+    - pasajes
+    - coniltur
+    - playasenator
+    - melillaexpress
+    - abramar
+    - rascadomarin
+    - revistaestretegas
+    - '@esky'
+    - confirmation
+    - '@calrom'
+    - confirmacion
+    - vacaciones
+    - turmar
+    - kanvoy
+    - vuelo
+    - undefined
+    - iberiaexpress
+    - gestion
+    - '@aer'
+    - '@ulysse'
+    - '@turatlantica'
+    - geographica
+    - geostar
+    - terminal9
+    - murimar
+    - hceivissa
+    - gaselec
+    - '@anjoca'
+    - grupogea
+    - betweencongresos
+    - protecmedia
+    - recepcion
+    - grupolesaca
+    - vacanze
+    - voyage
+    - pisamundavecindario
+    - administracion
+    - overture
+    - tierrasdelmundo
+    - planning
+    - properties
+    - vuela
+    - crucero
+    - '@dondetellevo'
+    - '@iberostar'
+    - nuevasrutas
+    - persiguiendoelviento
+    - viatges
+    - ticket
+    - airdepartment
+    - e-savia
+    - '@reedmackay'
+    - '@globalia'
+    - edreams.com
+    - '@trailfinders'
+  SPRING:
+    LIMITS:
+      - 80
+      - 172
+  SUMMER:
+    LIMITS:
+      - 172
+      - 264
+  FALL:
+    LIMITS:
+      - 264
+      - 355
+  ECONOMY_CLASS_VALUES:
+    - A
+    - B
+    - F
+    - G
+    - H
+    - K
+    - L
+    - M
+    - N
+    - O
+    - Q
+    - S
+    - V
+    - Y
+    - Z
+    - X
+  PREMIUM_CLASS_VALUES:
+    - E
+    - P
+    - T
+    - W
+  BUSINESS_CLASS_VALUES:
+    - C
+    - D
+    - I
+    - J
+    - R
+    - U
+  AGE_LIMIT:
+    - 0
+    - 100
+  WEEKEND:
+    - 1
+    - 7
+    - 6
+  WEEKDAY:
+    - 2
+    - 3
+    - 4
+    - 5
+  DELAY_LH: 30
+  DELAY_MH: 20
+  DELAY_SH: 15
+PREPROCESS:
+  CAT_ENCODER: cat_encoder.pkl
+  TARGET_ENCODER: target_encoder.pkl
+  BIN_AGE: 10
+  COLUMNS_TREND:
+    - gross_revenue_and_ancillaries
+  CAT_CONV:
+    - most_od_flown
+  VARIABLES_CCV:
+    - gross_revenue_sh_year1
+    - gross_revenue_mh_year1
+    - gross_revenue_lh_year1
+  FLOAT_CONV:
+    - ff_tier
+    - purchases_2015
+    - purchases_2016
+    - purchases_2017
+  TEST_SIZE: 0.2
+  VAL_TEST_SIZE: 0.5
+TRAIN:
+  MODEL_NAME: CatBoostClassifier
+  OPT_METRICS: f1-score
+  MODEL_NAME_SAVE: model_catboost.pkl
+  N_TRIALS: 50
+  EXTRA_FEATURES:
+  - age_bin
+  - most_od_flown_tg
+  ELIMINATE_FEATURES:
+    - age
+    - most_od_flown
+  CAT_FEATURES:
+    - ff_tier
+    - most_od_flown
+  BINARY_FEATURES:
+    - flag_ibplus
+    - is_corporate
+    - is_resident
+    - ind_direct_sale
+    - mkt_permission
+  DISCRETE_FEATURES:
+    - frequency
+    - n_ancillaries
+    - seniority
+    - last_purchase
+    - last2_purchase
+    - last3_purchase
+    - last_flight
+    - n_exchanges
+    - n_not_travelled
+    - n_refunded
+    - purchases_2015
+    - purchases_2016
+    - purchases_2017
+    - last_spent
+    - n_destination_city_od
+  CONT_FEATURES:
+    - num_days_anticipation
+    - num_hours_in_destination
+    - loc_dep_weekend
+    - ow_flights
+    - gross_revenue_and_ancillaries
+    - alone_flights
+    - couple_flights
+    - group_flights
+    - summer_flights
+    - winter_flights
+    - fall_flights
+    - spring_flights
+    - sh_haul
+    - mh_haul
+    - lh_haul
+    - economy
+    - premium
+    - business
+    - mean_deviation_flight_spent
+    - max_minutes_delay_arr_year1
+    - revenue_avios
+    - IB_pctg
+    - mean_spend_year3
+    - mean_spend_year2
+    - mean_spend_year1
+    - trend1_gross_revenue_and_ancillaries
+    - trend2_gross_revenue_and_ancillaries
+    - last_purchase1_2
+    - last_purchase2_3
+    - age
+PREDICT:
+  COLUMNS_RENAME:
+    gross_revenue_sh_year1: ccv_sh
+    gross_revenue_mh_year1: ccv_mh
+    gross_revenue_lh_year1: ccv_lh
+  COLUMNS_SAVE:
+    - cid
+    - ccv
+    - ccv_sh
+    - ccv_mh
+    - ccv_lh
+    - churn_probability
+    - insert_date_ci

@@ -1,0 +1,162 @@
+GENERAL:
+  BL_MAPPING:
+    Business: 1
+    Leisure: 0
+  BL_TARGET_COL: bl_reason
+  BLV_TARGET_COL: blv_reason
+  KEY_COLUMNS:
+    - cid_analytical
+    - pnr_resiber
+    - date_creation_pnr_resiber
+    - prime_ticket_num
+    - ticketing_carrier
+  DESTINATION_TIMES_NAME: feat_times_destination
+  TRAVEL_TIMES_NAME: feat_travel_times
+  DESTINATION_TIMES_LQ_NAME: feat_times_destination_last_quarter
+  TRAVEL_TIMES_LQ_NAME: feat_times_travel_last_quarter
+  NON_WORKING_MAILS_NAME: feat_is_working_mail
+  COMPANION_NUMBER_NAME: feat_companion_number
+  HAUL_NAME: feat_haul
+  CLASS_NAME: feat_class
+  FARE_FAMILY_NAME: feat_fare_family
+  FLEX_FF_NAME: feat_flex_ff
+  IS_CORPORATE_NAME: feat_is_corporate
+  RESIDENT_NAME: feat_is_resident
+  TIER_NAME: feat_tier
+  SALES_CHANNEL_NAME: feat_sales_channel
+  WEEKDAY_NAME: feat_weekday_name
+  AVIOS_NAME: feat_avios_exchange
+  DAYS_IN_DESTINATION_NAME: feat_days_in_destination
+  DESTINATION_CITY_NAME: feat_destination
+  ORIGIN_CITY_NAME: feat_origin
+  ITINERARY_NAME: feat_itinerary
+  PAYMENT_NAME: feat_payment
+  BOARDPOINT_COUNTRY_CODE_NAME: feat_boarding_cc
+  OFFPOINT_COUNTRY_CODE_NAME: feat_offpoint_cc
+  DEPARTURE_TIME_NAME: feat_departure_time
+  BAGS_PAYMENT_NAME: feat_eur_bags
+  BAGS_NUMBER_NAME: feat_num_bags
+  SEATS_PAYMENT_NAME: feat_eur_seats
+  SEATS_NUMBER_NAME: feat_num_seats
+  BOARDING_AIRPORT_NAME: feat_boarding_airport
+  FLIGHT_ITINERARY_NAME: feat_itinerary_city
+  SCALES_NAME: feat_scales
+  CLOSE_HOLIDAYS_NAME: feat_close_holidays
+  CAT_COMPANION_NUMBER_NAME: feat_category_companion_number
+  BOOL_COMPANION_NUMBER_NAME: feat_tf_companion
+  BOOL_DESTINATION_TIMES_NAME: feat_tf_times_destination
+  BOOL_DESTINATION_TIMES_LQ_NAME: feat_tf_times_travel_last_quarter
+  WEEKNUM_NAME: feat_weeknum
+  MONTH_NAME: feat_month
+  YEAR_NAME: feat_year
+  TIME_FLIGHT_NAME: feat_time_flight
+  FIRST_TRAVEL_NAME: feat_is_first_travel
+  PCT_REP_VS_TRAVELS_NAME: feat_pct_rep_vs_travels
+  PCT_REP3M_VS_REP_NAME: feat_pct_last3m_over_total_reps
+  PCT_IATA_BUSINESS_NAME: feat_business_iata_pct
+  PCT_IATA_LEISURE_NAME: feat_leisure_iata_pct
+  PCT_IATA_VFR_NAME: feat_vfr_iata_pct
+  PREDICT_COLUMN_NAME: prediction
+  SAVING_MODEL_NAME: clf
+ETL_STEP:
+  NON_WORKING_MAILS_VALUES:
+    - gmail
+    - hotmail
+    - yahoo
+    - outlook
+    - icloud
+    - live
+    - me
+    - msn
+    - web
+  ECONOMY_CLASS_VALUES:
+    - A
+    - B
+    - F
+    - G
+    - H
+    - K
+    - L
+    - M
+    - N
+    - O
+    - Q
+    - S
+    - V
+    - Y
+    - Z
+    - X
+  PREMIUM_CLASS_VALUES:
+    - E
+    - P
+    - T
+    - W
+  BUSINESS_CLASS_VALUES:
+    - C
+    - D
+    - I
+    - J
+    - R
+    - U
+PREPROCESS_STEP:
+  IMPUTER_MODEL_NAME: null_imputer
+  ENCODER_MODEL_NAME: categorical_encoder
+  IATA_FILENAME: iata_pct
+  BOARDING_AIRPORT_MAPPING:
+    HR:
+      - DBV
+      - SPU
+      - ZAG
+  VACATION_RANGE_DAYS: 3
+  CLOSE_HOLIDAYS_VALUES:
+    0: No close holidays
+    1: Close holidays
+  SCALES_VALUES:
+    0: No scales
+    1: Scales
+  NON_WORKING_MAILS_VALUES:
+    0: Personal mail
+    1: Working mail
+  CAT_COMPANION_NUMBER_VALUES:
+    0: Alone
+    1: One companion
+    2: Small group
+    3: Small group
+    __missing__: Group
+  BOOL_COMPANION_NUMBER_VALUES:
+    0: Travel alone
+    1: Travel accompanied
+  RESIDENT_VALUES:
+    0: No resident
+    1: Resident
+  AVIOS_VALUES:
+    0: No avios exchange
+    1: Avios exchange
+  BAGS_NUMBER_VALUES:
+    0: No bags
+    1: Bags
+  SEATS_NUMBER_VALUES:
+    0: No seats
+    1: Seats
+  BOOL_DESTINATION_TIMES_VALUES:
+    0: First destination travel
+    1: Repeated destination
+  TIME_FLIGHT_VALUES:
+    labels:
+      - Night
+      - Morning
+      - Afternoon
+      - Evening
+    bins:
+      - 0
+      - 6
+      - 12
+      - 18
+      - 23
+  FIRST_TRAVEL_VALUES:
+    0: Has travel before
+    1: First travel
+TRAIN_STEP:
+  CLASSIFIER_NAME: "RandomForestClassifier"
+EVALUATION_STEP:
+  MIN_GROWTH_RATE: 0.5

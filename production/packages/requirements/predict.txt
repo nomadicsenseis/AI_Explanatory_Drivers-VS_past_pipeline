@@ -1,0 +1,9 @@
+scikit-learn==1.2.0
+catboost==1.1.1
+lightgbm==3.3.4
+imbalanced-learn==0.10.1
+pyarrow==10.0.1
+fsspec==2021.8.1
+s3fs==0.4.2
+fastparquet==2022.12.0
+PyYAML==6.0
