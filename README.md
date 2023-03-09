@@ -180,6 +180,20 @@ These are the main SparkMagic commands, and together they provide an efficient a
 
 ##### Tips
 
+Amazon EMR is a distributed data processing service that enables users to process large amounts of data using frameworks such as Apache Spark and Hadoop. Amazon SageMaker, on the other hand, is a fully managed service that helps developers create, train and deploy high-quality machine learning models. Here are some tips for using Amazon EMR from Amazon SageMaker:
+
+Use Amazon EMR Notebooks - Amazon EMR Notebooks is a service that allows users to create and run Jupyter notebooks on an EMR cluster. This means you can run code in Spark or Hadoop on the same EMR cluster you are working on, which reduces latency and improves performance. In addition, you can create an EMR cluster directly from Amazon SageMaker and then connect to it from an EMR notebook.
+
+Use EMR Studio: EMR Studio is a web development environment that enables users to create, develop and run big data-based applications. By using EMR Studio, users can connect directly to their EMR cluster and run code in Spark or Hadoop. EMR Studio is an ideal choice for those who prefer a graphical user interface instead of a command line.
+
+Use the Boto3 SDK: The Boto3 SDK is a Python library that allows developers to interact with AWS services. Using the Boto3 SDK, users can connect to their EMR cluster and run code in Spark or Hadoop directly from Python. This is especially useful for those who prefer to write code in Python rather than Scala or Java.
+
+Use SageMaker's integration with EMR: Amazon SageMaker integrates seamlessly with EMR, which means you can use EMR to preprocess your data before training your models in SageMaker. To use this integration, you need to create an EMR cluster and load your data into it. You can then use Spark or Hadoop to preprocess your data and store it in Amazon S3. Then, you can use SageMaker to train your models using the preprocessed data.
+
+In summary, Amazon EMR and Amazon SageMaker are two powerful services that complement each other to enable users to process large amounts of data and train high-quality machine learning models. By using the tips above, you can take full advantage of these tools and improve the efficiency of your big data and machine learning workflows.
+
+TODO: Meter tips mas especificos
+
 ### Plotting
 
 In Amazon SageMaker, users can generate graphs and visualizations to explore and understand their training data and machine learning models. This can be done using different visualization tools and libraries, such as Matplotlib, Seaborn, Plotly, among others.
