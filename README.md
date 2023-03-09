@@ -125,6 +125,12 @@ Resource issues: Some libraries may require a large amount of resources to funct
 
 These are some of the most common problems a user may encounter when trying to install libraries in SageMaker. To resolve these problems, it is important to investigate the error message, review the documentation and consult the user community.
 
+Additionally, it is recommended to check for updates and compatibility with the latest versions of libraries and technologies before installing. It may also be helpful to use a virtual environment or container to isolate the installation of libraries from other projects.
+
+Finally, to avoid potential issues with library installation in SageMaker, it is a best practice to document the libraries and their versions used in a project, and to save them in a requirements.txt file. This can help ensure that the same libraries and versions are used consistently across different environments and projects.
+
+In summary, installing libraries in SageMaker can be a straightforward process using the !pip install command, but it is important to be aware of potential issues such as insufficient permissions, dependency conflicts, internet connection problems, compatibility issues, and resource issues. By understanding these issues and following best practices, developers can successfully install the required libraries and build high-quality machine learning models in SageMaker.
+
 ##### Tips
 
 #### Distributed based [EMR]
