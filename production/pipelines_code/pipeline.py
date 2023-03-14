@@ -1,5 +1,13 @@
 """
-Pipeline definition for BLV model.
+This is a template for a pipeline definition.
+
+The pipeline is defined using the sagemaker Python SDK, and it consists of several steps that execute
+a sequence of processing and training jobs to produce a trained model.
+
+The pipeline can takes several parameters, including the region where the pipeline will be executed,
+the name of the pipeline, a base job prefix, an IAM role, a default S3 bucket, and more user defined parameters.
+
+The pipeline can be formed with multiple steps.
 """
 import logging
 import sagemaker
@@ -23,44 +31,42 @@ from sagemaker.workflow.properties import PropertyFile
 from sagemaker.workflow.step_collections import RegisterModel
 from sagemaker.workflow.steps import ProcessingStep, TrainingStep
 
+# This is necessary to ensure that all relative paths in the project are resolved correctly and
+# to avoid errors related to incorrect file references.
 BASE_DIR = dirname(realpath(f"{__file__}{sep}{pardir}"))
 chdir(BASE_DIR)
 
-MIN_ROW_NUMBER = "160000000"
 
-def get_pipeline(
+def set_pipeline_definition(
     region: str,
     pipeline_name: str,
     base_job_prefix: str,
     role: Optional[str] = None,
     default_bucket: Optional[str] = None,
 ) -> Pipeline:
-    """Pipeline definition."""
+    """TODO: DS"""
+
+    # INITIALIZE THE VARIABLES
+    # Sets the session and the execution role.
     sagemaker_session = utils.get_session(region=region, default_bucket=default_bucket)
     if role is None:
         role = get_execution_role(sagemaker_session)
-    # Parameters for pipeline execution
+
+    # These parameters are the ones that the pipeline needs to execute. They are the parameters that will be used
+    # the different execution steps that are defined.
+    # TIP: Although there are different types of parameters such as ParameterString or ParameterInteger,
+    # for those parameters that are going to be arguments of execution steps, it is necessary that
+    # they be of type ParameterString and of type ParameterString and then in the execution
+    # code itself change the type if necessary.
     processing_instance_count = ParameterInteger(name="processing_instance_count", default_value=3)
-    param_str_execution_date = ParameterString(name="str_execution_date", default_value="2023-03-01")
-    param_s3_bucket = ParameterString(name="s3_bucket",default_value="iberia-data-lake")
-    param_s3_path_read = ParameterString(name="s3_path_read")
-    param_s3_path_write = ParameterString(name="s3_path_write")
-    param_is_last_date = ParameterString(name="is_last_date", default_value="1")
-    param_use_type = ParameterString(name="use_type")
-    param_trials = ParameterString(name="trials", default_value="1")
-    param_is_retrain_required = ParameterString(name="is_retrain_required", default_value="1")
-    train_predict_condition = ConditionEquals(left=param_use_type, right="train")
-    # -------------------------------------------
-    configuration = utils.read_config_data()
-    pyspark_properties = {
-        key.replace("_", "."): value
-        for key, value in configuration.get("PYSPARK").items()
-    }
-    # Pyspark Configuration
-    pyspark_config = [
-        {"Classification": "spark-defaults", "Properties": pyspark_properties}
-    ]
-    # Procesors used in the executions
+    is_for_predict = ParameterString(name="is_for_predict", default_value="0")
+    execution_date = ParameterString(name="str_execution_date")
+    s3_bucket = ParameterString(name="s3_bucket", default_value="iberia-data-lake")
+    s3_key_data_source = ParameterString(name="s3_key_data_source")
+    s3_key = ParameterString(name="s3_path_write")
+    train_condition = ConditionEquals(left=is_for_predict, right="0")
+
+    # Within this class are the different types of instances that can be raised.
     processors = utils.Processors(
         base_job_prefix=base_job_prefix,
         role=role,
@@ -68,347 +74,149 @@ def get_pipeline(
         instance_type="ml.m5.4xlarge",
         sagemaker_session=sagemaker_session,
     )
-    # train_processors = utils.Processors(
-    #     base_job_prefix=base_job_prefix,
-    #     role=role,
-    #     instance_type="ml.m5.4xlarge",
-    #     instance_count=processing_instance_count,
-    #     sagemaker_session=sagemaker_session,
-    # )
 
-    # ETL ERRORS
-    pyspark_processor = processors.pyspark()
-    etl_errors_step_pyspark_args = pyspark_processor.get_run_args(
-        submit_app=path_join(BASE_DIR, "code", "etl_errors.py"),
-        submit_py_files=[
-            path_join(BASE_DIR, "packages", "utils.py"),
-        ],
-        arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_read",
-            param_s3_path_read,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--is_last_date",
-            param_is_last_date,
-            "--min_row_number",
-            MIN_ROW_NUMBER
-        ],
-        configuration=pyspark_config,
-    )
-    etl_errors_step = ProcessingStep(
-        name="etl_errors_step",
-        processor=pyspark_processor,
-        inputs=etl_errors_step_pyspark_args.inputs,
-        outputs=etl_errors_step_pyspark_args.outputs,
-        job_arguments=etl_errors_step_pyspark_args.arguments,
-        code=etl_errors_step_pyspark_args.code,
-    )
+    # CREATE STEPS
+    # One of the steps that can be used are to generate ETLs. These use PySpark, and in order to be able to
+    # run them properly you first have to define the PySpark configuration. The properties
+    # that can be changed can be seen here https://spark.apache.org/docs/latest/configuration.html.
+    # These properties are defined in a config.yml file on the same path as this pipeline.py file.
+    # Inside the config.yml file there is a key named PYSPARK, and it is under this where you can
+    # define the properties that we want the machine that is going to execute PySpark code to have.
+    # It is necessary to take into account that the names of the properties come with ".", these have to be substituted
+    # by "_" so that there are no errors of malformation of the file.
+    configuration = utils.read_config_data()
+    pyspark_properties = {
+        key.replace("_", "."): value
+        for key, value in configuration.get("PYSPARK").items()
+    }
+    pyspark_config = [
+        {"Classification": "spark-defaults", "Properties": pyspark_properties}
+    ]
 
-    # ETL
+    # ETL STEP
     pyspark_processor = processors.pyspark()
-    etl_step_pyspark_args = pyspark_processor.get_run_args(
+    etl_step_args = pyspark_processor.get_run_args(
         submit_app=path_join(BASE_DIR, "code", "etl.py"),
         submit_py_files=[
             path_join(BASE_DIR, "packages", "utils.py"),
             path_join(BASE_DIR, "packages", "etl_utils.py"),
-        ],
-        submit_files=[path_join(BASE_DIR, "packages", "config.yml")],
+        ],  # This argument is for passing Python files.
+        submit_files=[path_join(BASE_DIR, "packages", "config.yml")],  # This argument is for passing text files.
         arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_read",
-            param_s3_path_read,
-            "--s3_path_write",
-            param_s3_path_write,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--is_last_date",
-            param_is_last_date,
-            "--use_type",
-            param_use_type,
-        ],
+            "--s3_bucket", s3_bucket,
+            "--s3_key_data_source", s3_key_data_source,
+            "--s3_key", s3_key,
+            "--execution_date", execution_date,
+            "--is_for_predict", is_for_predict,
+        ],  # This argument is to pass the arguments to the executable.
         configuration=pyspark_config,
     )
     etl_step = ProcessingStep(
         name="etl_step",
-        depends_on=["etl_errors_step"],
         processor=pyspark_processor,
-        inputs=etl_step_pyspark_args.inputs,
-        outputs=etl_step_pyspark_args.outputs,
-        job_arguments=etl_step_pyspark_args.arguments,
-        code=etl_step_pyspark_args.code,
+        inputs=etl_step_args.inputs,
+        outputs=etl_step_args.outputs,
+        job_arguments=etl_step_args.arguments,
+        code=etl_step_args.code,
     )
 
-    # PREPROCESS TRAIN
+    # PREPROCESS STEP
     framework_processor = processors.framework()
-    train_preprocess_step_args = framework_processor.get_run_args(
+    preprocess_args = framework_processor.get_run_args(
         code=path_join(BASE_DIR, "code", "preprocess.py"),
         dependencies=[
             path_join(BASE_DIR, "packages", "utils.py"),
             path_join(BASE_DIR, "packages", "config.yml"),
             path_join(BASE_DIR, "packages", "requirements", "preprocess.txt")
-        ],
+        ],  # This argument is for passing needed files.
         arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_write",
-            param_s3_path_write,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--use_type",
-            param_use_type,
-        ],
+            "--s3_bucket", s3_bucket,
+            "--s3_key", s3_key,
+            "--execution_date", execution_date,
+            "--is_for_predict", is_for_predict,
+        ],  # This argument is to pass the arguments to the executable.
     )
-    train_preprocess_step = ProcessingStep(
-        name="train_preprocess_step",
+    preprocess_step = ProcessingStep(
+        name="preprocess_step",
+        depends_on=["etl_step"],  # This argument is to create links between steps. Create an execution graph.
         processor=framework_processor,
-        inputs=train_preprocess_step_args.inputs,
-        outputs=train_preprocess_step_args.outputs,
-        job_arguments=train_preprocess_step_args.arguments,
-        code=train_preprocess_step_args.code,
-    )
-
-    # PREPROCESS PREDICT
-    framework_processor = processors.framework()
-    predict_preprocess_step_args = framework_processor.get_run_args(
-        code=path_join(BASE_DIR, "code", "preprocess.py"),
-        dependencies=[
-            path_join(BASE_DIR, "packages", "utils.py"),
-            path_join(BASE_DIR, "packages", "config.yml"),
-            path_join(BASE_DIR, "packages", "requirements", "preprocess.txt"),
-        ],
-        arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_write",
-            param_s3_path_write,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--use_type",
-            param_use_type,
-            "--is_last_date",
-            param_is_last_date,
-        ],
-    )
-    predict_preprocess_step = ProcessingStep(
-        name="predict_preprocess_step",
-        processor=framework_processor,
-        inputs=predict_preprocess_step_args.inputs,
-        outputs=predict_preprocess_step_args.outputs,
-        job_arguments=predict_preprocess_step_args.arguments,
-        code=predict_preprocess_step_args.code,
-    )
-
-    # TRAIN AUX
-    framework_processor = processors.framework()
-    train_step_args = framework_processor.get_run_args(
-        code=path_join(BASE_DIR, "code", "train.py"),
-        dependencies=[
-            path_join(BASE_DIR, "packages", "config.yml"),
-            path_join(BASE_DIR, "packages", "train_utils.py"),
-            path_join(BASE_DIR, "packages", "requirements", "train.txt"),
-            path_join(BASE_DIR, "packages", "utils.py"),
-            path_join(BASE_DIR, "packages", "plots.py"),
-        ],
-        arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_write",
-            param_s3_path_write,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--is_last_date",
-            param_is_last_date,
-        ],
-    )
-    train_step = ProcessingStep(
-        name="train_step",
-        depends_on=["train_preprocess_step"],
-        processor=framework_processor,
-        inputs=train_step_args.inputs,
-        outputs=train_step_args.outputs,
-        job_arguments=train_step_args.arguments,
-        code=train_step_args.code,
+        inputs=preprocess_args.inputs,
+        outputs=preprocess_args.outputs,
+        job_arguments=preprocess_args.arguments,
+        code=preprocess_args.code,
     )
 
     # TRAIN
-    training_estimator_parameters = {
+    training_parameters = {
         "entry_point": path_join(BASE_DIR, "code", "train.py"),
         "dependencies": [
             path_join(BASE_DIR, "packages", "config.yml"),
             path_join(BASE_DIR, "packages", "train_utils.py"),
             path_join(BASE_DIR, "packages", "requirements", "train.txt"),
             path_join(BASE_DIR, "packages", "utils.py"),
-            path_join(BASE_DIR, "packages", "plots.py"),
-        ],
+        ],  # This argument is for passing needed files.
         "py_version": "py3",
         "role": role,
         "instance_count": 1,
         "instance_type": "ml.m5.4xlarge",
         "framework_version": "1.0-1",
         "base_job_name": f"{base_job_prefix}/sklearn_estimator",
-        "container_log_level": logging.INFO,
+        "container_log_level": logging.INFO,  # Important to see the logs on CloudWatch later.
         "hyperparameters": {
-            "s3_bucket": param_s3_bucket,
-            "s3_path_write": param_s3_path_write,
-            "str_execution_date": param_str_execution_date,
-            "is_last_date": param_is_last_date,
-        },
+            "s3_bucket": s3_bucket,
+            "s3_key": s3_key,
+            "execution_date": execution_date,
+            "is_for_predict": is_for_predict,
+        },  # This argument is to pass the arguments to the executable.
     }
-    sklearn_estimator = SKLearn(**training_estimator_parameters)
-    training_step = TrainingStep(
-        name="training_step", estimator=sklearn_estimator# , depends_on=["train_preprocess_step"]
-    )
-    #
-    # # EVALUATION
-    # train_step_evaluation_report = PropertyFile(
-    #     name="train_step_evaluation_report",
-    #     output_name="train_step_evaluation_report",
-    #     path="train_step_evaluation_report.json",
-    # )
-    # framework_processor = processors.framework()
-    # evaluation_step_args = framework_processor.get_run_args(
-    #     code=path_join(BASE_DIR, "code", "evaluation.py"),
-    #     dependencies=[
-    #         path_join(BASE_DIR, "packages", "utils.py"),
-    #         path_join(BASE_DIR, "packages", "config.yml"),
-    #         path_join(BASE_DIR, "packages", "requirements", "evaluation.txt"),
-    #     ],
-    #     arguments=[
-    #         "--s3_bucket",
-    #         param_s3_bucket,
-    #         "--s3_path",
-    #         param_s3_path,
-    #         "--str_execution_date",
-    #         param_str_execution_date,
-    #         "--is_last_date",
-    #         param_is_last_date,
-    #         "--model_type",
-    #         param_model_type,
-    #         "--is_retrain_required",
-    #         param_is_retrain_required
-    #     ],
-    #     outputs=[
-    #         ProcessingOutput(
-    #             output_name="train_step_evaluation_report",
-    #             source="/opt/ml/processing/train_step_evaluation_report",
-    #         )
-    #     ],
-    # )
-    # evaluation_step = ProcessingStep(
-    #     name="evaluation_step",
-    #     depends_on=["training_step"],
-    #     processor=framework_processor,
-    #     inputs=evaluation_step_args.inputs,
-    #     outputs=evaluation_step_args.outputs,
-    #     job_arguments=evaluation_step_args.arguments,
-    #     code=evaluation_step_args.code,
-    #     property_files=[train_step_evaluation_report],
-    # )
-    # model_metrics = ModelMetrics(
-    #     model_statistics=MetricsSource(
-    #         content_type="application/json",
-    #         s3_uri=f"{evaluation_step.arguments['ProcessingOutputConfig']['Outputs'][0]['S3Output']['S3Uri']}/train_step_evaluation_report.json",
-    #     )
-    # )
-    # register_step = RegisterModel(
-    #     name="register_step",
-    #     estimator=sklearn_estimator,
-    #     model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
-    #     depends_on=["evaluation_step"],
-    #     response_types=["text/csv"],
-    #     content_types=["text/csv"],
-    #     approval_status="Approved",
-    #     model_metrics=model_metrics,
-    #     domain="MACHINE_LEARNING",
-    #     task="CLASSIFICATION",
-    #     model_package_group_name=f"{pipeline_name}-package-group",
-    # )
+    sklearn_estimator = SKLearn(**training_parameters)
+    training_step = TrainingStep(name="training_step", estimator=sklearn_estimator)
+
     # PREDICT
     framework_processor = processors.framework()
-    predict_step_args = framework_processor.get_run_args(
+    predict_args = framework_processor.get_run_args(
         code=path_join(BASE_DIR, "code", "predict.py"),
         dependencies=[
             path_join(BASE_DIR, "packages", "utils.py"),
             path_join(BASE_DIR, "packages", "config.yml"),
             path_join(BASE_DIR, "packages", "requirements", "predict.txt"),
-        ],
+        ],  # This argument is for passing needed files.
         arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_write",
-            param_s3_path_write,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--is_last_date",
-            param_is_last_date,
-        ],
+            "--s3_bucket", s3_bucket,
+            "--s3_key", s3_key,
+            "--execution_date", execution_date,
+            "--is_for_predict", is_for_predict,
+        ],  # This argument is to pass the arguments to the executable.
     )
     predict_step = ProcessingStep(
         name="predict_step",
-        depends_on=["predict_preprocess_step"],
         processor=framework_processor,
-        inputs=predict_step_args.inputs,
-        outputs=predict_step_args.outputs,
-        job_arguments=predict_step_args.arguments,
-        code=predict_step_args.code,
-    )
-
-    # EXPLAINER
-    framework_processor = processors.framework()
-    explainer_step_args = framework_processor.get_run_args(
-        code=path_join(BASE_DIR, "code", "explainer.py"),
-        dependencies=[
-            path_join(BASE_DIR, "packages", "utils.py"),
-            path_join(BASE_DIR, "packages", "config.yml"),
-            path_join(BASE_DIR, "packages", "requirements", "explainer.txt"),
-        ],
-        arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_write",
-            param_s3_path_write,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--is_last_date",
-            param_is_last_date,
-        ],
-    )
-    explainer_step = ProcessingStep(
-        name="explainer_step",
-        depends_on=["train_step"],
-        processor=framework_processor,
-        inputs=explainer_step_args.inputs,
-        outputs=explainer_step_args.outputs,
-        job_arguments=explainer_step_args.arguments,
-        code=explainer_step_args.code,
+        inputs=predict_args.inputs,
+        outputs=predict_args.outputs,
+        job_arguments=predict_args.arguments,
+        code=predict_args.code,
     )
 
     # CONDITION STEP
     condition_step = ConditionStep(
         name="condition_step",
-        depends_on=["etl_step"],
-        conditions=[train_predict_condition],
-        if_steps=[train_preprocess_step, train_step, explainer_step],
-        else_steps=[predict_preprocess_step, predict_step],
+        depends_on=["preprocess_step"],
+        conditions=[train_condition],
+        if_steps=[training_step],
+        else_steps=[predict_step],
     )
-    # PIPELINE
+
+    # Pipeline definition
     pipeline = Pipeline(
         name=pipeline_name,
         parameters=[
             processing_instance_count,
-            param_str_execution_date,
-            param_s3_bucket,
-            param_s3_path_read,
-            param_s3_path_write,
-            param_is_last_date,
-            param_use_type,
-            param_trials,
-            param_is_retrain_required,
+            execution_date,
+            s3_bucket,
+            s3_key_data_source,
+            s3_key,
         ],
-        steps=[etl_step, condition_step],
+        steps=[etl_step, preprocess_step, condition_step],
         sagemaker_session=sagemaker_session,
     )
     return pipeline
