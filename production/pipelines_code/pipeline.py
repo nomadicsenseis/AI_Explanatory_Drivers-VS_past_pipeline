@@ -10,7 +10,6 @@ the name of the pipeline, a base job prefix, an IAM role, a default S3 bucket, a
 The pipeline can be formed with multiple steps.
 """
 import logging
-import sagemaker
 from os import chdir, pardir, sep
 from os.path import dirname
 from os.path import join as path_join
@@ -18,17 +17,12 @@ from os.path import realpath
 from typing import Optional
 
 from production.pipelines_code import utils
-from sagemaker.model_metrics import MetricsSource, ModelMetrics
-from sagemaker.processing import ProcessingOutput
 from sagemaker.session import get_execution_role
 from sagemaker.sklearn.estimator import SKLearn
-from sagemaker.estimator import Estimator
 from sagemaker.workflow.condition_step import ConditionStep
 from sagemaker.workflow.conditions import ConditionEquals
 from sagemaker.workflow.parameters import ParameterInteger, ParameterString
 from sagemaker.workflow.pipeline import Pipeline
-from sagemaker.workflow.properties import PropertyFile
-from sagemaker.workflow.step_collections import RegisterModel
 from sagemaker.workflow.steps import ProcessingStep, TrainingStep
 
 # This is necessary to ensure that all relative paths in the project are resolved correctly and
@@ -64,6 +58,9 @@ def set_pipeline_definition(
     s3_bucket = ParameterString(name="s3_bucket", default_value="iberia-data-lake")
     s3_key_data_source = ParameterString(name="s3_key_data_source")
     s3_key = ParameterString(name="s3_path_write")
+
+    # We are going to create a pipeline that can be used for both training and prediction.
+    # For this we need conditions such as ConditionEquals and ConditionSteps.
     train_condition = ConditionEquals(left=is_for_predict, right="0")
 
     # Within this class are the different types of instances that can be raised.
@@ -93,7 +90,7 @@ def set_pipeline_definition(
         {"Classification": "spark-defaults", "Properties": pyspark_properties}
     ]
 
-    # ETL STEP
+    # ETL step
     pyspark_processor = processors.pyspark()
     etl_step_args = pyspark_processor.get_run_args(
         submit_app=path_join(BASE_DIR, "code", "etl.py"),
@@ -120,7 +117,7 @@ def set_pipeline_definition(
         code=etl_step_args.code,
     )
 
-    # PREPROCESS STEP
+    # Preprocess step
     framework_processor = processors.framework()
     preprocess_args = framework_processor.get_run_args(
         code=path_join(BASE_DIR, "code", "preprocess.py"),
@@ -146,7 +143,9 @@ def set_pipeline_definition(
         code=preprocess_args.code,
     )
 
-    # TRAIN
+    # Train step
+    # Training steps have their own instance -> TrainingStep. However, you can use a
+    # ProcessingStep without problems. Here we are going to see how it would be to use the own instance of training.
     training_parameters = {
         "entry_point": path_join(BASE_DIR, "code", "train.py"),
         "dependencies": [
@@ -158,8 +157,8 @@ def set_pipeline_definition(
         "py_version": "py3",
         "role": role,
         "instance_count": 1,
-        "instance_type": "ml.m5.4xlarge",
-        "framework_version": "1.0-1",
+        "instance_type": "ml.m5.4xlarge",  # Type of machine used in this step.
+        "framework_version": "1.0-1",  # Framework version, in this case is the version of Scikit-learn.
         "base_job_name": f"{base_job_prefix}/sklearn_estimator",
         "container_log_level": logging.INFO,  # Important to see the logs on CloudWatch later.
         "hyperparameters": {
@@ -172,7 +171,7 @@ def set_pipeline_definition(
     sklearn_estimator = SKLearn(**training_parameters)
     training_step = TrainingStep(name="training_step", estimator=sklearn_estimator)
 
-    # PREDICT
+    # Predict step
     framework_processor = processors.framework()
     predict_args = framework_processor.get_run_args(
         code=path_join(BASE_DIR, "code", "predict.py"),
@@ -197,7 +196,7 @@ def set_pipeline_definition(
         code=predict_args.code,
     )
 
-    # CONDITION STEP
+    # Condition step
     condition_step = ConditionStep(
         name="condition_step",
         depends_on=["preprocess_step"],
@@ -206,7 +205,7 @@ def set_pipeline_definition(
         else_steps=[predict_step],
     )
 
-    # Pipeline definition
+    # PIPELINE DEFINITION
     pipeline = Pipeline(
         name=pipeline_name,
         parameters=[
