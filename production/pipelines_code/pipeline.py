@@ -38,7 +38,25 @@ def set_pipeline_definition(
     role: Optional[str] = None,
     default_bucket: Optional[str] = None,
 ) -> Pipeline:
-    """TODO: DS"""
+    """
+    Sets up an AWS SageMaker pipeline definition that can be used for both training and prediction.
+
+    Args:
+        region: The name of the AWS region to use.
+        pipeline_name: The name of the pipeline to create.
+        base_job_prefix: The base name of the SageMaker jobs that will be created.
+        role: The AWS IAM role to use for the pipeline execution. If not provided,
+            the execution role will be obtained from the AWS SageMaker session. Defaults to None.
+        default_bucket: The name of the default S3 bucket to use. If not provided,
+            the bucket will be obtained from the AWS SageMaker session. Defaults to None.
+
+    Returns:
+        Pipeline: The SageMaker pipeline definition.
+
+    Raises:
+        ValueError: If the provided `is_for_predict` value is not valid (i.e., not equal to "0" or "1").
+
+    """
 
     # INITIALIZE THE VARIABLES
     # Sets the session and the execution role.
