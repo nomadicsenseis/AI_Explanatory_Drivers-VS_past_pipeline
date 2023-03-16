@@ -388,6 +388,7 @@ Note: Before creating an endpoint, you must first create an endpoint configurati
 
 ## Production
 
+
 ### Project structure
 
 #### Exploratory data analysis (EDA)
@@ -395,6 +396,161 @@ Note: Before creating an endpoint, you must first create an endpoint configurati
 #### Develop
 
 #### Production
+
+Before deploying your model to Amazon SageMaker, it's essential to prepare it properly. In this section, we will cover the required steps in detail, along with code examples.
+
+2.1. Train and Save Your Model
+
+First, you need to train your model using your preferred machine learning framework (e.g., TensorFlow, PyTorch, or scikit-learn). After training, save your model in the required format for SageMaker. Most frameworks have built-in functions to save the model as a file.
+
+Example using TensorFlow:
+
+```
+import tensorflow as tf
+
+# Define and train your model
+model = tf.keras.Sequential([...])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.fit(train_data, train_labels, epochs=10, batch_size=32)
+
+# Save your trained model
+model.save('my_model.h5')
+
+```
+
+2.2. Convert Model to a SageMaker-Compatible Format
+
+Once your model is trained and saved, convert it to a format that can be used with SageMaker. For TensorFlow and PyTorch models, you can save the model as a .tar.gz file, while scikit-learn models need to be saved as a .joblib file.
+
+Example using TensorFlow:
+
+```
+import tarfile
+
+# Compress the TensorFlow model into a .tar.gz file
+with tarfile.open('my_model.tar.gz', 'w:gz') as tar:
+    tar.add('my_model.h5')
+```
+
+2.3. Create an Entry Point Script
+
+Create a script that serves as an entry point for your model. This script should include functions for loading the model, preprocessing input data, predicting with the model, and post-processing the output. Save this script as a separate file (e.g., inference.py).
+
+Example using TensorFlow:
+
+```
+# inference.py
+
+import json
+import tensorflow as tf
+
+_MODEL = None
+
+def model_fn(model_dir):
+    global _MODEL
+    _MODEL = tf.keras.models.load_model(f'{model_dir}/my_model.h5')
+    return _MODEL
+
+def input_fn(request_body, request_content_type):
+    if request_content_type == 'application/json':
+        input_data = json.loads(request_body)
+        return input_data
+    else:
+        raise ValueError('Content type must be application/json')
+
+def predict_fn(input_data, model):
+    return model.predict(input_data)
+
+def output_fn(prediction, response_content_type):
+    if response_content_type == 'application/json':
+        return json.dumps(prediction.tolist()), response_content_type
+    else:
+        raise ValueError('Content type must be application/json')
+```
+
+Creating a SageMaker Pipeline
+SageMaker Pipelines allows you to create, automate, and manage end-to-end machine learning workflows, from data preprocessing and model training to deployment.
+
+3.1. Define Pipeline Steps
+
+Start by defining the steps for your pipeline, such as data preprocessing, model training, and model deployment. Each step is defined using a SageMaker Python SDK class.
+
+Example using SageMaker Python SDK:
+
+```
+import boto3
+from sagemaker.sklearn.processing import SKLearnProcessor
+from sagemaker.processing import ProcessingInput, ProcessingOutput
+from sagemaker.workflow.steps import ProcessingStep, TrainingStep, CreateModelStep
+from sagemaker.workflow.pipeline import Pipeline
+
+# Define a data preprocessing step
+sklearn_processor = SKLearnProcessor(framework_version='0.23-1',
+                                     role=<your_sagemaker_role>,
+                                     instance_type='ml.m5.xlarge',
+                                     instance_count=1)
+
+preprocessing_step = ProcessingStep(
+    name='DataPreprocessing',
+    processor=sklearn_processor,
+    inputs=[ProcessingInput(source=<input_data_s3_path>,
+                            destination='/opt/ml/processing/input')],
+    outputs=[ProcessingOutput(output_name='train',
+                              source='/opt/ml/processing/output/train'),
+             ProcessingOutput(output_name='validation',
+                              source='/opt/ml/processing/output/validation')],
+    code='preprocessing.py'
+)
+
+# Define a model training step
+estimator = <your_sagemaker_estimator>
+
+training_step = TrainingStep(
+    name='ModelTraining',
+    estimator=estimator,
+    inputs={'train': sagemaker.inputs.TrainingInput(s3_data=preprocessing_step.properties.ProcessingOutputConfig.Outputs['train'].S3Output.S3)
+    content_type='text/csv'),
+    validation': sagemaker.inputs.TrainingInput(s3_data=preprocessing_step.properties.ProcessingOutputConfig.Outputs['validation'].S3Output.S3Uri, content_type='text/csv')
+}
+)
+
+Define a model creation step
+model_step = CreateModelStep(
+    name='CreateModel',
+    model_name=<model_name>,
+    model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
+    primary_container_image=<container_image>,
+    role=<your_sagemaker_role>
+)
+
+Define a model deployment step
+deploy_step = steps.EndpointStep(
+    name='DeployModel',
+    endpoint_name=<endpoint_name>,
+    model_name=model_step.properties.ModelName,
+    config_name=<endpoint_config_name>,
+    update=False
+)
+```
+
+
+Once you've defined the steps, assemble them into a pipeline and execute it using the SageMaker Python SDK.
+
+Example:
+```
+# Assemble the pipeline
+pipeline = Pipeline(
+    name=<pipeline_name>,
+    steps=[preprocessing_step, training_step, model_step, deploy_step]
+)
+
+# Execute the pipeline
+pipeline.upsert(role_arn=<your_sagemaker_role>)
+execution = pipeline.start()
+execution.wait()
+```
+
+These steps will create a SageMaker Pipeline that automates your machine learning workflow, from data preprocessing, model training, to deployment. The pipeline is defined and executed using the SageMaker Python SDK, making it easy to manage and monitor your end-to-end process.
 
 ### Continuous integration with GitLab
 
