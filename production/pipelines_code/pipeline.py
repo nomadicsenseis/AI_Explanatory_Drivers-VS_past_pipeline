@@ -91,6 +91,7 @@ def get_pipeline(
             "--use_type",
             param_use_type,
         ],
+        outputs=[],
         configuration=pyspark_config,
     )
     from sagemaker.workflow.properties import PropertyFile
