@@ -86,8 +86,6 @@ def get_pipeline(
             param_s3_path_write,
             "--str_execution_date",
             param_str_execution_date,
-            "--is_last_date",
-            param_is_last_date,
             "--use_type",
             param_use_type,
         ],
