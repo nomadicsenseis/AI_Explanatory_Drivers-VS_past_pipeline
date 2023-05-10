@@ -1,0 +1,36 @@
+stages:
+  - build
+create_or_update_sagemaker_ancilliaries_propension_bag_develop:
+  stage: build
+  image:
+    name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+    entrypoint: [""]
+  variables:
+    ENVIRONMENT: develop
+  only:
+    - develop
+  before_script:
+    - apt update
+    - apt install python3.8 -y
+    - apt install python3-pip -y
+  script:
+    - pip install boto3==1.24.80 sagemaker==2.109.0 PyYAML==6.0
+    - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR/production
+    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT
+create_or_update_sagemaker_ancilliaries_propension_bag_main:
+  stage: build
+  image:
+    name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+    entrypoint: [""]
+  variables:
+    ENVIRONMENT: production
+  only:
+    - main
+  before_script:
+    - apt update
+    - apt install python3.8 -y
+    - apt install python3-pip -y
+  script:
+    - pip install boto3==1.24.80 sagemaker==2.109.0 PyYAML==6.0
+    - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR/production
+    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT
