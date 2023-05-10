@@ -4,6 +4,7 @@ from pyspark import SparkFiles
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 import logging
+import json
 
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
 SAGEMAKER_LOGGER.setLevel(logging.INFO)
