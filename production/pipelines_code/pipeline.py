@@ -94,15 +94,14 @@ def get_pipeline(
         configuration=pyspark_config,
     )
 
-    output_log_etl = ProcessingOutput(
-        source='/opt/ml/processing/output/log.txt',
-        destination='s3://iberia-data-lake/sagemaker/sagemaker-template/logs/preprocess/etl',
-    )
     etl_step = ProcessingStep(
         name="etl_step",
         processor=pyspark_processor,
         inputs=etl_step_pyspark_args.inputs,
-        outputs=[etl_step_pyspark_args.outputs,output_log_etl],
+        outputs=[etl_step_pyspark_args.outputs,
+                 ProcessingOutput(
+                    source='/opt/ml/processing/output/log.txt')
+                 ],
         job_arguments=etl_step_pyspark_args.arguments,
         code=etl_step_pyspark_args.code,
     )
@@ -159,16 +158,14 @@ def get_pipeline(
         ],
     )
 
-    output_log_preprocess = ProcessingOutput(
-        source='/opt/ml/processing/output/log.txt',
-        destination='s3://iberia-data-lake/sagemaker/sagemaker-template/logs/preprocess/log',
-    )
-
     predict_preprocess_step = ProcessingStep(
         name="predict_preprocess_step",
         processor=framework_processor,
         inputs=predict_preprocess_step_args.inputs,
-        outputs=[predict_preprocess_step_args.outputs,output_log_preprocess],
+        outputs=[predict_preprocess_step_args.outputs,
+                 ProcessingOutput(
+                    source='/opt/ml/processing/output/log.txt')
+                 ],
         job_arguments=predict_preprocess_step_args.arguments,
         code=predict_preprocess_step_args.code,
     )
