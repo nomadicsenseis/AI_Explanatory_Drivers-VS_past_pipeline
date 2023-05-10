@@ -96,16 +96,18 @@ def get_pipeline(
     from sagemaker.workflow.properties import PropertyFile
     from sagemaker.workflow.steps import ProcessingStep
 
-    sagemaker.processing.ProcessingOutput(output_name="log", source="/opt/ml/processing/log/log.json")
-
+    log_output = sagemaker.processing.ProcessingOutput(
+        output_name="log",
+        source="/opt/ml/processing/log",
+        destination=f"s3://iberia-data-lake/sagemaker/sagemaker-template/logs",  # Reemplaza con tu bucket y prefix de S3
+        app_managed=False
+    )
     evaluation_report = PropertyFile(
         name="log",
         output_name="log",
-        path="/opt/ml/processing/log/log.json"
+        path="log.json"
     )
-
-
-
+    etl_step_pyspark_args.outputs.append(log_output)  # Añade el output a la lista de outputs
     etl_step = ProcessingStep(
         name="etl_step",
         processor=pyspark_processor,
