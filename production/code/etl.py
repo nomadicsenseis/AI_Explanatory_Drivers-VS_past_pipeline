@@ -76,7 +76,7 @@ def create_spark_session() -> SparkSession:
 if __name__ == "__main__":
     """Main functionality of the script."""
     report_dict = {'esto': 'prueba'}  # your report
-    evaluation_path = "/opt/ml/processing/output/log.json"
+    evaluation_path = "/opt/ml/processing/log/log.json"
 
     with open(evaluation_path, "w") as f:
         f.write(json.dumps(report_dict))
