@@ -76,7 +76,21 @@ def create_spark_session() -> SparkSession:
 
 if __name__ == "__main__":
     """Main functionality of the script."""
-    report_dict = {'esto': 'prueba'}  # your report
+    report_dict = [
+      {
+        "MetricName": "accuracy",
+        "Value": 0.78
+      },
+      {
+        "MetricName": "precision",
+        "Value": 0.76
+      },
+      {
+        "MetricName": "recall",
+        "Value": 0.69
+      }
+    ]
+  # your report
     evaluation_path = "/opt/ml/processing/log/log.json"
 
     with open(evaluation_path, "w") as f:
