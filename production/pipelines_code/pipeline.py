@@ -183,7 +183,6 @@ def get_pipeline(
             path_join(BASE_DIR, "packages", "config.yml"),
             path_join(BASE_DIR, "packages", "requirements", "train.txt"),
             path_join(BASE_DIR, "packages", "utils.py"),
-            path_join(BASE_DIR, "packages", "plots.py"),
         ],
         arguments=[
             "--s3_bucket",
@@ -213,7 +212,6 @@ def get_pipeline(
             path_join(BASE_DIR, "packages", "config.yml"),
             path_join(BASE_DIR, "packages", "requirements", "train.txt"),
             path_join(BASE_DIR, "packages", "utils.py"),
-            path_join(BASE_DIR, "packages", "plots.py"),
         ],
         "py_version": "py3",
         "role": role,
