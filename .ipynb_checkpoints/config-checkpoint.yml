@@ -1,3 +1,0 @@
-MODEL_VERSION: sagemaker_template
-VERTICAL: customer
-SAGEMAKER_ROLE: arn:aws:iam::077156906314:role/ibdata-aip-role-sagemaker-customer-user
