@@ -96,11 +96,16 @@ def get_pipeline(
     from sagemaker.workflow.properties import PropertyFile
     from sagemaker.workflow.steps import ProcessingStep
 
+    sagemaker.processing.ProcessingOutput(output_name="log", source="/opt/ml/processing/log/log.json")
+
     evaluation_report = PropertyFile(
         name="log",
         output_name="log",
-        path="log.json"
+        json_path="/opt/ml/processing/log/log.json"
     )
+
+
+
     etl_step = ProcessingStep(
         name="etl_step",
         processor=pyspark_processor,
