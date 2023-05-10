@@ -4,11 +4,13 @@ from pyspark import SparkFiles
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
 import logging
+
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
 SAGEMAKER_LOGGER.setLevel(logging.INFO)
 SAGEMAKER_LOGGER.addHandler(logging.StreamHandler())
 
 STEP = "ETL"
+
 
 # We define the Arguments class that inherits from the AbstractArguments abstract class.
 class Arguments(utils.AbstractArguments):
@@ -70,16 +72,14 @@ def create_spark_session() -> SparkSession:
     # Return the Spark session
     return spark
 
+
 if __name__ == "__main__":
-
     """Main functionality of the script."""
+    report_dict = {'esto': 'prueba'}  # your report
+    evaluation_path = "/opt/ml/processing/output/log.json"
 
-    # Crea un manejador de archivos que escriba los logs a un archivo
-    file_handler = logging.FileHandler('/opt/ml/processing/output/log.txt')
-    file_handler.setLevel(logging.INFO)
-
-    # Añade el manejador de archivos al logger
-    SAGEMAKER_LOGGER.addHandler(file_handler)
+    with open(evaluation_path, "w") as f:
+        f.write(json.dumps(report_dict))
 
     # Arguments
     SAGEMAKER_LOGGER.info("userlog: Starting %s step...", STEP)
@@ -117,4 +117,3 @@ if __name__ == "__main__":
     save_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/titanic.csv"
     SAGEMAKER_LOGGER.info("userlog: Saving information for etl step in %s.", save_path)
     df.coalesce(1).write.option("header", "true").mode("overwrite").csv(save_path)
-
