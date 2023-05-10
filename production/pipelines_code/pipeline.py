@@ -95,7 +95,6 @@ def get_pipeline(
     )
 
     output_log_etl = ProcessingOutput(
-        output_name='log',
         source='/opt/ml/processing/output/log.txt',
         destination='s3://iberia-data-lake/sagemaker/sagemaker-template/logs/preprocess/etl',
     )
@@ -161,7 +160,6 @@ def get_pipeline(
     )
 
     output_log_preprocess = ProcessingOutput(
-        output_name='log',
         source='/opt/ml/processing/output/log.txt',
         destination='s3://iberia-data-lake/sagemaker/sagemaker-template/logs/preprocess/log',
     )
