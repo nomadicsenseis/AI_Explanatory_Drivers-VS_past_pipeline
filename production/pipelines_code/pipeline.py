@@ -101,7 +101,7 @@ def get_pipeline(
     evaluation_report = PropertyFile(
         name="log",
         output_name="log",
-        json_path="/opt/ml/processing/log/log.json"
+        path="/opt/ml/processing/log/log.json"
     )
 
 
