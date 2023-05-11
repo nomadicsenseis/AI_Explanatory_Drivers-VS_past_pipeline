@@ -1,6 +1,3 @@
-"""
-Pipeline definition for BLV model.
-"""
 import logging
 import sagemaker
 from os import chdir, pardir, sep
@@ -55,7 +52,6 @@ def get_pipeline(
     param_use_type = ParameterString(name="use_type")
     param_trials = ParameterString(name="trials", default_value="1")
     param_is_retrain_required = ParameterString(name="is_retrain_required", default_value="1")
-    train_predict_condition = ConditionEquals(left=param_use_type, right="train")
 
     # Define a condition for pipeline execution
     train_predict_condition = ConditionEquals(left=param_use_type, right="train")
@@ -109,19 +105,6 @@ def get_pipeline(
         outputs=[],  # List of output configurations
         configuration=pyspark_config,  # PySpark configuration options
     )
-
-    log_output = sagemaker.processing.ProcessingOutput(
-        output_name="logs",
-        source="/opt/ml/processing/logs",
-        destination=f"s3://iberia-data-lake/sagemaker/sagemaker-template/logs",  # Reemplaza con tu bucket y prefix de S3
-        app_managed=False
-    )
-    evaluation_report = PropertyFile(
-        name="logs",
-        output_name="logs",
-        path="logs.json"
-    )
-    etl_step_pyspark_args.outputs.append(log_output)  # Añade el output a la lista de outputs
 
     # Create a processing step
     etl_step = ProcessingStep(
@@ -211,7 +194,7 @@ def get_pipeline(
         code=predict_preprocess_step_args.code,  # Specify the code to be executed for the step
     )
 
-    # TRAIN AUX
+    # TRAIN
     # Create a framework processor for training
     framework_processor = processors.framework()
 
@@ -242,29 +225,6 @@ def get_pipeline(
         job_arguments=train_step_args.arguments,  # Specify the job arguments for this step
         code=train_step_args.code,  # Provide the code for this step
     )
-
-    # TRAIN
-    training_estimator_parameters = {
-        "entry_point": path_join(BASE_DIR, "code", "train.py"),
-        "dependencies": [
-            path_join(BASE_DIR, "packages", "config.yml"),
-            path_join(BASE_DIR, "packages", "requirements", "train.txt"),
-            path_join(BASE_DIR, "packages", "utils.py"),
-        ],
-        "py_version": "py3",
-        "role": role,
-        "instance_count": 1,
-        "instance_type": "ml.m5.4xlarge",
-        "framework_version": "1.0-1",
-        "base_job_name": f"{base_job_prefix}/sklearn_estimator",
-        "container_log_level": logging.INFO,
-        "hyperparameters": {
-            "s3_bucket": param_s3_bucket,
-            "s3_path_write": param_s3_path_write,
-            "str_execution_date": param_str_execution_date,
-            "is_last_date": param_is_last_date,
-        },
-    }
 
     # PREDICT
     framework_processor = processors.framework()

@@ -254,13 +254,13 @@ if __name__ == "__main__":
 
     # Execute preprocess
     in_features_train = config.get("VARIABLES_ETL").get('COLUMNS_TO_SAVE') + \
-                        [config.get("VARIABLES").get('ID')]
+                        [config.get("VARIABLES_ETL").get('ID')]
 
     if USE_TYPE == 'train':
 
         # Divide train and test
         X_train, X_test, X_val, y_train, y_test, y_val = split_train_val_test(df_features[in_features_train],
-                                                                              df_features[config.get("VARIABLES").get(
+                                                                              df_features[config.get("VARIABLES_ETL").get(
                                                                                   'TARGET')])
         # Features encoder
         SAGEMAKER_LOGGER.info(f"X_train, X_test, X_val, y_train, y_test, y_val: {X_train.shape}, {X_test.shape}, "

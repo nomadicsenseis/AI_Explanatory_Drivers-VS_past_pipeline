@@ -221,7 +221,7 @@ if __name__ == "__main__":
     X_oos = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_OOS/X_out_of_sample.csv")
     y_oos = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_OOS/y_out_of_sample.csv")
     metrics_oos = eval_set(X_oos, y_oos, model, features, 'out_of_sample')
-
+    #TODO: commentar mas
     s3_resource = resource("s3")
     SAGEMAKER_LOGGER.info(f"Dumping metrics...")
     clf_metrics = {**metrics_train, **metrics_test, **metrics_val, **metrics_oos}
