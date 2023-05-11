@@ -260,7 +260,7 @@ def get_pipeline(
     # CONDITION STEP
     condition_step = ConditionStep(
         name="condition_step",
-        depends_on=["etl_step"],  # Depends on the previous step "etl_step"
+        #depends_on=["etl_step"],  # Depends on the previous step "etl_step"
         conditions=[train_predict_condition],  # Condition for branching
         if_steps=[train_preprocess_step, train_step],  # Steps to execute if the condition is true
         else_steps=[predict_preprocess_step, predict_step]  # Steps to execute if the condition is false
@@ -280,7 +280,7 @@ def get_pipeline(
             param_trials,  # Number of trials for model training
             param_is_retrain_required,  # Flag indicating if retraining is required
         ],
-        steps=[etl_step, condition_step],  # List of pipeline steps
+        steps=[ condition_step],  # List of pipeline steps etl_step,
         sagemaker_session=sagemaker_session,  # Sagemaker session object
     )
     return pipeline

@@ -130,7 +130,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
             ('imputer', SimpleImputer(strategy='median')),
             ('scaler', StandardScaler())])
 
-        categorical_features = ['Embarked', 'Sex', 'Pclass', 'Cabin', 'Title']
+        categorical_features = ['Embarked', 'Sex', 'Pclass', 'Cabin']
         categorical_transformer = Pipeline(steps=[
             ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
             ('onehot', OneHotEncoder(handle_unknown='ignore'))])
