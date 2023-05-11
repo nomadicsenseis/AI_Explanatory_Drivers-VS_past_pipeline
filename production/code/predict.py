@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     # Perform prediction and add the probabilities to the dataframe
     probabilities = clf_model.predict_proba(df_predict[clf_model.feature_names_])
-    df_predict[f"{config['VARIABLES']['TARGET']}_probability"] = probabilities[:, 1]
+    df_predict[f"{config['VARIABLES_ETL']['TARGET']}_probability"] = probabilities[:, 1]
 
     # Rename columns, add insert date and select columns to save
     df_predict['insert_date_ci'] = STR_EXECUTION_DATE

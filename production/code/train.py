@@ -178,12 +178,6 @@ def eval_set(X_set, y_set, model, features, set_name):  # Define function with i
 
 if __name__ == "__main__":
 
-    # Crea un manejador de archivos que escriba los logs a un archivo
-    file_handler = logging.FileHandler('/opt/ml/processing/output/log.txt')
-    file_handler.setLevel(logging.INFO)
-
-    # Añade el manejador de archivos al logger
-    SAGEMAKER_LOGGER.addHandler(file_handler)
     """Main functionality of the script."""
     # DEFINE ARGUMENTS
     SAGEMAKER_LOGGER.info("userlog: Starting %s step...", STEP)
