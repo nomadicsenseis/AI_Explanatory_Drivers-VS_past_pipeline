@@ -113,7 +113,6 @@ def get_pipeline(
         inputs=etl_step_pyspark_args.inputs,  # Inputs for the processor
         outputs=etl_step_pyspark_args.outputs,  # Where to store the outputs
         job_arguments=etl_step_pyspark_args.arguments,  # Arguments for the processor
-        property_files=[evaluation_report],  # Report files to be generated
         code=etl_step_pyspark_args.code,  # Code to be executed
     )
 
