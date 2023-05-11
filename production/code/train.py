@@ -18,6 +18,7 @@ from os import environ
 import utils
 from boto3 import resource
 from pandas import read_csv
+from catboost import CatBoostClassifier
 import joblib
 from imblearn.ensemble import (
     BalancedRandomForestClassifier,
