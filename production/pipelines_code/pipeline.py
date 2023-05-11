@@ -47,7 +47,15 @@ def get_pipeline(
 
     # Define pipeline parameters
     processing_instance_count = ParameterInteger(name="processing_instance_count", default_value=3)
-    # More pipeline parameters...
+    param_str_execution_date = ParameterString(name="str_execution_date", default_value="2023-03-01")
+    param_s3_bucket = ParameterString(name="s3_bucket", default_value="iberia-data-lake")
+    param_s3_path_read = ParameterString(name="s3_path_read")
+    param_s3_path_write = ParameterString(name="s3_path_write")
+    param_is_last_date = ParameterString(name="is_last_date", default_value="1")
+    param_use_type = ParameterString(name="use_type")
+    param_trials = ParameterString(name="trials", default_value="1")
+    param_is_retrain_required = ParameterString(name="is_retrain_required", default_value="1")
+    train_predict_condition = ConditionEquals(left=param_use_type, right="train")
 
     # Define a condition for pipeline execution
     train_predict_condition = ConditionEquals(left=param_use_type, right="train")
