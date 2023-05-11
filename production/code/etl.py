@@ -76,22 +76,15 @@ def create_spark_session() -> SparkSession:
 
 if __name__ == "__main__":
     """Main functionality of the script."""
-    report_dict = [
-        {
-            "MetricName": "accuracy",
-            "Value": 0.78
-        },
-        {
-            "MetricName": "precision",
-            "Value": 0.76
-        },
-        {
-            "MetricName": "recall",
-            "Value": 0.69
+    report_dict = {
+        "hyperparam": {
+            "eta": {
+                "value": 0.6
+            }
         }
-    ]
+    }
     # your report
-    evaluation_path = "/opt/ml/processing/log/log.json"
+    evaluation_path = "/opt/ml/processing/logs/logs.json"
 
     with open(evaluation_path, "w") as f:
         f.write(json.dumps(report_dict))
@@ -118,8 +111,6 @@ if __name__ == "__main__":
     config_etl = config.get(STEP)
 
     # READ DATA SOURCE
-    #{S3_PATH_WRITE}
-    #sagemaker / sagemaker - template / titanic_database
     s3_dir = f's3://{S3_BUCKET}/{S3_PATH_READ}/titanic.csv'
     df = spark.read.csv(s3_dir, header='true')
     SAGEMAKER_LOGGER.info("userlog: Read date path %s.", s3_dir)
