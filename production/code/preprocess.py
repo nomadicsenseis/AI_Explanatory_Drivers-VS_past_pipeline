@@ -111,7 +111,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
 
     # In training mode
     else:
-        y_train = pd.DataFrame(y_train, columns=[config.get("VARIABLES").get('TARGET')])
+        y_train = pd.DataFrame(y_train, columns=[config.get("VARIABLES_ETL").get('TARGET')])
         SAGEMAKER_LOGGER.info(f'Processing X_train {X_train.shape} ')
         SAGEMAKER_LOGGER.info(f'Processing y_train {y_train.shape} ')
 
@@ -217,8 +217,8 @@ def read_data(prefix) -> DataFrame:
     for file in preprocess_paths:
         df = pd.read_csv(file, error_bad_lines=False)
         df_features = pd.concat([df_features, df], axis=0)
-    df_features.index = df_features[config['VARIABLES']['ID']]
-    df_features.index.name = config['VARIABLES']['ID']
+    df_features.index = df_features[config['VARIABLES_ETL']['ID']]
+    df_features.index.name = config['VARIABLES_ETL']['ID']
     SAGEMAKER_LOGGER.info(f"Data size: {str(len(df_features))}")
     SAGEMAKER_LOGGER.info(f"Columns: {df_features.columns}")
     return df_features
