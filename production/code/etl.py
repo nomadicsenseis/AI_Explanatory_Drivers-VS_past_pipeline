@@ -122,6 +122,6 @@ if __name__ == "__main__":
     SAGEMAKER_LOGGER.info(f"userlog: Dataframe length --> {str(len_df)}")
 
     # Save data
-    save_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/titanic.csv"
+    save_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
     SAGEMAKER_LOGGER.info("userlog: Saving information for etl step in %s.", save_path)
     df.coalesce(1).write.option("header", "true").mode("overwrite").csv(save_path)

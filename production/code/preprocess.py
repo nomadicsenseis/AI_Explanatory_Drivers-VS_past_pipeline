@@ -198,6 +198,31 @@ def split_train_val_test(X: DataFrame, target) -> object:
     X_train, X_test, y_train, y_test = train_test_split(X_traintest, y_traintest, stratify=y_traintest, test_size=0.2)
     return X_train, X_test, X_val, y_train, y_test, y_val
 
+def read_data(prefix) -> DataFrame:
+    """This function automatically reads a dataframe processed
+    with all features in S3 and return this dataframe with
+    cid as index
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    Pandas dataframe containing all features
+    """
+
+    s3_keys = [item.key for item in s3_resource.Bucket(S3_BUCKET).objects.filter(Prefix=prefix) if item.key.endswith(".csv")]
+    preprocess_paths = [f"s3://{S3_BUCKET}/{key}" for key in s3_keys]
+    df_features = pd.DataFrame()
+    for file in preprocess_paths:
+        df = pd.read_csv(file)
+        df_features = pd.concat([df_features, df], axis=0)
+    df_features.index = df_features[config['VARIABLES']['ID']]
+    df_features.index.name = config['VARIABLES']['ID']
+    SAGEMAKER_LOGGER.info(f"Data size: {str(len(df_features))}")
+    SAGEMAKER_LOGGER.info(f"Columns: {df_features.columns}")
+    return df_features
+
 
 if __name__ == "__main__":
 
@@ -220,11 +245,12 @@ if __name__ == "__main__":
     s3_resource = boto3.resource("s3")
 
     # path
-    src_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/titanic.csv"
+    prefix = f"{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
+    src_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
     out_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}"
 
     # Read data
-    df_features = pd.read_csv(src_path)
+    df_features = read_data(prefix)
 
     # Execute preprocess
     in_features_train = config.get("VARIABLES_ETL").get('COLUMNS_TO_SAVE') + \
