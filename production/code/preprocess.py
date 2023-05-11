@@ -89,28 +89,28 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
     # In prediction mode
     if use_type == 'predict':
         # Get the path to the saved transformation pipeline
-        model_path, _, _, _ = utils.get_path_to_read_and_date(
-            read_last_date=bool(int(IS_LAST_DATE)),
-            bucket=S3_BUCKET,
-            key=save_path_read,
-            partition_date=STR_EXECUTION_DATE,
-        )
-        # Remove s3 info path
-        if 's3://' in model_path:
-            model_path = model_path.split('//')[1].replace(f"{S3_BUCKET}/", '')
-        SAGEMAKER_LOGGER.info(f"userlog: path for models: {model_path + '/models/'}")
-
-        # Read the transformation pipeline
-        pipeline = (
-            s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}")
-            .get()
-        )
-
-        # Load the pipeline and apply transformation
-        pipe = pickle.loads(pipeline["Body"].read())
-        time.sleep(30)
-        X = pipe.transform(df)
-        X = pd.DataFrame(X, columns=get_names_from_pipeline(pipe.named_steps['preprocessor']))
+        # model_path, _, _, _ = utils.get_path_to_read_and_date(
+        #     read_last_date=bool(int(IS_LAST_DATE)),
+        #     bucket=S3_BUCKET,
+        #     key=save_path_read,
+        #     partition_date=STR_EXECUTION_DATE,
+        # )
+        # # Remove s3 info path
+        # if 's3://' in model_path:
+        #     model_path = model_path.split('//')[1].replace(f"{S3_BUCKET}/", '')
+        # SAGEMAKER_LOGGER.info(f"userlog: path for models: {model_path + '/models/'}")
+        #
+        # # Read the transformation pipeline
+        # pipeline = (
+        #     s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}")
+        #     .get()
+        # )
+        #
+        # # Load the pipeline and apply transformation
+        # pipe = pickle.loads(pipeline["Body"].read())
+        time.sleep(10)
+        # X = pipe.transform(df)
+        X = df # pd.DataFrame(X, columns=get_names_from_pipeline(pipe.named_steps['preprocessor']))
 
     # In training mode
     else:
@@ -119,34 +119,33 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         SAGEMAKER_LOGGER.info(f'Processing y_train {y_train.shape} ')
 
         # Define transformations for the columns
-        numeric_features = ['Age', 'Fare']
-        numeric_transformer = Pipeline(steps=[
-            ('imputer', SimpleImputer(strategy='median')),
-            ('scaler', StandardScaler())])
-
-        categorical_features = ['Embarked', 'Sex', 'Pclass', 'Cabin']
-        categorical_transformer = Pipeline(steps=[
-            ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-            ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-
-        # Combine all transformations using ColumnTransformer
-        preprocessor = ColumnTransformer(
-            transformers=[
-                ('num', numeric_transformer, numeric_features),
-                ('cat', categorical_transformer, categorical_features)])
+        # numeric_features = ['Age', 'Fare']
+        # numeric_transformer = Pipeline(steps=[
+        #     ('imputer', SimpleImputer(strategy='median')),
+        #     ('scaler', StandardScaler())])
+        #
+        # categorical_features = ['Embarked', 'Sex', 'Pclass', 'Cabin']
+        # categorical_transformer = Pipeline(steps=[
+        #     ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+        #     ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+        #
+        # # Combine all transformations using ColumnTransformer
+        # preprocessor = ColumnTransformer(
+        #     transformers=[
+        #         ('num', numeric_transformer, numeric_features),
+        #         ('cat', categorical_transformer, categorical_features)])
 
         # Fit and apply the transformation pipeline, then save it
-        pipe = Pipeline(steps=[('preprocessor', preprocessor)])
-        X = pipe.fit_transform(df, y_train)
-        s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
-            Body=pickle.dumps(pipe)
-        )
-        X = pd.DataFrame(X)#, columns=get_names_from_pipeline(preprocessor)
+        # pipe = Pipeline(steps=[('preprocessor', preprocessor)])
+        X = df
+        # s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
+        #     Body=pickle.dumps(pipe)
+        # )
+        # X = pd.DataFrame(X, columns=get_names_from_pipeline(preprocessor)
         SAGEMAKER_LOGGER.info(f'Procesed X_train {X.shape} ')
         #SAGEMAKER_LOGGER.info(f'Columns names out prep {get_names_from_pipeline(preprocessor)}')
 
     #X.reset_index(drop=True, inplace=True)
-
     #df.reset_index(drop=True, inplace=True)
     #X[config['VARIABLES_ETL']['ID']] = df[config['VARIABLES_ETL']['ID']].copy()
 
