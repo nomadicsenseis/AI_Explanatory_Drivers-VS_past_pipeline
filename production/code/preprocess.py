@@ -215,10 +215,11 @@ def read_data(prefix) -> DataFrame:
     for file in preprocess_paths:
         df = pd.read_csv(file, error_bad_lines=False)
         df_features = pd.concat([df_features, df], axis=0)
-    df_features.index = df_features[config['VARIABLES_ETL']['ID']]
-    df_features.index.name = config['VARIABLES_ETL']['ID']
     SAGEMAKER_LOGGER.info(f"Data size: {str(len(df_features))}")
     SAGEMAKER_LOGGER.info(f"Columns: {df_features.columns}")
+    df_features.index = df_features[config['VARIABLES_ETL']['ID']]
+    df_features.index.name = config['VARIABLES_ETL']['ID']
+
     return df_features
 
 
