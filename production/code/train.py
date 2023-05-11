@@ -18,7 +18,7 @@ from os import environ
 import utils
 from boto3 import resource
 from pandas import read_csv
-from catboost import CatBoostClassifier
+from lightgbm import LGBMClassifier
 import joblib
 from imblearn.ensemble import (
     BalancedRandomForestClassifier,
@@ -213,7 +213,7 @@ if __name__ == "__main__":
 
     # Estimator
     SAGEMAKER_LOGGER.info(f"userlog: INPUT COLS: {str(features)}")
-    model = CatBoostClassifier(auto_class_weights="Balanced", random_state=42, silent=True)
+    model = LGBMClassifier(random_state=42)
     model = model.fit(X_train[features], y_train)
     metrics_train = get_metrics(model, X_train[features], y_train, 'train')
     SAGEMAKER_LOGGER.info(f"Trained model: {str(model)}")
