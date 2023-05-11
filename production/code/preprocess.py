@@ -140,11 +140,13 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
             Body=pickle.dumps(pipe)
         )
         X = pd.DataFrame(X)#, columns=get_names_from_pipeline(preprocessor)
+        SAGEMAKER_LOGGER.info(f'Procesed X_train {X.shape} ')
         #SAGEMAKER_LOGGER.info(f'Columns names out prep {get_names_from_pipeline(preprocessor)}')
 
     #X.reset_index(drop=True, inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    X[config['VARIABLES_ETL']['ID']] = df[config['VARIABLES_ETL']['ID']].copy()
+
+    #df.reset_index(drop=True, inplace=True)
+    #X[config['VARIABLES_ETL']['ID']] = df[config['VARIABLES_ETL']['ID']].copy()
 
     return X
 
