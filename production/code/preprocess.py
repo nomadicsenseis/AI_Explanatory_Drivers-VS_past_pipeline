@@ -90,7 +90,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         model_path, _, _, _ = utils.get_path_to_read_and_date(
             read_last_date=bool(int(IS_LAST_DATE)),
             bucket=S3_BUCKET,
-            key=path_read,
+            key=out_path,
             partition_date=STR_EXECUTION_DATE,
         )
         # Remove s3 info path
@@ -136,7 +136,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         # Fit and apply the transformation pipeline, then save it
         pipe = Pipeline(steps=[('preprocessor', preprocessor)])
         X = pipe.fit_transform(df, y_train)
-        s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
+        s3_resource.Object(S3_BUCKET, f"{out_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
             Body=pickle.dumps(pipe)
         )
         X = pd.DataFrame(X, columns=get_names_from_pipeline(preprocessor))
