@@ -91,7 +91,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         model_path, _, _, _ = utils.get_path_to_read_and_date(
             read_last_date=bool(int(IS_LAST_DATE)),
             bucket=S3_BUCKET,
-            key=out_path,
+            key=save_path,
             partition_date=STR_EXECUTION_DATE,
         )
         # Remove s3 info path
