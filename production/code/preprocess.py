@@ -139,10 +139,10 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         s3_resource.Object(S3_BUCKET, f"{out_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
             Body=pickle.dumps(pipe)
         )
-        X = pd.DataFrame(X, columns=get_names_from_pipeline(preprocessor))
-        SAGEMAKER_LOGGER.info(f'Columns names out prep {get_names_from_pipeline(preprocessor)}')
+        X = pd.DataFrame(X)#, columns=get_names_from_pipeline(preprocessor)
+        #SAGEMAKER_LOGGER.info(f'Columns names out prep {get_names_from_pipeline(preprocessor)}')
 
-    X.reset_index(drop=True, inplace=True)
+    #X.reset_index(drop=True, inplace=True)
     df.reset_index(drop=True, inplace=True)
     X[config['VARIABLES_ETL']['ID']] = df[config['VARIABLES_ETL']['ID']].copy()
 
