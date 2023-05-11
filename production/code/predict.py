@@ -99,7 +99,6 @@ if __name__ == "__main__":
     df_predict[f"{config['VARIABLES']['TARGET']}_probability"] = probabilities[:, 1]
 
     # Rename columns, add insert date and select columns to save
-    df_predict = df_predict.rename(config['PREDICT']['COLUMNS_RENAME'], axis=1)
     df_predict['insert_date_ci'] = STR_EXECUTION_DATE
     df_predict = df_predict[config['PREDICT']['COLUMNS_SAVE']]
 

@@ -31,15 +31,6 @@ TRAIN:
   MODEL_NAME: CatBoostClassifier
 
 PREDICT:
-  COLUMNS_RENAME:
-    gross_revenue_sh_year1: ccv_sh
-    gross_revenue_mh_year1: ccv_mh
-    gross_revenue_lh_year1: ccv_lh
   COLUMNS_SAVE:
-    - cid
-    - ccv
-    - ccv_sh
-    - ccv_mh
-    - ccv_lh
-    - churn_probability
     - insert_date_ci
+    - Survived_probability

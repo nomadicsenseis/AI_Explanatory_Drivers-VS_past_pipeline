@@ -320,9 +320,9 @@ if __name__ == "__main__":
                     f"{path}/{year}{month}{day}_metrics.json",
                     # Write the metrics in JSON format to the specified location in the S3 bucket
                 ).put(Body=(bytes(json.dumps(clf_metrics_json).encode("UTF-8"))))
-                else:
-                # If the number of features used is not equal to the number of features in the dataset, update the model
-                dumpModel(model, clf_metrics)
         else:
-            # If it's the first run, dump (save) the model and its metrics
+            # If the number of features used is not equal to the number of features in the dataset, update the model
             dumpModel(model, clf_metrics)
+    else:
+        # If it's the first run, dump (save) the model and its metrics
+        dumpModel(model, clf_metrics)
