@@ -215,7 +215,7 @@ def read_data(prefix) -> DataFrame:
     preprocess_paths = [f"s3://{S3_BUCKET}/{key}" for key in s3_keys]
     df_features = pd.DataFrame()
     for file in preprocess_paths:
-        df = pd.read_csv(file)
+        df = pd.read_csv(file, error_bad_lines=False)
         df_features = pd.concat([df_features, df], axis=0)
     df_features.index = df_features[config['VARIABLES']['ID']]
     df_features.index.name = config['VARIABLES']['ID']
