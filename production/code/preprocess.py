@@ -69,10 +69,6 @@ class Arguments(utils.AbstractArguments):
         self.args = parser.parse_args()
 
 
-def cabin_preprocesser(x):
-    return 0 if pd.isna(x) else 1
-
-
 def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFrame:
     """
     This function processes the features of the input DataFrame depending on the mode (prediction or training).
@@ -120,10 +116,6 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         SAGEMAKER_LOGGER.info(f'Processing X_train {X_train.shape} ')
         SAGEMAKER_LOGGER.info(f'Processing y_train {y_train.shape} ')
 
-        # Transform 'Cabin' into a binary variable
-        cabin_transformer = prep.FunctionTransformer(cabin_preprocesser)
-        cabin_pipeline = Pipeline(steps=[('cabin_preprocesser', cabin_transformer)])
-
         # Define transformations for the columns
         numeric_features = ['Age', 'Fare']
         numeric_transformer = Pipeline(steps=[
@@ -139,8 +131,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         preprocessor = ColumnTransformer(
             transformers=[
                 ('num', numeric_transformer, numeric_features),
-                ('cat', categorical_transformer, categorical_features),
-                ('cabin', cabin_pipeline, ['Cabin'])])
+                ('cat', categorical_transformer, categorical_features)])
 
         # Fit and apply the transformation pipeline, then save it
         pipe = Pipeline(steps=[('preprocessor', preprocessor)])
