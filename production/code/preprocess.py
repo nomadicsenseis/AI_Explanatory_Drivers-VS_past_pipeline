@@ -83,6 +83,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
     Returns:
     DataFrame: The processed DataFrame.
     """
+    save_path = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}'
 
     # In prediction mode
     if use_type == 'predict':
@@ -247,7 +248,6 @@ if __name__ == "__main__":
     prefix = f"{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
     src_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
     out_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}"
-    save_path = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}'
 
     # Read data
     df_features = read_data(prefix)
