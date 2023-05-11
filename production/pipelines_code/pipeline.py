@@ -9,6 +9,8 @@ from os.path import join as path_join
 from os.path import realpath
 from typing import Optional
 
+from sagemaker.workflow.properties import PropertyFile
+from sagemaker.workflow.steps import ProcessingStep
 from production.pipelines_code import utils
 from sagemaker.model_metrics import MetricsSource, ModelMetrics
 from sagemaker.processing import ProcessingOutput
@@ -29,38 +31,42 @@ chdir(BASE_DIR)
 MIN_ROW_NUMBER = "160000000"
 
 def get_pipeline(
-    region: str,
-    pipeline_name: str,
-    base_job_prefix: str,
-    role: Optional[str] = None,
-    default_bucket: Optional[str] = None,
+    region: str,  # AWS region
+    pipeline_name: str,  # Name of the pipeline
+    base_job_prefix: str,  # Prefix for the job names
+    role: Optional[str] = None,  # IAM role
+    default_bucket: Optional[str] = None,  # Default S3 bucket
 ) -> Pipeline:
-    """Pipeline definition."""
+
+    # Get a Sagemaker session
     sagemaker_session = utils.get_session(region=region, default_bucket=default_bucket)
+
+    # If the role is not provided, get the execution role
     if role is None:
         role = get_execution_role(sagemaker_session)
-    # Parameters for pipeline execution
+
+    # Define pipeline parameters
     processing_instance_count = ParameterInteger(name="processing_instance_count", default_value=3)
-    param_str_execution_date = ParameterString(name="str_execution_date", default_value="2023-03-01")
-    param_s3_bucket = ParameterString(name="s3_bucket",default_value="iberia-data-lake")
-    param_s3_path_read = ParameterString(name="s3_path_read")
-    param_s3_path_write = ParameterString(name="s3_path_write")
-    param_is_last_date = ParameterString(name="is_last_date", default_value="1")
-    param_use_type = ParameterString(name="use_type")
-    param_trials = ParameterString(name="trials", default_value="1")
-    param_is_retrain_required = ParameterString(name="is_retrain_required", default_value="1")
+    # More pipeline parameters...
+
+    # Define a condition for pipeline execution
     train_predict_condition = ConditionEquals(left=param_use_type, right="train")
-    # -------------------------------------------
+
+    # Read the configuration file
     configuration = utils.read_config_data()
+
+    # Prepare PySpark properties from the configuration
     pyspark_properties = {
         key.replace("_", "."): value
         for key, value in configuration.get("PYSPARK").items()
     }
-    # Pyspark Configuration
+
+    # Define PySpark configuration
     pyspark_config = [
         {"Classification": "spark-defaults", "Properties": pyspark_properties}
     ]
-    # Procesors used in the executions
+
+    # Initialize the processors used in the pipeline executions
     processors = utils.Processors(
         base_job_prefix=base_job_prefix,
         role=role,
@@ -70,14 +76,17 @@ def get_pipeline(
     )
 
     # ETL
+    # Initialize the PySpark processor
     pyspark_processor = processors.pyspark()
+
+    # Define the arguments for running a PySpark job
     etl_step_pyspark_args = pyspark_processor.get_run_args(
-        submit_app=path_join(BASE_DIR, "code", "etl.py"),
-        submit_py_files=[
+        submit_app=path_join(BASE_DIR, "code", "etl.py"),  # Path to the PySpark script
+        submit_py_files=[  # Python files to be submitted with the job
             path_join(BASE_DIR, "packages", "utils.py"),
         ],
-        submit_files=[path_join(BASE_DIR, "packages", "config.yml")],
-        arguments=[
+        submit_files=[path_join(BASE_DIR, "packages", "config.yml")],  # Other files to be submitted with the job
+        arguments=[  # Command line arguments to the PySpark script
             "--s3_bucket",
             param_s3_bucket,
             "--s3_path_read",
@@ -89,11 +98,9 @@ def get_pipeline(
             "--use_type",
             param_use_type,
         ],
-        outputs=[],
-        configuration=pyspark_config,
+        outputs=[],  # List of output configurations
+        configuration=pyspark_config,  # PySpark configuration options
     )
-    from sagemaker.workflow.properties import PropertyFile
-    from sagemaker.workflow.steps import ProcessingStep
 
     log_output = sagemaker.processing.ProcessingOutput(
         output_name="logs",

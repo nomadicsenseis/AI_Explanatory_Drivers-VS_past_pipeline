@@ -212,7 +212,7 @@ if __name__ == "__main__":
     S3_PATH_WRITE = args.s3_path_write
     USE_TYPE = args.use_type
     STR_EXECUTION_DATE = args.str_execution_date
-    IS_LAST_DATE = args.is_last_date
+    IS_LAST_DATE = 1
     date = STR_EXECUTION_DATE.split("/")[-1].split("=")[-1].replace("-", "")
     year, month, day = date[:4], date[4:6], date[6:]
 

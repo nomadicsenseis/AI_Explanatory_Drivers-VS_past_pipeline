@@ -7,12 +7,8 @@ check_call([executable, "-m", "pip", "install", "-r", f"./{STEP.lower()}.txt"])
 
 import argparse
 import logging
-from json import dumps as jdumps
 from os import environ
 from pickle import dumps as pkl_dumps
-
-import plots
-import train_utils as tutils
 import utils
 from boto3 import resource
 from catboost import CatBoostClassifier
@@ -116,49 +112,52 @@ def get_metrics(model,X_test,y_test,dataset):
     return metrics
 
 
+# Function to cast variables to their appropriate data types
 def cast_variables_types(df):
-    categorical_features = df.select_dtypes(include=['object'])
-    int_features = df.select_dtypes(include=['int64'])
-    float_features = df.select_dtypes(include=['float64'])
-    boolean_features = df.select_dtypes(include=['bool'])
+    categorical_features = df.select_dtypes(include=['object'])  # Identify categorical columns
+    int_features = df.select_dtypes(include=['int64'])  # Identify integer columns
+    float_features = df.select_dtypes(include=['float64'])  # Identify float columns
+    boolean_features = df.select_dtypes(include=['bool'])  # Identify boolean columns
     for c in categorical_features:
-        df[c] = pd.Categorical(df[c])
+        df[c] = pd.Categorical(df[c])  # Convert to categorical type
     for c in int_features:
-        df[c] = df[c].astype('int16', errors='raise')
+        df[c] = df[c].astype('int16', errors='raise')  # Convert to integer type
     for c in float_features:
-        df[c] = df[c].astype('float16', errors='raise')
+        df[c] = df[c].astype('float16', errors='raise')  # Convert to float type
     for c in boolean_features:
-        df[c] = df[c].astype('bool', errors='raise')
-    return df
+        df[c] = df[c].astype('bool', errors='raise')  # Convert to boolean type
+    return df  # Return the dataframe with casted variables
 
-
+# Function to save the model and its metrics to S3
 def dumpModel(model,metrics_json):
-    SAGEMAKER_LOGGER.info(f"Dumping model...")
-    fitted_clf_model = pickle.dumps(model)
+    SAGEMAKER_LOGGER.info(f"Dumping model...")  # Log the start of the model dumping process
+    fitted_clf_model = pickle.dumps(model)  # Serialize the model
     s3_resource.Object(
         S3_BUCKET,
         f"{save_path}/model/{config['TRAIN']['MODEL_NAME']}",
-    ).put(Body=fitted_clf_model)
-    SAGEMAKER_LOGGER.info(f"Dumping metrics...")
+    ).put(Body=fitted_clf_model)  # Save the serialized model to S3
+    SAGEMAKER_LOGGER.info(f"Dumping metrics...")  # Log the start of the metrics dumping process
     s3_resource.Object(
         S3_BUCKET,
         f"{save_path}/metrics/clf_metrics.json",
-    ).put(Body=(bytes(json.dumps(metrics_json).encode("UTF-8"))))
+    ).put(Body=(bytes(json.dumps(metrics_json).encode("UTF-8"))))  # Save the metrics to S3
 
 
-def eval_set(X_set,y_set,model,features,set_name):
-    X_set = cast_variables_types(X_set)
-    SAGEMAKER_LOGGER.info(f"X {set_name} SHAPE {X_test.shape} ; {y_set.shape}")
-    SAGEMAKER_LOGGER.info(f"WARNING X {set_name}: rows with na {X_set[features].isnull().any(axis=1).sum()}")
-    missing_rows = X_set[features].isnull().any(axis=1)
-    X_set = X_set[~missing_rows]
-    y_set = y_set[~missing_rows]
-    SAGEMAKER_LOGGER.info(f"X {set_name} SHAPE {X_set.shape} ; {y_set.shape}")
-    metrics_set = get_metrics(model, X_set[features], y_set, set_name)
-    del X_set
-    del y_set
-    gc.collect()
-    return metrics_set
+
+def eval_set(X_set, y_set, model, features, set_name):  # Define function with input parameters
+    X_set = cast_variables_types(X_set)  # Casting variable types of the features in the dataset
+    SAGEMAKER_LOGGER.info(f"X {set_name} SHAPE {X_test.shape} ; {y_set.shape}")  # Log the shape of the input data
+    SAGEMAKER_LOGGER.info(f"WARNING X {set_name}: rows with na {X_set[features].isnull().any(axis=1).sum()}")  # Log the number of rows with missing values
+    missing_rows = X_set[features].isnull().any(axis=1)  # Identify rows with missing values
+    X_set = X_set[~missing_rows]  # Remove rows with missing values from the features set
+    y_set = y_set[~missing_rows]  # Remove corresponding rows from the target set
+    SAGEMAKER_LOGGER.info(f"X {set_name} SHAPE {X_set.shape} ; {y_set.shape}")  # Log the shape of the cleaned data
+    metrics_set = get_metrics(model, X_set[features], y_set, set_name)  # Calculate metrics for the model
+    del X_set  # Delete the features set to free up memory
+    del y_set  # Delete the target set to free up memory
+    gc.collect()  # Force garbage collection to free up more memory
+    return metrics_set  # Return the calculated metrics
+
 
 if __name__ == "__main__":
 
