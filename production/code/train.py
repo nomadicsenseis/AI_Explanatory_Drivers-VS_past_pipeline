@@ -1,24 +1,41 @@
+import json
+import re
 from subprocess import check_call
 from sys import executable
+import gc
+import pandas as pd
+import pickle
+import boto3
 
 STEP = "TRAIN"
+FIRST_TIME = True
 
 check_call([executable, "-m", "pip", "install", "-r", f"./{STEP.lower()}.txt"])
 
 import argparse
 import logging
 from os import environ
-from pickle import dumps as pkl_dumps
 import utils
 from boto3 import resource
-from catboost import CatBoostClassifier
 from pandas import read_csv
+import joblib
+from imblearn.ensemble import (
+    BalancedRandomForestClassifier,
+    EasyEnsembleClassifier,
+    RUSBoostClassifier,
+    BalancedBaggingClassifier,
+)
+
+
 from sklearn.metrics import (
-    accuracy_score,
-    f1_score,
-    precision_score,
     recall_score,
+    precision_score,
+    f1_score,
+    accuracy_score,
     roc_auc_score,
+    classification_report,
+    confusion_matrix,
+    make_scorer,
 )
 
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
@@ -221,34 +238,46 @@ if __name__ == "__main__":
     X_oos = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_OOS/X_out_of_sample.csv")
     y_oos = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_OOS/y_out_of_sample.csv")
     metrics_oos = eval_set(X_oos, y_oos, model, features, 'out_of_sample')
-    #TODO: commentar mas
+    # Initialize Amazon S3 as a resource
     s3_resource = resource("s3")
+
+    # Log information about the start of the process of dumping metrics
     SAGEMAKER_LOGGER.info(f"Dumping metrics...")
+
+    # Combine all metrics from different datasets (train, test, validation, and out of sample)
     clf_metrics = {**metrics_train, **metrics_test, **metrics_val, **metrics_oos}
 
+    # Log the combined metrics
     SAGEMAKER_LOGGER.info(f"METRICS: {clf_metrics}")
+
+    # Create an Amazon S3 resource object using boto3 (Python SDK for AWS)
     s3_resource = boto3.resource('s3')
 
+    # If it's not the first run
     if not FIRST_TIME:
-        # Recuperamos el modelo vigente
+        # Retrieve the current model from the S3 bucket
         my_bucket = s3_resource.Bucket(S3_BUCKET)
         model_paths = []
 
+        # Filter objects in the bucket under the specified prefix
         for obj in my_bucket.objects.filter(Prefix=f'{S3_PATH_WRITE}/02_train_step/'):
+            # Extract the version number (or any numerical value) from the object key
             match = re.search(r'(\d+)/', obj.key)
             if match:
+                # Store the keys with numerical values
                 model_paths.append(obj.key)
 
-        # En este caso, asumimos que sólo hay una carpeta numérica
+        # Assume there is only one numeric folder and get the latest model path
         latest_model_path = sorted(model_paths)[-1]
         SAGEMAKER_LOGGER.info(f"latest_model_path: {latest_model_path}")
 
+        # Get the object (model) from the bucket and deserialize it
         prod_model = (
             my_bucket.Object(f"{latest_model_path}").get()
         )
         prod_model = pickle.loads(prod_model["Body"].read())
 
-
+        # Define a function to get the number of features used in the model
         def get_number_of_training_variables(model):
             if hasattr(model, 'n_features_in_'):
                 return model.n_features_in_
@@ -257,31 +286,43 @@ if __name__ == "__main__":
             else:
                 return None
 
-
+        # Get the number of features used in the model
         number_of_training_variables = get_number_of_training_variables(model)
 
+        # If the number of features used is equal to the number of features in the dataset
         if number_of_training_variables == len(features):
+            # Get the metrics of the model
             prod_model_metrics_test = get_metrics(prod_model, X_test[features], y_test, 'test')
-            ## Proceso de Checkeo si hay que actualizar modelo
+
+            # Define metrics for comparison and minimum thresholds for model update
             compare_metrics = ["Recall"]
             min_increase = 0.05
             min_thresholds = {"AUC": 0.9, "Recall": 0.8, "Precision": 0.2, "Accuracy": 0.8, "F1-Score": 0.25}
+
+            # Decide whether to update the model based on the defined metrics
             result = should_update_model(prod_model_metrics_test, clf_metrics, compare_metrics, min_increase,
                                          min_thresholds)
 
+            # Log the result of whether to update the model
             print("Actualizar modelo:", result)
             clf_metrics_json = json.dumps(clf_metrics)
 
+            # If the model should be updated
             if result:
+                # Update the model
                 dumpModel(model, clf_metrics)
             else:
                 path = f"{S3_PATH_WRITE}/02_train_step/not_deployed"
                 SAGEMAKER_LOGGER.info(f"Dumping FAILED MODEL metrics...")
                 s3_resource.Object(
                     S3_BUCKET,
+                    # Define the path for storing the metrics of the model that was not updated
                     f"{path}/{year}{month}{day}_metrics.json",
+                    # Write the metrics in JSON format to the specified location in the S3 bucket
                 ).put(Body=(bytes(json.dumps(clf_metrics_json).encode("UTF-8"))))
+                else:
+                # If the number of features used is not equal to the number of features in the dataset, update the model
+                dumpModel(model, clf_metrics)
         else:
+            # If it's the first run, dump (save) the model and its metrics
             dumpModel(model, clf_metrics)
-    else:
-        dumpModel(model, clf_metrics)
