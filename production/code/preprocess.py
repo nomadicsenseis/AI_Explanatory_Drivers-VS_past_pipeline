@@ -24,9 +24,7 @@ from pandas import DataFrame
 
 import boto3
 import utils
-import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.compose import ColumnTransformer
 
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
@@ -202,16 +200,6 @@ def split_train_val_test(X: DataFrame, target) -> object:
 
 
 if __name__ == "__main__":
-    from smexperiments import Tracker
-    def track_metrics(metrics, tracker):
-        for key, value in metrics.items():
-            tracker.log_metric(key, value)
-
-
-    tracker = Tracker.load()
-    metrics = {"accuracy": 0.78, "precision": 0.76, "recall": 0.69}
-    track_metrics(metrics, tracker)
-
 
     """Main functionality of the script."""
     # DEFINE ARGUMENTS
