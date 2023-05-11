@@ -100,7 +100,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
 
         # Read the transformation pipeline
         pipeline = (
-            s3_resource.Object(S3_BUCKET, f"{model_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}")
+            s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}")
             .get()
         )
 
@@ -136,7 +136,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         # Fit and apply the transformation pipeline, then save it
         pipe = Pipeline(steps=[('preprocessor', preprocessor)])
         X = pipe.fit_transform(df, y_train)
-        s3_resource.Object(S3_BUCKET, f"{out_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
+        s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
             Body=pickle.dumps(pipe)
         )
         X = pd.DataFrame(X)#, columns=get_names_from_pipeline(preprocessor)
@@ -246,6 +246,7 @@ if __name__ == "__main__":
     prefix = f"{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
     src_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
     out_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}"
+    save_path = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}'
 
     # Read data
     df_features = read_data(prefix)
