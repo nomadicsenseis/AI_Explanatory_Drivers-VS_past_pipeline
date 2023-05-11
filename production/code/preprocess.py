@@ -202,7 +202,7 @@ def split_train_val_test(X: DataFrame, target) -> object:
 
 
 if __name__ == "__main__":
-    from smexperiments.metrics import Tracker
+    from smexperiments import Tracker
     def track_metrics(metrics, tracker):
         for key, value in metrics.items():
             tracker.log_metric(key, value)
