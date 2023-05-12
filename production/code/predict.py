@@ -95,7 +95,8 @@ if __name__ == "__main__":
     df_predict = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_for_prediction.csv")
 
     # Perform prediction and add the probabilities to the dataframe
-    probabilities = clf_model.predict_proba(df_predict[clf_model.feature_names_])
+    features = list(config['TRAIN']['FEATURES'])
+    probabilities = clf_model.predict_proba(df_predict[clf_model.features])
     df_predict[f"{config['VARIABLES_ETL']['TARGET']}_probability"] = probabilities[:, 1]
 
     # Rename columns, add insert date and select columns to save
