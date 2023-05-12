@@ -86,7 +86,7 @@ if __name__ == "__main__":
     s3_resource = resource("s3")
     fitted_clf_model = (
         s3_resource.Bucket(S3_BUCKET)
-        .Object(f"{model_path}/model/{config['TRAIN']['MODEL_NAME_SAVE']}")
+        .Object(f"{model_path}/model/{config['TRAIN']['MODEL_NAME']}")
         .get()
     )
     clf_model = pkl_loads(fitted_clf_model["Body"].read())
