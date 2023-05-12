@@ -1,8 +1,13 @@
 # Machine Learning Project - Sagemaker
 
+[[_TOC_]]
 
+##### Table of Contents  
+[1. Introduction](####Memory/CPU based)
+[2.-Second Topic](#second-topic) 
+[3.-Third Topic](#third_topic)
 
-## Introduction
+## 1. Introduction
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
