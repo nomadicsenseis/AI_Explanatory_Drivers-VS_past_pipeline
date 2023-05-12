@@ -230,9 +230,6 @@ if __name__ == "__main__":
     y_val = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_val/y_val.csv")
     metrics_val = eval_set(X_val, y_val, model, features, 'validation')
 
-    X_oos = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_OOS/X_out_of_sample.csv")
-    y_oos = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_OOS/y_out_of_sample.csv")
-    metrics_oos = eval_set(X_oos, y_oos, model, features, 'out_of_sample')
     # Initialize Amazon S3 as a resource
     s3_resource = resource("s3")
 
@@ -240,7 +237,7 @@ if __name__ == "__main__":
     SAGEMAKER_LOGGER.info(f"Dumping metrics...")
 
     # Combine all metrics from different datasets (train, test, validation, and out of sample)
-    clf_metrics = {**metrics_train, **metrics_test, **metrics_val, **metrics_oos}
+    clf_metrics = {**metrics_train, **metrics_test, **metrics_val}
 
     # Log the combined metrics
     SAGEMAKER_LOGGER.info(f"METRICS: {clf_metrics}")
