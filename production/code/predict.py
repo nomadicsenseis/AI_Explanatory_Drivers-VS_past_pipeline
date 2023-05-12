@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     # Perform prediction and add the probabilities to the dataframe
     features = list(config['TRAIN']['FEATURES'])
-    probabilities = clf_model.predict_proba(df_predict[clf_model.features])
+    probabilities = clf_model.predict_proba(df_predict[features])
     df_predict[f"{config['VARIABLES_ETL']['TARGET']}_probability"] = probabilities[:, 1]
 
     # Rename columns, add insert date and select columns to save
