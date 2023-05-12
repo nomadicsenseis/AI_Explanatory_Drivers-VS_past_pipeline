@@ -6,13 +6,69 @@
 
 ## 1. Introduction
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+This repository has been created to help and guide the different Data teams to use AWS Sagemaker and be able to develop and deploy Machine Learning models in production in an agile and efficient way. In this guide you will find almost everything you need to know to use this service, from an overview of the framework, through the Jupyter notebook adapted to Sagemaker (with some tricks), to the Pipelines to deploy models in production.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Clarify that this template is a guide made with the purpose of helping teams, if any team wants to work in a different way, with a different project structure and with their own guidelines, they are free to do it.
 
-## Setup
+## 2. Sagemaker overview
+
+### How does it work?
+
+![Sagemaker framework](src/sagemaker_architecture.jpg)
+
+Let’s first understand how Jupyter notebooks are set up and accessed. Jupyter notebooks are by default hosted on a single machine and can be accessed via any web browser. The following diagram illustrates how it works if set up on an Amazon Elastic Compute Cloud (Amazon EC2 instance).
+
+You can access the Jupyter notebooks by opening the browser and entering the URL of the Jupyter server, which makes an HTTPS/WSS call to the machine where the Jupyter server is hosted. The machine runs a notebook server that receives the request and uses zeromq to communicate with the kernel process.
+
+As commented before, each user has his own EBS volume to store his data, the only thing that is shared is the instance where the notebook server is located between different verticals.
+
+### Setup
+
+![Sagemaker framework](src/setup/setup_screen.png)
+
+The interface prior to using Sagemaker is shown below. Here are all the users, where the name nomenclature refers to the vertical, followed by a hyphen with the user's name. Each user has its own filesystem and shares with the other users the EC2 instance explained above to launch Sagemaker Studio. If we want to launch Sagemaker Studio with our user, we simply click on Launch and then Studio. It is important not to use the Canvas or TensorBoard service as it is quite expensive.
 
 ### Framework
+
+In the picture above you can see the main Sagemaker interface. We have marked with numbers what we think is most important on a day-to-day basis and we will describe each of the points below:
+
+![Sagemaker framework](src/setup/interface/general_interface.png)
+
+1. Filesystem in Elastic Block Storage (EBS) where all data accessible by Sagemaker instances or notebook will be stored. It is recommended to store code, small files and configuration files here. For large files it is recommended to use s3.
+
+2. In this tab will appear the instances that are active, the apps running in these instances, the kernels and the open terminals. It is important to look at it from time to time to avoid unnecessary expenses and to use the shutdown button in case you want to delete it.
+
+3. To clone repositories or start a new one. In general, it is recommended to work with gitlab, although other types of project repositories can be used. To clone a repository it is recommended to use the terminal and to do it by means of commands
+
+4. This tab is used for help, extensions or themes. It is rarely used.
+
+5. Summary of Sagemaker internal tabs in use or open.
+
+6. To initialize a jump start, i.e. a guided machine learning project. Its use has not been investigated.
+
+7. Summary of the different projects, clusters and other active services in Sagemaker. Above all, it will be used to monitor and check the status of the pipelines.
+
+8. Create a new launcher
+
+9. Create a new folder
+
+10. Import an external file from your local server
+
+11. Update filesystem information and view
+
+12. Using gitlab (command line recommended)
+
+13. To create a new instance of jupyter notebook in the directory you are in
+
+14. To create and use a console with python3
+
+15. Used as a terminal image of the main Sagemaker instance.
+
+16. Used as a system terminal of the main Sagemaker instance
+
+17. To create a .txt file
+
+18. We have never used it, but it is used to create less ad-hoc and more guided machine learning projects, with less flexibility.
 
 ### Commands
 
@@ -40,39 +96,39 @@ In short, the AWS SageMaker notebook environment is a secure, managed cloud deve
 
 ### Instances
 
-AWS SageMaker offers several main instances that can be used depending on the use case:
+AWS SageMaker offers several main instances that can be used depending on the use case. It is important to emphasize that due to infra limitations, not all of them can be used and in case of not being able to use it, an error will be displayed. The type instances are the following:
 
-ml.t2.medium: This is a low-cost instance that can be used for development and testing purposes.
+- ml.t2.medium: This is a low-cost instance that can be used for development and testing purposes.
 
-ml.m4.xlarge: This is a more powerful instance that can be used for training and intensive processing tasks.
+- ml.m4.xlarge: This is a more powerful instance that can be used for training and intensive processing tasks. We recommend this instance for running processes with Pandas and for steps in production for both in-memory processing and training. If we want more capacity or memory, we simply increase the number (i.e. ml.m8.xlarge).
 
-ml.p2.xlarge: This is an instance designed for GPU processing tasks, such as training deep learning models.
+- ml.p2.xlarge: This is an instance designed for GPU processing tasks, such as training deep learning models.
 
-ml.g4dn.xlarge: This is a GPU instance designed for graphics-intensive tasks, such as data visualization and image generation.
+- ml.g4dn.xlarge: This is a GPU instance designed for graphics-intensive tasks, such as data visualization and image generation.
 
-ml.c5.large: An instance designed for processing-intensive tasks that require high network bandwidth, such as large-scale data transfer.
+- ml.c5.large: An instance designed for processing-intensive tasks that require high network bandwidth, such as large-scale data transfer.
 
 Use case recommendation for each instance:
 
-ml.t2.medium: Ideal for testing and code development.
+- ml.t2.medium: Ideal for testing and code development. We recommend this instance for launching processes in pyspark, as the instance is only used to connect to the EMR cluster and does not require high capacity and memory.
 
-ml.m4.xlarge: Ideal for model training and intensive processing.
+- ml.m4.xlarge: Ideal for model training and intensive processing.
 
-ml.p2.xlarge: Ideal for deep learning model training and other GPU processing tasks.
+- ml.p2.xlarge: Ideal for deep learning model training and other GPU processing tasks.
 
-ml.g4dn.xlarge: Ideal for data visualization and image generation.
+- ml.g4dn.xlarge: Ideal for data visualization and image generation.
 
-ml.c5.large: Ideal for large-scale data transfer and other processing-intensive tasks requiring high network bandwidth.
+- ml.c5.large: Ideal for large-scale data transfer and other processing-intensive tasks requiring high network bandwidth.
 
 These are only general recommendations. The final use of each instance will depend on the specific use case and the performance and cost requirements. The choice of the appropriate instance depends on many factors, such as the size of the model, the size of the training data, the desired speed and efficiency, among others. It is important to carefully evaluate the needs and requirements before selecting an instance for use with Amazon SageMaker.
 
 To select a machine, you must perform the following steps
 
-![How to select image for notebook ](https://gitlab.com/iberia-data/data-science/sagemaker-template/-/blob/main/src/setup/instances/HowToSelectMachine.png)
+![How to select image for notebook ](src/setup/instances/HowToSelectMachine.png)
 
 Once selected, a menu will be displayed in which you can filter the machines that have quick access. It should be noted that the access times to any machine is affordable, being only a few minutes in most cases.
 
-![Menu for machine selection](https://gitlab.com/iberia-data/data-science/sagemaker-template/-/blob/main/src/setup/instances/MachinesAllow.png)
+![Menu for machine selection](src/setup/instances/MachinesAllow.png)
 
 To check the prices associated with each of the machines that can be selected, you can go to the following address: https://aws.amazon.com/es/sagemaker/pricing/
 
