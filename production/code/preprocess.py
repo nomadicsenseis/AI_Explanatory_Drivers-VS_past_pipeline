@@ -282,7 +282,7 @@ if __name__ == "__main__":
         y_val.to_csv(f"{out_path}/data_val/y_val.csv", index=False)
 
     else:
-        X_pred = df_features[in_features_predict]
+        X_pred = df_features[in_features_train]
         SAGEMAKER_LOGGER.info(f"userlog: feature_processer_predict pre: {str(X_pred.shape)}")
         X_pred = feature_processer(X_pred)
         SAGEMAKER_LOGGER.info(f"userlog: feature_processer_predict post: {str(X_pred.shape)}")
