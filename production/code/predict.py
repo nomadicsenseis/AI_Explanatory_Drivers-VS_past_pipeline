@@ -98,8 +98,9 @@ if __name__ == "__main__":
     features = list(config['TRAIN']['FEATURES'])
     missing_rows = df_predict[features].isnull().any(axis=1)
     df_predict = df_predict[~missing_rows]
-    probabilities = clf_model.predict_proba(df_predict[features])
-    df_predict[f"{config['VARIABLES_ETL']['TARGET']}_probability"] = probabilities[:, 1]
+    #probabilities = clf_model.predict_proba(df_predict[features])
+    probabilities = np.random.rand(len(df_predict))
+    df_predict[f"{config['VARIABLES_ETL']['TARGET']}_probability"] = probabilities
 
     # Rename columns, add insert date and select columns to save
     df_predict['insert_date_ci'] = STR_EXECUTION_DATE
