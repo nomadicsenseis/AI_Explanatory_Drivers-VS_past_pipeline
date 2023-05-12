@@ -72,6 +72,16 @@ In the picture above you can see the main Sagemaker interface. We have marked wi
 
 ### Terminal
 
+There are a number of commands (apart from the typical bash commands) that will make your life easier when moving around in sagemaker:
+
+- delete-pipeline: if you want to delete a pipeline already created, with this command you can delete it, but only if it belongs to your vertical.
+
+- list-apps: in case you want to see the applications currently in use, this is a good option.
+
+- update-pipeline: in case you want to update a pipeline already created.
+
+- update-pipeline-execution: if you want to update an execution of a pipeline already created.
+
 ### Gitlab
 
 ### Pipeline
