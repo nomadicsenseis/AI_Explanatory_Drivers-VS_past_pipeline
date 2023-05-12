@@ -70,8 +70,6 @@ In the picture above you can see the main Sagemaker interface. We have marked wi
 
 18. We have never used it, but it is used to create less ad-hoc and more guided machine learning projects, with less flexibility.
 
-### Commands
-
 ### Terminal
 
 ### Gitlab
@@ -80,7 +78,7 @@ In the picture above you can see the main Sagemaker interface. We have marked wi
 
 ### Filesystem
 
-## Sagemaker Notebooks [Jupyter]
+## 3. Sagemaker Notebooks [Jupyter]
 
 Amazon SageMaker Notebook is a cloud-integrated Jupyter notebook service designed to simplify development and code execution on Amazon SageMaker. It enables developers and data scientists to create and run Jupyter notebooks in a secure, managed environment, with access to AWS resources and processing power.
 
@@ -398,7 +396,7 @@ In this example, an endpoint with the name my-endpoint is created and associated
 Note: Before creating an endpoint, you must first create an endpoint configuration that specifies details about how the model will be used in production.
 
 
-## Production
+## 4. Production
 
 ### Project structure
 
