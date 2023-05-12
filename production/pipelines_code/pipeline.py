@@ -178,8 +178,6 @@ def get_pipeline(
             param_str_execution_date,
             "--use_type",
             param_use_type,
-            "--is_last_date",
-            param_is_last_date,
         ],  # Specify the command-line arguments for the preprocessing code
     )
 
