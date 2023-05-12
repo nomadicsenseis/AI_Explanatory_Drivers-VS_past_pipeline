@@ -96,6 +96,8 @@ if __name__ == "__main__":
 
     # Perform prediction and add the probabilities to the dataframe
     features = list(config['TRAIN']['FEATURES'])
+    missing_rows = df_predict[features].isnull().any(axis=1)
+    df_predict = df_predict[~missing_rows]
     probabilities = clf_model.predict_proba(df_predict[features])
     df_predict[f"{config['VARIABLES_ETL']['TARGET']}_probability"] = probabilities[:, 1]
 
