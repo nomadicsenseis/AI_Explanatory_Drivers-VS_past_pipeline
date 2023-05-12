@@ -1,11 +1,8 @@
 # Machine Learning Project - Sagemaker
 
+#### Table of contents
 [[_TOC_]]
 
-##### Table of Contents  
-[1. Introduction](####Memory/CPU based)
-[2.-Second Topic](#second-topic) 
-[3.-Third Topic](#third_topic)
 
 ## 1. Introduction
 
