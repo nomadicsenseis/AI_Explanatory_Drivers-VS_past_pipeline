@@ -82,6 +82,8 @@ There are a number of commands (apart from the typical bash commands) that will 
 
 - update-pipeline-execution: if you want to update an execution of a pipeline already created.
 
+![Terminal code](src/setup/interface/terminal_example.png)
+
 ### Gitlab
 
 GitLab is an important tool used alongside SageMaker for version control and collaboration. It is a web-based DevOps lifecycle tool that provides a Git repository manager providing a wiki, issue-tracking, and CI/CD pipeline features.
@@ -107,9 +109,12 @@ It is recommended to work with GitLab primarily due to its seamless integration 
 
 ### Pipeline
 
-In the context of Amazon SageMaker, a pipeline represents a series of machine learning (ML) steps, such as data preparation, model training, model evaluation, and deployment. Each of these steps is encapsulated as a job. Pipelines bring an order of execution to these jobs, facilitating the process of building, training, and deploying a model.
+In the context of Amazon SageMaker, a pipeline represents a series of machine learning (ML) steps, such as data preparation, model training, model evaluation, and deployment. Each of these steps is encapsulated as a job. Pipelines bring an order of execution to these jobs, facilitating the process of building, training, and deploying a model.,
+
+![Pipeline Registry](src/setup/interface/pipeline_desk.png)
 
 #### Creating a Pipeline
+
 Creating a pipeline in SageMaker involves defining the steps that your machine learning workflow will go through. This could include:
 
 - Data processing: Cleaning and transforming raw data into a format suitable for model training.
@@ -123,25 +128,31 @@ Creating a pipeline in SageMaker involves defining the steps that your machine l
 Each step in the pipeline corresponds to a job that is defined using SageMaker's Python SDK. Once the pipeline is defined, it can be executed with a single command.
 
 #### Updating a Pipeline
+
 Once a pipeline has been created, you might need to update it to reflect changes in the workflow. For instance, you might want to use a different preprocessing method, or you might want to experiment with different training algorithms.
 
 To update a pipeline, you can use the update-pipeline command. This allows you to change the pipeline definition and apply the changes without having to recreate the entire pipeline.
 
 #### Deleting a Pipeline
+
 If you no longer need a pipeline, you can delete it to clean up your SageMaker environment. This is done using the delete-pipeline command. Note that this will only delete the pipeline; any models trained by the pipeline will not be deleted.
 
 #### Executing a Pipeline
+
 To execute a pipeline, you can use the start-pipeline-execution command. This will run each step in the pipeline in the order they are defined.
 
 If you want to update an execution of a pipeline that is already created, you can use the update-pipeline-execution command.
 
 #### Monitoring a Pipeline
+
 You can monitor the status of your pipelines through the SageMaker interface. This provides visibility into the progress of your pipeline execution and helps you identify any issues that might occur during the execution.
 
 #### Debugging a Pipeline
+
 In the event that a pipeline execution fails or produces unexpected results, SageMaker provides tools for debugging. Logs for each pipeline step are accessible through the AWS CloudWatch service, where you can examine detailed logs for each job in the pipeline. These logs can provide valuable insight into issues such as errors in your code or problems with data.
 
 #### Pipeline Best Practices
+
 - Modularity: Define each step in your pipeline as a separate, self-contained unit of work. This improves readability and makes it easier to update or replace individual steps.
 
 - Version Control: Use a version control system such as GitLab to track changes to your pipeline definitions. This enables you to experiment with different configurations and roll back to a previous version if needed.
@@ -151,6 +162,7 @@ In the event that a pipeline execution fails or produces unexpected results, Sag
 - Security: Ensure that your pipelines are secure. Restrict access to your pipelines to only those who need it, use IAM roles to manage permissions, and encrypt sensitive data.
 
 #### Pipeline and SageMaker Studio
+
 SageMaker Studio provides a visual interface for creating and managing pipelines. You can drag and drop steps to create a pipeline, and then monitor the execution of each step in real-time. Additionally, you can view the code that defines each step, making it easier to understand what's happening at each stage of your machine learning workflow.
 
 In summary, SageMaker pipelines are a powerful tool for orchestrating your machine learning workflows. They help you automate and standardize processes, improve collaboration, and increase the efficiency and reproducibility of your projects. By understanding how to create, update, and manage pipelines, you can take full advantage of the capabilities that SageMaker provides.
@@ -190,7 +202,7 @@ SageMaker notebooks also offer seamless integration with other SageMaker feature
 
 In short, the AWS SageMaker notebook environment is a secure, managed cloud development platform for building, running and distributing machine learning and data analytics applications.
 
-//TODO: FOTOS, COMENTARIOS DEL LAYOUT, ETC
+![Notebook Instance](src/setup/interface/notebook_instance.png)
 
 ### Framework
 
@@ -220,7 +232,6 @@ The terminal in SageMaker serves as a command-line interface where you can run a
 In conclusion, the SageMaker framework provides a comprehensive, user-friendly, and powerful platform for machine learning development. By understanding the various components and how they interact, you can leverage SageMaker to streamline your machine learning workflows and enhance productivity.
 
 ### Instances
-
 AWS SageMaker offers several main instances that can be used depending on the use case. It is important to emphasize that due to infra limitations, not all of them can be used and in case of not being able to use it, an error will be displayed. The type instances are the following:
 
 - ml.t2.medium: This is a low-cost instance that can be used for development and testing purposes.
@@ -249,7 +260,7 @@ These are only general recommendations. The final use of each instance will depe
 
 To select a machine, you must perform the following steps
 
-![How to select image for notebook ](src/setup/instances/HowToSelectMachine.png)
+![How to select image for notebook](src/setup/instances/HowToSelectMachine.png)
 
 Once selected, a menu will be displayed in which you can filter the machines that have quick access. It should be noted that the access times to any machine is affordable, being only a few minutes in most cases.
 
@@ -367,8 +378,6 @@ SparkMagic commands include the following:
 %spark display: This command allows users to display the results of Spark commands on the notebook. The results are displayed in a user-friendly format, such as a table or a graph.
 
 These are the main SparkMagic commands, and together they provide an efficient and easy way to interact with Spark from the Jupyter notebook.
-
-##### Tips
 
 ### Plotting
 
@@ -694,7 +703,7 @@ In summary, this pipeline ensures that when changes are made to the `develop` or
 
 Amazon SageMaker is a fully managed service that provides developers and data scientists with the ability to build, train, and deploy machine learning (ML) models quickly. SageMaker removes the heavy lifting from each step of the machine learning process to make it easier to develop high-quality models.
 
-![Pipeline sagemaker](src/setup/interface/pipeline_desk.png)
+![Pipeline sagemaker](src/setup/interface/pipelines_desk.png)
 
 A key feature of SageMaker is its ML Pipelines, which provide a purpose-built, easy-to-use Continuous Integration and Continuous Delivery (CI/CD) service for machine learning. Here's a framework for using SageMaker Pipelines and some tips to make the most of them:
 
@@ -722,7 +731,29 @@ A key feature of SageMaker is its ML Pipelines, which provide a purpose-built, e
 
 Remember, SageMaker Pipelines are a powerful tool for automating and managing the lifecycle of your machine learning models. By following these tips, you can make the most of this service and ensure that your models are always ready to deliver accurate and timely predictions.
 
-### Foto grafo + explicación de cada step y su código
+![Pipeline Desk](src/setup/interface/pipeline_desk.png)
+
+This SageMaker pipeline script defines a machine learning pipeline which includes the following stages:
+
+1. **Setup:** Here, AWS resources and pipeline parameters are configured. An AWS SageMaker session is created, and an IAM role is assigned. The pipeline parameters include instance count, execution date, S3 bucket and path, and other flags that control the execution of the pipeline. 
+
+2. **Configuration:** Configuration data is read from a PySpark configuration file, and processors are initialized. These processors will be used to execute the pipeline steps.
+
+3. **ETL Step:** This step uses a PySpark job to perform ETL (Extract, Transform, Load) operations on the data. The job is configured to run a script (`etl.py`), with additional files provided as dependencies. This step will read data from an S3 bucket, perform transformations, and write the result back to another S3 location.
+
+4. **Preprocessing Steps:** There are two preprocessing steps: `train_preprocess_step` and `predict_preprocess_step`. Both steps are similar and are configured to run a preprocessing script (`preprocess.py`) with different inputs and outputs depending on whether the step is for training or prediction. These steps prepare the data for model training or prediction, respectively.
+
+5. **Train Step:** This step uses a script (`train.py`) to train a machine learning model. It is dependent on the completion of the `train_preprocess_step`. The trained model is written to the specified S3 location.
+
+6. **Predict Step:** This step uses a script (`predict.py`) to make predictions using the trained model. It is dependent on the `predict_preprocess_step`. The prediction results are written to the specified S3 location.
+
+7. **Condition Step:** This step controls the execution of the pipeline based on the value of the `use_type` parameter. If `use_type` equals "train", the pipeline executes the train preprocessing and train steps. Otherwise, it executes the predict preprocessing and predict steps.
+
+8. **Pipeline:** This is the final stage where the pipeline is assembled. All the steps and parameters are combined to create a SageMaker Pipeline. The pipeline has two main steps: the ETL step and the condition step.
+
+The entire script is designed to be flexible and reusable, with many parameters and configurations externalized, allowing for easy adjustments based on different needs.
+
+In summary, this SageMaker pipeline script defines a machine learning pipeline which can perform ETL operations on data, preprocess the data, train a model, and make predictions. The pipeline is flexible, allowing for different paths of execution based on the provided parameters.
 
 # Utils for mkdocs
 
