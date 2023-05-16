@@ -84,9 +84,101 @@ There are a number of commands (apart from the typical bash commands) that will 
 
 ### Gitlab
 
+GitLab is an important tool used alongside SageMaker for version control and collaboration. It is a web-based DevOps lifecycle tool that provides a Git repository manager providing a wiki, issue-tracking, and CI/CD pipeline features.
+
+#### Usage with SageMaker
+In a typical workflow, your codebase resides in GitLab repositories. You can clone these repositories to your SageMaker environment, work on your models, experiment, and then push your changes back to GitLab.
+
+To clone a repository into your SageMaker environment, you'd typically use the terminal within SageMaker. Here are the steps:
+
+Open a terminal in SageMaker.
+Navigate to the directory where you want to clone the repository.
+Run the command: git clone [repository_url]
+After making changes to your code or notebooks, you would want to commit these changes and push them back to GitLab. Here's how you do it:
+
+Open a terminal in SageMaker.
+Navigate to the directory containing the cloned repository.
+Run the command: git add . to stage all changes.
+Run the command: git commit -m "Your commit message" to commit the changes.
+Finally, run the command: git push to push your changes to the GitLab repository.
+
+#### Note
+It is recommended to work with GitLab primarily due to its seamless integration with SageMaker and other AWS services. However, it is important to note that other version control systems can be used as well, depending on your specific project needs and requirements.
+
 ### Pipeline
 
+In the context of Amazon SageMaker, a pipeline represents a series of machine learning (ML) steps, such as data preparation, model training, model evaluation, and deployment. Each of these steps is encapsulated as a job. Pipelines bring an order of execution to these jobs, facilitating the process of building, training, and deploying a model.
+
+#### Creating a Pipeline
+Creating a pipeline in SageMaker involves defining the steps that your machine learning workflow will go through. This could include:
+
+- Data processing: Cleaning and transforming raw data into a format suitable for model training.
+
+- Model training: Setting up and running a training job with your chosen algorithm and training data.
+
+- Model evaluation: Evaluating the model's performance using a validation dataset.
+
+- Model deployment: Deploying the trained model to an endpoint for making predictions.
+
+Each step in the pipeline corresponds to a job that is defined using SageMaker's Python SDK. Once the pipeline is defined, it can be executed with a single command.
+
+#### Updating a Pipeline
+Once a pipeline has been created, you might need to update it to reflect changes in the workflow. For instance, you might want to use a different preprocessing method, or you might want to experiment with different training algorithms.
+
+To update a pipeline, you can use the update-pipeline command. This allows you to change the pipeline definition and apply the changes without having to recreate the entire pipeline.
+
+#### Deleting a Pipeline
+If you no longer need a pipeline, you can delete it to clean up your SageMaker environment. This is done using the delete-pipeline command. Note that this will only delete the pipeline; any models trained by the pipeline will not be deleted.
+
+#### Executing a Pipeline
+To execute a pipeline, you can use the start-pipeline-execution command. This will run each step in the pipeline in the order they are defined.
+
+If you want to update an execution of a pipeline that is already created, you can use the update-pipeline-execution command.
+
+#### Monitoring a Pipeline
+You can monitor the status of your pipelines through the SageMaker interface. This provides visibility into the progress of your pipeline execution and helps you identify any issues that might occur during the execution.
+
+#### Debugging a Pipeline
+In the event that a pipeline execution fails or produces unexpected results, SageMaker provides tools for debugging. Logs for each pipeline step are accessible through the AWS CloudWatch service, where you can examine detailed logs for each job in the pipeline. These logs can provide valuable insight into issues such as errors in your code or problems with data.
+
+#### Pipeline Best Practices
+- Modularity: Define each step in your pipeline as a separate, self-contained unit of work. This improves readability and makes it easier to update or replace individual steps.
+
+- Version Control: Use a version control system such as GitLab to track changes to your pipeline definitions. This enables you to experiment with different configurations and roll back to a previous version if needed.
+
+- Resource Management: Regularly review your active pipelines and delete any that are no longer needed. This helps manage resource usage and control costs.
+
+- Security: Ensure that your pipelines are secure. Restrict access to your pipelines to only those who need it, use IAM roles to manage permissions, and encrypt sensitive data.
+
+#### Pipeline and SageMaker Studio
+SageMaker Studio provides a visual interface for creating and managing pipelines. You can drag and drop steps to create a pipeline, and then monitor the execution of each step in real-time. Additionally, you can view the code that defines each step, making it easier to understand what's happening at each stage of your machine learning workflow.
+
+In summary, SageMaker pipelines are a powerful tool for orchestrating your machine learning workflows. They help you automate and standardize processes, improve collaboration, and increase the efficiency and reproducibility of your projects. By understanding how to create, update, and manage pipelines, you can take full advantage of the capabilities that SageMaker provides.
+
+
 ### Filesystem
+
+The file system in Amazon SageMaker represents the structure and location of data files used in your machine learning workflows. This is typically managed using Amazon Elastic Block Store (EBS), a high-performance block storage service designed for use with Amazon EC2 for both throughput and transaction-intensive workloads at any scale.
+
+#### Using EBS with SageMaker
+Amazon EBS provides raw block-level storage that can be attached to Amazon EC2 instances, and is used in Amazon SageMaker to provide storage for your Jupyter notebooks, data files, and other important files. This allows the data to be easily accessible by your SageMaker instances or notebooks.
+
+Storing code and small files: It is recommended to store your code files, small datasets, and configuration files in EBS. These files can be quickly accessed and used in your SageMaker notebooks.
+
+Updating filesystem information and viewing: You can view and update your file system directly from your SageMaker notebook instance. This provides an easy way to manage your files and directories.
+
+#### Using S3 for Large Files
+For larger files and datasets, it is recommended to use Amazon S3 (Simple Storage Service), an object storage service that offers industry-leading scalability, data availability, security, and performance.
+
+This means that you can store and retrieve any amount of data at any time, from anywhere on the web, and only pay for what you use. In your SageMaker environment, you can easily read data from S3 into your notebooks for analysis or model training, and write results or models back to S3.
+
+#### Creating New Folders and Files
+Within your SageMaker environment, you can create new directories to organize your files as you would in any other file system. Additionally, you can create new files such as .txt files or new instances of Jupyter notebooks directly within the directory you are in.
+
+#### Importing External Files
+To import external files from your local server, you can use the 'Upload' button in the SageMaker interface. This will allow you to select files from your local machine and upload them to your SageMaker environment.
+
+In conclusion, the file system in SageMaker, along with EBS and S3, provides a robust and flexible structure for managing your data and code. Understanding how to effectively use these resources is essential for maintaining an organized and efficient workflow in your machine learning projects.
 
 ## 3. Sagemaker Notebooks [Jupyter]
 
@@ -101,6 +193,31 @@ In short, the AWS SageMaker notebook environment is a secure, managed cloud deve
 //TODO: FOTOS, COMENTARIOS DEL LAYOUT, ETC
 
 ### Framework
+
+The framework in Amazon SageMaker provides an integrated and scalable environment for handling all stages of a machine learning workflow - including data exploration, data cleaning, model training, model evaluation, and deployment.
+
+#### Understanding the SageMaker Interface
+The SageMaker interface is intuitive and user-friendly, designed to help you manage your machine learning projects efficiently. Here are some of the main components of the SageMaker interface:
+
+- Instances: The instances tab shows all active instances, including the apps running on these instances, the kernels, and the open terminals. Regularly checking this tab will help avoid unnecessary expenses. You can shut down instances when they are no longer needed.
+
+- Repositories: SageMaker provides the ability to clone repositories or start a new one. It is generally recommended to use GitLab for version control, but other repository services can also be used.
+
+- Help and Extensions: This tab is used for accessing help resources, managing extensions, and changing themes.
+
+- Internal Tabs: A summary of SageMaker internal tabs that are in use or open can be seen, allowing for easy navigation between different components of SageMaker.
+
+- Jump Start: This option allows you to initialize a guided machine learning project.
+
+- Projects and Services: This provides a summary of the different projects, clusters, and other active services in SageMaker. It is mainly used to monitor and check the status of the pipelines.
+
+#### Creating New Resources
+From the SageMaker interface, you can also perform actions such as creating a new launcher, a new folder, or importing an external file from your local server. You can also create new instances of Jupyter notebooks in the directory you are in or create and use a console with Python3.
+
+#### Working with the Terminal
+The terminal in SageMaker serves as a command-line interface where you can run a variety of commands to manage your SageMaker resources. Some of the commands you may frequently use include delete-pipeline, list-apps, update-pipeline, and update-pipeline-execution.
+
+In conclusion, the SageMaker framework provides a comprehensive, user-friendly, and powerful platform for machine learning development. By understanding the various components and how they interact, you can leverage SageMaker to streamline your machine learning workflows and enhance productivity.
 
 ### Instances
 
@@ -140,8 +257,25 @@ Once selected, a menu will be displayed in which you can filter the machines tha
 
 To check the prices associated with each of the machines that can be selected, you can go to the following address: https://aws.amazon.com/es/sagemaker/pricing/
 
+### Memory/CPU based
 
-#### Memory/CPU based
+In Amazon SageMaker, as in other cloud-based environments, resources such as memory and CPU play a crucial role in determining the performance of your machine learning workflows. Understanding how these resources are used and allocated can help you optimize your workflows and manage costs.
+
+#### Memory in SageMaker
+Memory is a critical resource for machine learning tasks, as these tasks often involve handling large amounts of data and require significant memory capacity. In SageMaker, the amount of memory available to you depends on the type of EC2 instance you choose for your notebook instances or training jobs. Amazon provides a wide variety of instance types with varying amounts of memory to cater to different requirements.
+
+Large datasets or memory-intensive operations might require instances with a high memory capacity. SageMaker also allows for distributed training on multiple instances, effectively multiplying the available memory.
+
+#### CPU in SageMaker
+The Central Processing Unit (CPU) is responsible for executing the instructions of a computer program. In machine learning, CPUs are essential for data processing and model training, especially for tasks that can't be easily parallelized.
+
+The number of CPU cores available in SageMaker depends on the EC2 instance type chosen. Some instance types come with powerful CPUs with multiple cores, which can speed up the training process significantly.
+
+#### Choosing the Right Instance Type
+Selecting the right instance type for your SageMaker tasks is a balance between performance and cost. High-memory and high-CPU instances provide better performance but come at a higher cost. You should consider the requirements of your specific tasks and datasets when selecting an instance type.
+
+#### Monitoring Usage
+SageMaker provides tools for monitoring the usage of memory and CPU resources. Regular monitoring can help you identify bottlenecks, understand the performance of your tasks, and make necessary adjustments.
 
 ##### Installing libraries
 
