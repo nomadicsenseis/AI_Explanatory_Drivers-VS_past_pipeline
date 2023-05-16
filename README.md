@@ -731,7 +731,7 @@ A key feature of SageMaker is its ML Pipelines, which provide a purpose-built, e
 
 Remember, SageMaker Pipelines are a powerful tool for automating and managing the lifecycle of your machine learning models. By following these tips, you can make the most of this service and ensure that your models are always ready to deliver accurate and timely predictions.
 
-![Pipeline Desk](src/setup/interface/pipeline_desk.png)
+![Pipeline Desk](src/setup/interface/pipelines_desk.png)
 
 This SageMaker pipeline script defines a machine learning pipeline which includes the following stages:
 
