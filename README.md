@@ -113,7 +113,7 @@ It is recommended to work with GitLab primarily due to its seamless integration 
 
 In the context of Amazon SageMaker, a pipeline represents a series of machine learning (ML) steps, such as data preparation, model training, model evaluation, and deployment. Each of these steps is encapsulated as a job. Pipelines bring an order of execution to these jobs, facilitating the process of building, training, and deploying a model.,
 
-![Pipeline Registry](src/setup/interface/pipeline_desk.png)
+![Pipeline Registry](src/setup/interface/pipelines_desk.png)
 
 #### Creating a Pipeline
 
