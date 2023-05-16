@@ -6,6 +6,11 @@
 
 ## 1. Introduction
 
+This repository has been created to help and guide the different Data teams to use AWS Sagemaker and be able to develop and deploy Machine Learning models in production in an agile and efficient way. In this guide you will find almost everything you need to know to use this service, from an overview of the framework, through the Jupyter notebook adapted to Sagemaker (with some tricks), to the Pipelines to deploy models in production.
+
+Clarify that this template is a guide made with the purpose of helping teams, if any team wants to work in a different way, with a different project structure and with their own guidelines, they are free to do it.
+
+
 Amazon SageMaker is a fully managed service that helps developers and data engineers build, train, and deploy high-quality machine learning models. It offers a variety of tools and resources for companies to easily implement artificial intelligence (AI) solutions into their applications and systems.
 
 With SageMaker, developers can access a complete set of machine learning tools in the cloud, enabling them to perform tasks such as data preparation, model building, model training and model deployment. In addition, the service also provides pre-trained, out-of-the-box machine learning models for common tasks such as image classification and natural language processing (NLP).
@@ -720,6 +725,23 @@ The `develop` directory in a data science project plays a vital role in housing 
 Remember, the `develop` folder is a dynamic space that evolves over time as the project progresses. It allows data scientists to iterate on their work, improving the project's final outcomes, and providing a history of the thought process and progression of the project.
 
 #### Production
+
+The `production` folder is a crucial part of any data science project. It signifies the transition from development and testing to real-world application. This directory typically contains the final, refined versions of all code, scripts, and other files used in the project. Here's an in-depth look at what it might include:
+
+- **Final Code**: This is the cleaned-up and optimized version of all the scripts used in the project, including data preprocessing, modeling, validation, and deployment scripts. The code here is ready for production and can handle new data efficiently.
+
+- **Packages**: This directory contains any additional packages or libraries that are used by the code. These can be custom packages developed specifically for the project, or third-party packages that aren't readily available through standard package managers.
+
+- **Model Files**: The `production` folder would also typically contain the final, trained versions of the machine learning models used in the project. These models are ready to be deployed and used for making predictions on new data.
+
+- **Data Pipelines**: The production folder contains the finalized versions of data pipelines. These pipelines automate the process of data ingestion, cleaning, transformation, model training, validation, and prediction generation. They are designed to handle new data efficiently and reliably.
+
+- **Configuration Files**: Any configuration files required to run the scripts or set up the environment would be part of the production folder. This includes files specifying the correct versions of libraries to use, paths to data or model files, and other configuration details.
+
+- **Documentation**: Finally, the `production` folder should contain thorough documentation explaining how to use the scripts, what each part of the code does, how to set up and use the data pipelines, and how to deploy and use the models. This documentation is crucial for ensuring that the project can be used and maintained effectively in the future.
+
+Remember, the `production` folder is the culmination of all the work done throughout the project. It should contain everything needed to deploy the project in a real-world environment and generate actionable insights from new data.
+
 
 Before deploying your model to Amazon SageMaker, it's essential to prepare it properly. In this section, we will cover the required steps in detail, along with code examples.
 
