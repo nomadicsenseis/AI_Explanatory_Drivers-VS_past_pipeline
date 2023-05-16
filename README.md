@@ -6,9 +6,35 @@
 
 ## 1. Introduction
 
-This repository has been created to help and guide the different Data teams to use AWS Sagemaker and be able to develop and deploy Machine Learning models in production in an agile and efficient way. In this guide you will find almost everything you need to know to use this service, from an overview of the framework, through the Jupyter notebook adapted to Sagemaker (with some tricks), to the Pipelines to deploy models in production.
+Amazon SageMaker is a fully managed service that helps developers and data engineers build, train, and deploy high-quality machine learning models. It offers a variety of tools and resources for companies to easily implement artificial intelligence (AI) solutions into their applications and systems.
 
-Clarify that this template is a guide made with the purpose of helping teams, if any team wants to work in a different way, with a different project structure and with their own guidelines, they are free to do it.
+With SageMaker, developers can access a complete set of machine learning tools in the cloud, enabling them to perform tasks such as data preparation, model building, model training and model deployment. In addition, the service also provides pre-trained, out-of-the-box machine learning models for common tasks such as image classification and natural language processing (NLP).
+
+SageMaker integrates with a variety of other AWS services, allowing developers to take advantage of the scalability, security and reliability of the AWS cloud platform. Models trained on SageMaker can be easily deployed to web and mobile applications through AWS services such as Amazon API Gateway and AWS Lambda.
+
+In addition, SageMaker offers a variety of model lifecycle management tools and resources that enable developers to efficiently manage their models. Developers can track the performance of their models and adjust them as needed to ensure they remain accurate over time.
+
+Furthermore, SageMaker provides easy-to-use tools for developers to optimize and fine-tune their models for specific use cases, such as improving accuracy or reducing inference time. The service also offers a range of instance types and sizes to accommodate various workloads and budgets.
+
+Another advantage of using SageMaker is its ability to automate and streamline the machine learning workflow, allowing developers to focus on building better models instead of worrying about infrastructure and operational tasks. For example, SageMaker can automatically launch and manage instances for data processing and model training, as well as automate hyperparameter tuning and model selection.
+
+SageMaker also supports a variety of popular machine learning frameworks and libraries, such as TensorFlow, PyTorch, and Scikit-learn, making it easy for developers to work with their preferred tools and languages.
+
+Overall, Amazon SageMaker provides a comprehensive set of tools and resources for developers to build, train and deploy high-quality machine learning models with ease, while taking advantage of the scalability, security and reliability of the AWS cloud platform.
+
+This makes it a valuable service for companies of all sizes looking to implement AI solutions into their applications and systems. With SageMaker, developers can quickly and easily create custom models tailored to their specific business needs, and deploy them with confidence knowing that they are backed by the reliability and security of AWS.
+
+In addition to its technical capabilities, SageMaker also offers extensive documentation, tutorials, and support resources to help developers get started and troubleshoot issues. This makes it accessible to developers with varying levels of experience in machine learning and AI.
+
+Overall, Amazon SageMaker is a powerful tool for companies looking to leverage the benefits of machine learning and AI in their applications and systems. Its fully managed service, range of tools and resources, and integration with AWS services make it a reliable and efficient solution for building, training, and deploying high-quality machine learning models.
+
+Moreover, SageMaker provides a cost-effective approach to machine learning, allowing companies to pay only for the resources they use. With SageMaker, developers can easily scale up or down their computing resources based on the size and complexity of their machine learning workloads, helping to reduce costs and optimize performance.
+
+SageMaker also provides built-in security features to help protect data and models, such as encryption at rest and in transit, identity and access management, and compliance with industry standards and regulations.
+
+Finally, SageMaker is constantly evolving and expanding, with new features and capabilities being added regularly. This ensures that developers have access to the latest machine learning tools and technologies, and can continue to improve and innovate their models over time.
+
+In summary, Amazon SageMaker is a valuable service that provides developers and data engineers with the tools and resources needed to build, train, and deploy high-quality machine learning models. Its integration with AWS services, ease of use, and cost-effectiveness make it a compelling choice for companies looking to implement AI solutions into their applications and systems.
 
 ## 2. Sagemaker overview
 
@@ -323,6 +349,12 @@ The following problems may be encountered when attempting to install libraries o
 
 These are some of the most common problems a user may encounter when trying to install libraries in SageMaker. To resolve these problems, it is important to investigate the error message, review the documentation and consult the user community.
 
+Additionally, it is recommended to check for updates and compatibility with the latest versions of libraries and technologies before installing. It may also be helpful to use a virtual environment or container to isolate the installation of libraries from other projects.
+
+Finally, to avoid potential issues with library installation in SageMaker, it is a best practice to document the libraries and their versions used in a project, and to save them in a requirements.txt file. This can help ensure that the same libraries and versions are used consistently across different environments and projects.
+
+In summary, installing libraries in SageMaker can be a straightforward process using the !pip install command, but it is important to be aware of potential issues such as insufficient permissions, dependency conflicts, internet connection problems, compatibility issues, and resource issues. By understanding these issues and following best practices, developers can successfully install the required libraries and build high-quality machine learning models in SageMaker.
+
 ##### Tips
 
 - Understand Your Resource Needs: Before starting a project, understand the memory, CPU, and storage requirements of your tasks. This will help you choose the right instance type and avoid unnecessary costs.
@@ -419,6 +451,22 @@ SparkMagic commands include the following:
 `%spark display`: This command allows users to display the results of Spark commands on the notebook. The results are displayed in a user-friendly format, such as a table or a graph.
 
 These are the main SparkMagic commands, and together they provide an efficient and easy way to interact with Spark from the Jupyter notebook.
+
+##### Tips
+
+Amazon EMR is a distributed data processing service that enables users to process large amounts of data using frameworks such as Apache Spark and Hadoop. Amazon SageMaker, on the other hand, is a fully managed service that helps developers create, train and deploy high-quality machine learning models. Here are some tips for using Amazon EMR from Amazon SageMaker:
+
+Use Amazon EMR Notebooks - Amazon EMR Notebooks is a service that allows users to create and run Jupyter notebooks on an EMR cluster. This means you can run code in Spark or Hadoop on the same EMR cluster you are working on, which reduces latency and improves performance. In addition, you can create an EMR cluster directly from Amazon SageMaker and then connect to it from an EMR notebook.
+
+Use EMR Studio: EMR Studio is a web development environment that enables users to create, develop and run big data-based applications. By using EMR Studio, users can connect directly to their EMR cluster and run code in Spark or Hadoop. EMR Studio is an ideal choice for those who prefer a graphical user interface instead of a command line.
+
+Use the Boto3 SDK: The Boto3 SDK is a Python library that allows developers to interact with AWS services. Using the Boto3 SDK, users can connect to their EMR cluster and run code in Spark or Hadoop directly from Python. This is especially useful for those who prefer to write code in Python rather than Scala or Java.
+
+Use SageMaker's integration with EMR: Amazon SageMaker integrates seamlessly with EMR, which means you can use EMR to preprocess your data before training your models in SageMaker. To use this integration, you need to create an EMR cluster and load your data into it. You can then use Spark or Hadoop to preprocess your data and store it in Amazon S3. Then, you can use SageMaker to train your models using the preprocessed data.
+
+In summary, Amazon EMR and Amazon SageMaker are two powerful services that complement each other to enable users to process large amounts of data and train high-quality machine learning models. By using the tips above, you can take full advantage of these tools and improve the efficiency of your big data and machine learning workflows.
+
+TODO: Meter tips mas especificos
 
 ### Plotting
 
@@ -620,6 +668,7 @@ During the production phase, code is refined and optimized, data pipelines are f
 
 This section aims to provide a detailed overview of the project structure during the production phase, outlining the organization and purpose of different directories and files. It will offer a clear understanding of how the production environment is set up, enabling efficient navigation and modification as the project evolves. This knowledge is critical not only for the current team members but also for future contributors who may need to understand the system quickly.
 
+
 ### Project structure
 
 - develop: This folder typically contains all the developmental codes and scripts. It can include various versions of data processing, model development, and testing codes that data scientists have worked on during the development stage.
@@ -672,21 +721,160 @@ Remember, the `develop` folder is a dynamic space that evolves over time as the 
 
 #### Production
 
-The `production` folder is a crucial part of any data science project. It signifies the transition from development and testing to real-world application. This directory typically contains the final, refined versions of all code, scripts, and other files used in the project. Here's an in-depth look at what it might include:
+Before deploying your model to Amazon SageMaker, it's essential to prepare it properly. In this section, we will cover the required steps in detail, along with code examples.
 
-- **Final Code**: This is the cleaned-up and optimized version of all the scripts used in the project, including data preprocessing, modeling, validation, and deployment scripts. The code here is ready for production and can handle new data efficiently.
+2.1. Train and Save Your Model
 
-- **Packages**: This directory contains any additional packages or libraries that are used by the code. These can be custom packages developed specifically for the project, or third-party packages that aren't readily available through standard package managers.
+First, you need to train your model using your preferred machine learning framework (e.g., TensorFlow, PyTorch, or scikit-learn). After training, save your model in the required format for SageMaker. Most frameworks have built-in functions to save the model as a file.
 
-- **Model Files**: The `production` folder would also typically contain the final, trained versions of the machine learning models used in the project. These models are ready to be deployed and used for making predictions on new data.
+Example using TensorFlow:
 
-- **Data Pipelines**: The production folder contains the finalized versions of data pipelines. These pipelines automate the process of data ingestion, cleaning, transformation, model training, validation, and prediction generation. They are designed to handle new data efficiently and reliably.
+```
+import tensorflow as tf
 
-- **Configuration Files**: Any configuration files required to run the scripts or set up the environment would be part of the production folder. This includes files specifying the correct versions of libraries to use, paths to data or model files, and other configuration details.
+# Define and train your model
+model = tf.keras.Sequential([...])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.fit(train_data, train_labels, epochs=10, batch_size=32)
 
-- **Documentation**: Finally, the `production` folder should contain thorough documentation explaining how to use the scripts, what each part of the code does, how to set up and use the data pipelines, and how to deploy and use the models. This documentation is crucial for ensuring that the project can be used and maintained effectively in the future.
+# Save your trained model
+model.save('my_model.h5')
 
-Remember, the `production` folder is the culmination of all the work done throughout the project. It should contain everything needed to deploy the project in a real-world environment and generate actionable insights from new data.
+```
+
+2.2. Convert Model to a SageMaker-Compatible Format
+
+Once your model is trained and saved, convert it to a format that can be used with SageMaker. For TensorFlow and PyTorch models, you can save the model as a .tar.gz file, while scikit-learn models need to be saved as a .joblib file.
+
+Example using TensorFlow:
+
+```
+import tarfile
+
+# Compress the TensorFlow model into a .tar.gz file
+with tarfile.open('my_model.tar.gz', 'w:gz') as tar:
+    tar.add('my_model.h5')
+```
+
+2.3. Create an Entry Point Script
+
+Create a script that serves as an entry point for your model. This script should include functions for loading the model, preprocessing input data, predicting with the model, and post-processing the output. Save this script as a separate file (e.g., inference.py).
+
+Example using TensorFlow:
+
+```
+# inference.py
+
+import json
+import tensorflow as tf
+
+_MODEL = None
+
+def model_fn(model_dir):
+    global _MODEL
+    _MODEL = tf.keras.models.load_model(f'{model_dir}/my_model.h5')
+    return _MODEL
+
+def input_fn(request_body, request_content_type):
+    if request_content_type == 'application/json':
+        input_data = json.loads(request_body)
+        return input_data
+    else:
+        raise ValueError('Content type must be application/json')
+
+def predict_fn(input_data, model):
+    return model.predict(input_data)
+
+def output_fn(prediction, response_content_type):
+    if response_content_type == 'application/json':
+        return json.dumps(prediction.tolist()), response_content_type
+    else:
+        raise ValueError('Content type must be application/json')
+```
+
+Creating a SageMaker Pipeline
+SageMaker Pipelines allows you to create, automate, and manage end-to-end machine learning workflows, from data preprocessing and model training to deployment.
+
+3.1. Define Pipeline Steps
+
+Start by defining the steps for your pipeline, such as data preprocessing, model training, and model deployment. Each step is defined using a SageMaker Python SDK class.
+
+Example using SageMaker Python SDK:
+
+```
+import boto3
+from sagemaker.sklearn.processing import SKLearnProcessor
+from sagemaker.processing import ProcessingInput, ProcessingOutput
+from sagemaker.workflow.steps import ProcessingStep, TrainingStep, CreateModelStep
+from sagemaker.workflow.pipeline import Pipeline
+
+# Define a data preprocessing step
+sklearn_processor = SKLearnProcessor(framework_version='0.23-1',
+                                     role=<your_sagemaker_role>,
+                                     instance_type='ml.m5.xlarge',
+                                     instance_count=1)
+
+preprocessing_step = ProcessingStep(
+    name='DataPreprocessing',
+    processor=sklearn_processor,
+    inputs=[ProcessingInput(source=<input_data_s3_path>,
+                            destination='/opt/ml/processing/input')],
+    outputs=[ProcessingOutput(output_name='train',
+                              source='/opt/ml/processing/output/train'),
+             ProcessingOutput(output_name='validation',
+                              source='/opt/ml/processing/output/validation')],
+    code='preprocessing.py'
+)
+
+# Define a model training step
+estimator = <your_sagemaker_estimator>
+
+training_step = TrainingStep(
+    name='ModelTraining',
+    estimator=estimator,
+    inputs={'train': sagemaker.inputs.TrainingInput(s3_data=preprocessing_step.properties.ProcessingOutputConfig.Outputs['train'].S3Output.S3)
+    content_type='text/csv'),
+    validation': sagemaker.inputs.TrainingInput(s3_data=preprocessing_step.properties.ProcessingOutputConfig.Outputs['validation'].S3Output.S3Uri, content_type='text/csv')
+}
+)
+
+Define a model creation step
+model_step = CreateModelStep(
+    name='CreateModel',
+    model_name=<model_name>,
+    model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
+    primary_container_image=<container_image>,
+    role=<your_sagemaker_role>
+)
+
+Define a model deployment step
+deploy_step = steps.EndpointStep(
+    name='DeployModel',
+    endpoint_name=<endpoint_name>,
+    model_name=model_step.properties.ModelName,
+    config_name=<endpoint_config_name>,
+    update=False
+)
+```
+
+
+Once you've defined the steps, assemble them into a pipeline and execute it using the SageMaker Python SDK.
+
+Example:
+```
+# Assemble the pipeline
+pipeline = Pipeline(
+    name=<pipeline_name>,
+    steps=[preprocessing_step, training_step, model_step, deploy_step]
+)
+
+# Execute the pipeline
+pipeline.upsert(role_arn=<your_sagemaker_role>)
+execution = pipeline.start()
+execution.wait()
+```
+
+These steps will create a SageMaker Pipeline that automates your machine learning workflow, from data preprocessing, model training, to deployment. The pipeline is defined and executed using the SageMaker Python SDK, making it easy to manage and monitor your end-to-end process.
 
 ### Continuous integration with GitLab
 
