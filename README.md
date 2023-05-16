@@ -89,22 +89,24 @@ There are a number of commands (apart from the typical bash commands) that will 
 GitLab is an important tool used alongside SageMaker for version control and collaboration. It is a web-based DevOps lifecycle tool that provides a Git repository manager providing a wiki, issue-tracking, and CI/CD pipeline features.
 
 #### Usage with SageMaker
+
 In a typical workflow, your codebase resides in GitLab repositories. You can clone these repositories to your SageMaker environment, work on your models, experiment, and then push your changes back to GitLab.
 
 To clone a repository into your SageMaker environment, you'd typically use the terminal within SageMaker. Here are the steps:
 
-Open a terminal in SageMaker.
-Navigate to the directory where you want to clone the repository.
-Run the command: git clone [repository_url]
-After making changes to your code or notebooks, you would want to commit these changes and push them back to GitLab. Here's how you do it:
+- Open a terminal in SageMaker.
+- Navigate to the directory where you want to clone the repository.
+- Run the command: git clone [repository_url]
+- After making changes to your code or notebooks, you would want to commit these changes and push them back to GitLab. Here's how you do it:
 
-Open a terminal in SageMaker.
-Navigate to the directory containing the cloned repository.
-Run the command: git add . to stage all changes.
-Run the command: git commit -m "Your commit message" to commit the changes.
-Finally, run the command: git push to push your changes to the GitLab repository.
+    - Open a terminal in SageMaker.
+    - Navigate to the directory containing the cloned repository.
+    - Run the command: git add . to stage all changes.
+    - Run the command: git commit -m "Your commit message" to commit the changes.
+    - Finally, run the command: git push to push your changes to the GitLab repository.
 
 #### Note
+
 It is recommended to work with GitLab primarily due to its seamless integration with SageMaker and other AWS services. However, it is important to note that other version control systems can be used as well, depending on your specific project needs and requirements.
 
 ### Pipeline
@@ -167,12 +169,12 @@ SageMaker Studio provides a visual interface for creating and managing pipelines
 
 In summary, SageMaker pipelines are a powerful tool for orchestrating your machine learning workflows. They help you automate and standardize processes, improve collaboration, and increase the efficiency and reproducibility of your projects. By understanding how to create, update, and manage pipelines, you can take full advantage of the capabilities that SageMaker provides.
 
-
 ### Filesystem
 
 The file system in Amazon SageMaker represents the structure and location of data files used in your machine learning workflows. This is typically managed using Amazon Elastic Block Store (EBS), a high-performance block storage service designed for use with Amazon EC2 for both throughput and transaction-intensive workloads at any scale.
 
 #### Using EBS with SageMaker
+
 Amazon EBS provides raw block-level storage that can be attached to Amazon EC2 instances, and is used in Amazon SageMaker to provide storage for your Jupyter notebooks, data files, and other important files. This allows the data to be easily accessible by your SageMaker instances or notebooks.
 
 Storing code and small files: It is recommended to store your code files, small datasets, and configuration files in EBS. These files can be quickly accessed and used in your SageMaker notebooks.
@@ -180,14 +182,17 @@ Storing code and small files: It is recommended to store your code files, small 
 Updating filesystem information and viewing: You can view and update your file system directly from your SageMaker notebook instance. This provides an easy way to manage your files and directories.
 
 #### Using S3 for Large Files
+
 For larger files and datasets, it is recommended to use Amazon S3 (Simple Storage Service), an object storage service that offers industry-leading scalability, data availability, security, and performance.
 
 This means that you can store and retrieve any amount of data at any time, from anywhere on the web, and only pay for what you use. In your SageMaker environment, you can easily read data from S3 into your notebooks for analysis or model training, and write results or models back to S3.
 
 #### Creating New Folders and Files
+
 Within your SageMaker environment, you can create new directories to organize your files as you would in any other file system. Additionally, you can create new files such as .txt files or new instances of Jupyter notebooks directly within the directory you are in.
 
 #### Importing External Files
+
 To import external files from your local server, you can use the 'Upload' button in the SageMaker interface. This will allow you to select files from your local machine and upload them to your SageMaker environment.
 
 In conclusion, the file system in SageMaker, along with EBS and S3, provides a robust and flexible structure for managing your data and code. Understanding how to effectively use these resources is essential for maintaining an organized and efficient workflow in your machine learning projects.
@@ -209,6 +214,7 @@ In short, the AWS SageMaker notebook environment is a secure, managed cloud deve
 The framework in Amazon SageMaker provides an integrated and scalable environment for handling all stages of a machine learning workflow - including data exploration, data cleaning, model training, model evaluation, and deployment.
 
 #### Understanding the SageMaker Interface
+
 The SageMaker interface is intuitive and user-friendly, designed to help you manage your machine learning projects efficiently. Here are some of the main components of the SageMaker interface:
 
 - Instances: The instances tab shows all active instances, including the apps running on these instances, the kernels, and the open terminals. Regularly checking this tab will help avoid unnecessary expenses. You can shut down instances when they are no longer needed.
@@ -224,14 +230,17 @@ The SageMaker interface is intuitive and user-friendly, designed to help you man
 - Projects and Services: This provides a summary of the different projects, clusters, and other active services in SageMaker. It is mainly used to monitor and check the status of the pipelines.
 
 #### Creating New Resources
+
 From the SageMaker interface, you can also perform actions such as creating a new launcher, a new folder, or importing an external file from your local server. You can also create new instances of Jupyter notebooks in the directory you are in or create and use a console with Python3.
 
 #### Working with the Terminal
+
 The terminal in SageMaker serves as a command-line interface where you can run a variety of commands to manage your SageMaker resources. Some of the commands you may frequently use include delete-pipeline, list-apps, update-pipeline, and update-pipeline-execution.
 
 In conclusion, the SageMaker framework provides a comprehensive, user-friendly, and powerful platform for machine learning development. By understanding the various components and how they interact, you can leverage SageMaker to streamline your machine learning workflows and enhance productivity.
 
 ### Instances
+
 AWS SageMaker offers several main instances that can be used depending on the use case. It is important to emphasize that due to infra limitations, not all of them can be used and in case of not being able to use it, an error will be displayed. The type instances are the following:
 
 - ml.t2.medium: This is a low-cost instance that can be used for development and testing purposes.
@@ -273,40 +282,44 @@ To check the prices associated with each of the machines that can be selected, y
 In Amazon SageMaker, as in other cloud-based environments, resources such as memory and CPU play a crucial role in determining the performance of your machine learning workflows. Understanding how these resources are used and allocated can help you optimize your workflows and manage costs.
 
 #### Memory in SageMaker
+
 Memory is a critical resource for machine learning tasks, as these tasks often involve handling large amounts of data and require significant memory capacity. In SageMaker, the amount of memory available to you depends on the type of EC2 instance you choose for your notebook instances or training jobs. Amazon provides a wide variety of instance types with varying amounts of memory to cater to different requirements.
 
 Large datasets or memory-intensive operations might require instances with a high memory capacity. SageMaker also allows for distributed training on multiple instances, effectively multiplying the available memory.
 
 #### CPU in SageMaker
+
 The Central Processing Unit (CPU) is responsible for executing the instructions of a computer program. In machine learning, CPUs are essential for data processing and model training, especially for tasks that can't be easily parallelized.
 
 The number of CPU cores available in SageMaker depends on the EC2 instance type chosen. Some instance types come with powerful CPUs with multiple cores, which can speed up the training process significantly.
 
 #### Choosing the Right Instance Type
+
 Selecting the right instance type for your SageMaker tasks is a balance between performance and cost. High-memory and high-CPU instances provide better performance but come at a higher cost. You should consider the requirements of your specific tasks and datasets when selecting an instance type.
 
 #### Monitoring Usage
+
 SageMaker provides tools for monitoring the usage of memory and CPU resources. Regular monitoring can help you identify bottlenecks, understand the performance of your tasks, and make necessary adjustments.
 
 ##### Installing libraries
 
-Installation of libraries on a SageMaker Notebook machine:
+- Installation of libraries on a SageMaker Notebook machine:
+- Open a terminal on the Jupyter notebook.
+- Use the !pip install command to install the required libraries. For example, !pip install pandas matplotlib.
 
-Open a terminal on the Jupyter notebook.
-Use the !pip install command to install the required libraries. For example, !pip install pandas matplotlib.
 Note that some libraries, such as the data analysis libraries, may require more memory and processing power than is provided by default on a SageMaker Notebook machine. In these cases, it may be necessary to increase the memory and processing power of the machine before installing the libraries.
 
 The following problems may be encountered when attempting to install libraries on SageMaker:
 
-Insufficient permissions: If the user does not have sufficient permissions to install libraries in the SageMaker environment, they may receive an error message indicating that they do not have permissions to install libraries.
+- Insufficient permissions: If the user does not have sufficient permissions to install libraries in the SageMaker environment, they may receive an error message indicating that they do not have permissions to install libraries.
 
-Dependency conflicts: Libraries often depend on other libraries to function properly. If a library depends on a specific version of another library, but the currently installed version is different, a dependency conflict may occur resulting in an error when installing the library.
+- Dependency conflicts: Libraries often depend on other libraries to function properly. If a library depends on a specific version of another library, but the currently installed version is different, a dependency conflict may occur resulting in an error when installing the library.
 
-Internet connection problems: If the SageMaker environment does not have Internet access, it may not be able to download the required libraries during installation.
+- Internet connection problems: If the SageMaker environment does not have Internet access, it may not be able to download the required libraries during installation.
 
-Compatibility issues: Libraries are often developed to work with specific versions of Python and other technologies. If a library is not compatible with the version of Python or technology running in the SageMaker environment, an error may occur when attempting to install the library.
+- Compatibility issues: Libraries are often developed to work with specific versions of Python and other technologies. If a library is not compatible with the version of Python or technology running in the SageMaker environment, an error may occur when attempting to install the library.
 
-Resource issues: Some libraries may require a large amount of resources to function properly. If the SageMaker environment does not have sufficient resources available, an error may occur when attempting to install the library.
+- Resource issues: Some libraries may require a large amount of resources to function properly. If the SageMaker environment does not have sufficient resources available, an error may occur when attempting to install the library.
 
 These are some of the most common problems a user may encounter when trying to install libraries in SageMaker. To resolve these problems, it is important to investigate the error message, review the documentation and consult the user community.
 
@@ -342,12 +355,40 @@ Installing libraries on an Apache Spark cluster and on a SageMaker Notebook mach
 
 Installing libraries on a Spark cluster:
 
-Create a Python dependencies file, such as a requirements.txt file, containing the libraries you want to install.
-Upload the dependencies file to S3 or other Spark-accessible file storage.
-Start a Spark cluster on Amazon EMR, which will include an option to specify the location of the dependency file.
-Once the cluster is active, you can install the libraries on the cluster by using !pip install -r and providing the location of the dependency file in S3.
+- Create a Python dependencies file, such as a requirements.txt file, containing the libraries you want to install.
+- Upload the dependencies file to S3 or other Spark-accessible file storage.
+- Start a Spark cluster on Amazon EMR, which will include an option to specify the location of the dependency file.
+- Once the cluster is active, you can install the libraries on the cluster by using !pip install -r and providing the location of the dependency file in S3.
 
-Another option available to the user is the use of the command//TODO
+Another option available to the user is the use of the command "spark-submit --py-files."
+
+This command allows you to submit your application to a Spark cluster and include Python .zip, .egg or .py files that contain your dependencies. Here's how to use it:
+
+- Package your Python dependencies into .zip, .egg or .py files.
+- Upload these files to a location accessible by your Spark cluster, such as S3.
+- When you're ready to submit your job, use the `spark-submit --py-files` command and provide the location of your dependency files. The command might look something like this:
+
+  ```
+  spark-submit --py-files s3://my-bucket/my-dependencies.zip my_script.py
+  ```
+
+This will submit `my_script.py` to be run on the Spark cluster, and the Python dependencies inside `my-dependencies.zip` will be available to your script.
+
+Installing libraries on a SageMaker Notebook machine:
+
+- In a SageMaker Notebook, you can install libraries directly using `!pip install` command in a code cell. For example, to install the library `numpy`, you would use:
+
+  ```python
+  !pip install numpy
+  ```
+
+- If you have a requirements.txt file, you can install all the libraries listed in the file with:
+
+  ```python
+  !pip install -r requirements.txt
+  ```
+
+Please note that the libraries are installed for the current Jupyter kernel only. If you change the kernel, you will need to install the libraries again for that specific kernel.
 
 ##### SparkMagic
 
@@ -361,21 +402,21 @@ In short, SparkMagic commands provide a simple and efficient way to interact wit
 
 SparkMagic commands include the following:
 
-%spark configure: This command allows users to configure the connection to a Spark cluster. Users can specify the cluster URL, port, user and password, among other details.
+`%spark configure`: This command allows users to configure the connection to a Spark cluster. Users can specify the cluster URL, port, user and password, among other details.
 
-%spark: This command allows users to create a Spark session on the specified cluster using %spark configure. After creating the session, users can write and execute code in Spark directly from the notebook.
+`%spark`: This command allows users to create a Spark session on the specified cluster using %spark configure. After creating the session, users can write and execute code in Spark directly from the notebook.
 
-%spark info: This command displays information about the current Spark session, including the session ID, the cluster to which it is connected, and the session status.
+`%spark info`: This command displays information about the current Spark session, including the session ID, the cluster to which it is connected, and the session status.
 
-%spark log: This command displays logs for the current Spark session. These logs can be useful for debugging errors and better understanding what is happening in the cluster.
+`%spark log`: This command displays logs for the current Spark session. These logs can be useful for debugging errors and better understanding what is happening in the cluster.
 
-%spark cleanup: This command closes the current Spark session and frees the resources associated with the session.
+`%spark cleanup`: This command closes the current Spark session and frees the resources associated with the session.
 
-%spark add: This command allows users to add files to the current Spark session. Users can add local or remote files to the session so that they can be accessed and used by Spark.
+`%spark add`: This command allows users to add files to the current Spark session. Users can add local or remote files to the session so that they can be accessed and used by Spark.
 
-%spark load: This command allows users to load data into Spark from a local or remote file.
+`%spark load`: This command allows users to load data into Spark from a local or remote file.
 
-%spark display: This command allows users to display the results of Spark commands on the notebook. The results are displayed in a user-friendly format, such as a table or a graph.
+`%spark display`: This command allows users to display the results of Spark commands on the notebook. The results are displayed in a user-friendly format, such as a table or a graph.
 
 These are the main SparkMagic commands, and together they provide an efficient and easy way to interact with Spark from the Jupyter notebook.
 
