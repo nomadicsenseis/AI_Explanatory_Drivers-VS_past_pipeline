@@ -564,22 +564,194 @@ Note: Before creating an endpoint, you must first create an endpoint configurati
 
 ## 4. Production
 
+In the lifecycle of a data science project, the Production phase plays a crucial role. This stage signifies that the models and data processing pipelines developed throughout the project have been tested, validated, and are now ready for deployment in a real-world scenario. The purpose is to automate the process, ensuring that the project delivers actionable, timely, and accurate insights consistently.
+
+During the production phase, code is refined and optimized, data pipelines are finalized, and models are set up for continuous learning. Strict version control is adhered to, and rigorous testing is done to ensure everything functions as expected when new data is encountered.
+
+This section aims to provide a detailed overview of the project structure during the production phase, outlining the organization and purpose of different directories and files. It will offer a clear understanding of how the production environment is set up, enabling efficient navigation and modification as the project evolves. This knowledge is critical not only for the current team members but also for future contributors who may need to understand the system quickly.
+
 ### Project structure
+
+- develop: This folder typically contains all the developmental codes and scripts. It can include various versions of data processing, model development, and testing codes that data scientists have worked on during the development stage.
+
+- exploratory: This folder is often used for exploratory data analysis (EDA). It may contain notebooks or scripts which were used to initially understand and explore the data, find patterns, perform statistical analysis, and design initial models.
+
+- production: This is the heart of the project where the final, production-ready code resides.
+
+    - code: This folder contains the final version of all the scripts used in the project, including data processing, modeling, validation, and deployment scripts.
+    - packages: This folder contains any additional packages or libraries that are used by the code. These can be custom packages developed specifically for the project, or third-party packages that aren't readily available.
+    - pipelines_code: This folder contains code for the various data pipelines used in the project. These pipelines automate the process of data ingestion, cleaning, transformation, model training, validation, and prediction generation.
+
+- src: Short for source, this directory is used for code that will be imported in your scripts. It often contains utility functions and classes, and is typically structured as a Python package containing init files. This is where the majority of the reusable code will be placed, like helper functions or custom classes that are used across the project.
+
+Please note that this is a standard structure and can be customized according to the specific needs of the project.
 
 #### Exploratory data analysis (EDA)
 
+The Exploratory Data Analysis (EDA) phase is one of the most crucial stages in any data science project. It refers to the critical process of performing initial investigations on data to discover patterns, spot anomalies, test hypotheses, and check assumptions with the help of summary statistics and graphical representations.
+
+Here is a deeper look at what the `exploratory` folder might contain:
+
+- **Data Profiling Reports**: These are comprehensive reports generated using libraries like pandas-profiling in Python. They provide a thorough summary of the dataset, including the number of missing values, unique values, data types, common values, etc. This is often the first step in understanding the data.
+
+- **Notebooks/Scripts for Data Visualization**: These files contain code for generating various visualizations that help understand the data better. They can include histograms, box plots, scatter plots, correlation heatmaps, etc. These visualizations aid in understanding the distribution of data, presence of outliers, and relationships between different variables.
+
+- **Hypothesis Testing Results**: If any statistical hypothesis testing is done during the EDA, the results and the code used for testing will be present in this folder. This can help understand if certain assumptions about the data hold true.
+
+- **Insights Reports**: After analyzing the data, the key findings and insights are often compiled into a report. This can be in the form of a markdown file or a Jupyter notebook. It helps anyone reading the report to understand the key takeaways from the EDA.
+
+- **Preprocessing Code**: Any code used to clean the data, handle missing values, or perform feature engineering will be present in this folder. This code is often not the final version and may be subject to changes as the project progresses.
+
+Remember, the contents of the `exploratory` folder can vary depending on the project's needs and the data scientist's preferences. The purpose of this folder is to provide a snapshot of the initial data understanding and exploration process.
+
 #### Develop
+
+The `develop` directory in a data science project plays a vital role in housing all developmental scripts and codes. It's a workspace where data scientists can experiment, test, and iterate on different solutions before finalizing the best approach. Here's a deeper look at what this section may contain:
+
+- **Feature Experimentation**: Scripts or notebooks in this section can involve trying out different feature engineering techniques, testing different transformations, and creating new features. This is an experimental space where data scientists can freely modify and tweak features to see how these changes impact model performance.
+
+- **Model Experimentation**: This section might contain multiple scripts or notebooks, each representing a different machine learning model or a different set of hyperparameters. The purpose is to test a variety of models and configurations to find the one that offers the best performance on the problem at hand.
+
+- **Data Cleaning and Preprocessing**: While the final data cleaning and preprocessing steps would be in the production code, the `develop` folder might contain various versions of cleaning and preprocessing scripts, each representing a different approach to handling missing values, outliers, and other data issues.
+
+- **Validation and Evaluation**: You might find scripts here that are used to validate the models on validation datasets and evaluate their performance using various metrics. These scripts help in comparing different models and choosing the best one for production.
+
+- **Drafts and Old Versions**: The `develop` folder can also serve as an archive for older versions of scripts or drafts that were used at some point in the project but were later replaced or updated. 
+
+Remember, the `develop` folder is a dynamic space that evolves over time as the project progresses. It allows data scientists to iterate on their work, improving the project's final outcomes, and providing a history of the thought process and progression of the project.
 
 #### Production
 
+The `production` folder is a crucial part of any data science project. It signifies the transition from development and testing to real-world application. This directory typically contains the final, refined versions of all code, scripts, and other files used in the project. Here's an in-depth look at what it might include:
+
+- **Final Code**: This is the cleaned-up and optimized version of all the scripts used in the project, including data preprocessing, modeling, validation, and deployment scripts. The code here is ready for production and can handle new data efficiently.
+
+- **Packages**: This directory contains any additional packages or libraries that are used by the code. These can be custom packages developed specifically for the project, or third-party packages that aren't readily available through standard package managers.
+
+- **Model Files**: The `production` folder would also typically contain the final, trained versions of the machine learning models used in the project. These models are ready to be deployed and used for making predictions on new data.
+
+- **Data Pipelines**: The production folder contains the finalized versions of data pipelines. These pipelines automate the process of data ingestion, cleaning, transformation, model training, validation, and prediction generation. They are designed to handle new data efficiently and reliably.
+
+- **Configuration Files**: Any configuration files required to run the scripts or set up the environment would be part of the production folder. This includes files specifying the correct versions of libraries to use, paths to data or model files, and other configuration details.
+
+- **Documentation**: Finally, the `production` folder should contain thorough documentation explaining how to use the scripts, what each part of the code does, how to set up and use the data pipelines, and how to deploy and use the models. This documentation is crucial for ensuring that the project can be used and maintained effectively in the future.
+
+Remember, the `production` folder is the culmination of all the work done throughout the project. It should contain everything needed to deploy the project in a real-world environment and generate actionable insights from new data.
+
 ### Continuous integration with GitLab
 
+Continuous Integration (CI) is a DevOps practice where developers frequently merge their changes into a main branch. This is done multiple times a day, and each merge is verified by an automated build and test process to catch integration issues as early as possible. GitLab is one of the tools that provides robust support for CI, facilitating automation of the software delivery process.
+
+In the context of a data science project, here's what implementing continuous integration with GitLab might involve:
+
+- **GitLab CI Configuration File**: This is the `.gitlab-ci.yml` file, which is a YAML file that you create in your project’s root. This file defines the structure and order of the pipelines and includes the definitions of the pipeline jobs.
+
+- **Automated Testing**: Each time code is pushed to the repository, GitLab can run a series of automated tests to ensure that the new code doesn't break any existing functionality. This could involve unit tests, integration tests, or even model validation tests.
+
+- **Data Validation**: You can set up your CI pipeline to automatically validate any new data that is added to the project. This can help catch issues with the data early, before it's used in any modeling or analysis.
+
+- **Model Training and Validation**: GitLab CI can also be used to automatically train and validate models each time changes are made. This ensures that the models are always up-to-date and that any changes to the data or the model parameters don't negatively impact the model's performance.
+
+- **Deployment**: Once the code has been tested and the models have been trained and validated, GitLab CI can automatically deploy the models and any associated applications or services. This can be done using various deployment strategies like rolling updates, blue-green deployments, or canary deployments.
+
+- **Monitoring and Alerts**: Once everything is deployed, GitLab CI can help with monitoring the performance of the models and the applications. It can automatically send alerts if any issues are detected.
+
+Remember, setting up continuous integration with GitLab requires a careful design of the CI pipeline and rigorous testing to ensure that it works as expected. It's a significant investment of time and effort, but it can greatly improve the reliability and efficiency of the data science project.
+
+![Pipeline done](src/setup/interface/pipeline_cicd.png)
+
+In our case, configuration file (`.gitlab-ci.yml`) sets up a continuous integration pipeline with a single stage, "build", and two jobs that run in this stage. The two jobs are responsible for deploying the project in two different environments: `develop` and `production`. 
+
+**create_or_update_sagemaker_ancilliaries_propension_bag_develop job**
+
+This job is intended to run when new code is pushed to the `develop` branch of the repository. The job does the following:
+
+- Uses the `registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest` Docker image to create a build environment.
+
+- Sets an environment variable `ENVIRONMENT` to `develop`.
+
+- Updates the package lists for upgrades and new package installations with `apt update`.
+
+- Installs Python 3.8 and pip (a Python package installer) on the machine.
+
+- Installs specific versions of `boto3`, `sagemaker`, and `PyYAML` Python packages using pip.
+
+- Adds the `/production` directory of the project to the Python path.
+
+- Runs a Python script `create_pipeline.py` with the argument `--environment develop`.
+
+**create_or_update_sagemaker_ancilliaries_propension_bag_main job**
+
+This job is quite similar to the first one, but it is intended to run when new code is pushed to the `main` branch. The differences are:
+
+- The environment variable `ENVIRONMENT` is set to `production`.
+
+- The Python script `create_pipeline.py` is run with the argument `--environment production`.
+
+In summary, this pipeline ensures that when changes are made to the `develop` or `main` branches, the necessary environment is set up, the required packages are installed, and a Python script is run to create or update a pipeline in the corresponding AWS SageMaker environment. This enables a smooth and automated deployment process.
+
 ### Sagemaker Pipeline (framework and tips)
+
+Amazon SageMaker is a fully managed service that provides developers and data scientists with the ability to build, train, and deploy machine learning (ML) models quickly. SageMaker removes the heavy lifting from each step of the machine learning process to make it easier to develop high-quality models.
+
+![Pipeline sagemaker](src/setup/interface/pipeline_desk.png)
+
+A key feature of SageMaker is its ML Pipelines, which provide a purpose-built, easy-to-use Continuous Integration and Continuous Delivery (CI/CD) service for machine learning. Here's a framework for using SageMaker Pipelines and some tips to make the most of them:
+
+**Framework:**
+
+1. **Define the Steps**: A SageMaker pipeline consists of steps like data preprocessing, model training, model tuning, and model deployment. Each of these steps is defined using Python and the SageMaker Python SDK.
+
+![Stepdone](src/setup/interface/step_done_config.png)
+
+2. **Create the Pipeline**: Once the steps are defined, they are used to create a pipeline definition. This definition can also include conditions and loops to control the flow of execution.
+
+3. **Execute the Pipeline**: The pipeline can be executed on-demand or scheduled to run at specific intervals. The execution can be monitored using SageMaker Studio or the SageMaker API.
+
+**Tips:**
+
+1. **Parameterize Your Steps**: Make your pipeline steps configurable by using parameters. This allows you to reuse the same pipeline for different datasets, models, or hyperparameters.
+
+2. **Use Conditions**: You can use conditions to control the execution of certain steps in your pipeline. For example, you might want to perform a different preprocessing step depending on the type of data.
+
+3. **Monitor Your Pipelines**: Keep track of your pipeline executions and monitor the performance of your models over time. SageMaker provides tools for visualizing and monitoring your pipelines.
+
+4. **Automate Data Validation**: Use SageMaker's data wrangler for automatic data validation. This can help catch issues with the data before they impact your models.
+
+5. **Use CI/CD**: Use the CI/CD capabilities of SageMaker Pipelines to automatically build, test, and deploy your models. This ensures that your models are always up-to-date and that any changes to the code or data are quickly reflected in the deployed models.
+
+Remember, SageMaker Pipelines are a powerful tool for automating and managing the lifecycle of your machine learning models. By following these tips, you can make the most of this service and ensure that your models are always ready to deliver accurate and timely predictions.
 
 ### Foto grafo + explicación de cada step y su código
 
 # Utils for mkdocs
 
-```
-introduce code
-```
+MkDocs is a fast, simple, and downright gorgeous static site generator that's geared towards building project documentation. It uses Markdown files to build the pages of the documentation, and it comes with a variety of features that can help improve the quality and usability of your documentation. 
+
+Here are some useful tools (utils) and tips when working with MkDocs:
+
+**MkDocs Plugins:**
+
+1. **MkDocs-Material**: This is a theme for MkDocs that adds some nice aesthetic touches and provides a lot of customization options.
+
+2. **MkDocs-Minify**: This plugin minifies the HTML of your MkDocs site, reducing the size and improving load times.
+
+3. **MkDocs-Awesome-Pages**: This plugin gives you more control over the organization and layout of your pages.
+
+4. **MkDocs-Redirects**: This plugin allows you to create redirects from one page to another, which can be useful if you move or rename a page.
+
+5. **MkDocs-Search**: This plugin adds a search bar to your MkDocs site, allowing users to quickly find the information they're looking for.
+
+**Tips:**
+
+1. **Use a Clear Structure**: Organize your Markdown files in a clear and logical structure. This makes it easier for users to navigate your documentation.
+
+2. **Include a Table of Contents**: Use Markdown's built-in syntax to include a table of contents in your pages. This gives users an overview of the page's content and allows them to jump to specific sections.
+
+3. **Use Code Blocks**: If you're documenting code, use Markdown's syntax for code blocks. This will format your code nicely and make it easier to read.
+
+4. **Link Between Pages**: Use relative links to link between pages in your documentation. This makes it easier for users to navigate and ensures that links won't break if the site's URL changes.
+
+5. **Include a Search Bar**: If you're using the MkDocs-Search plugin, make sure to include a search bar in your layout. This allows users to quickly find the information they're looking for.
+
+By leveraging these tools and tips, you can create professional and user-friendly documentation with MkDocs.
