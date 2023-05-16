@@ -1,0 +1,10 @@
+numpy==1.23.5
+category-encoders==2.6.0
+pyarrow==10.0.1
+fsspec==2021.8.1
+s3fs==0.4.2
+fastparquet==2022.12.0
+pandas==1.5.3
+scikit-learn==1.2.0
+PyYAML==6.0
+sagemaker-experiments

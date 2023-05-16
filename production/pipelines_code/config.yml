@@ -1,0 +1,5 @@
+PYSPARK:
+  spark_executor_memory: "20000M"
+  spark_executor_cores: 7
+  spark_driver_memory: "20000M"
+  spark_sql_broadcastTimeout: 7200
