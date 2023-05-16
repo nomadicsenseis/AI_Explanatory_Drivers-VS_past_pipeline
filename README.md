@@ -301,6 +301,28 @@ These are some of the most common problems a user may encounter when trying to i
 
 ##### Tips
 
+- Understand Your Resource Needs: Before starting a project, understand the memory, CPU, and storage requirements of your tasks. This will help you choose the right instance type and avoid unnecessary costs.
+
+- Use the Right Tools for the Job: Use EBS for storing code and small files, and S3 for large datasets. Use SageMaker's built-in algorithms and models when possible to save time and effort.
+
+- Leverage Built-in Capabilities: SageMaker comes with a range of built-in capabilities, such as automatic model tuning, distributed training, and managed endpoints. Make sure to leverage these features to streamline your machine learning workflows.
+
+- Monitor Your Resources: Regularly monitor your resource usage to avoid unnecessary costs. Use CloudWatch to keep track of your instance performance and adjust as needed.
+
+- Clean Up Unused Resources: Regularly review and delete unused resources, such as notebook instances, training jobs, and endpoints. This will help you avoid unnecessary costs.
+
+- Use Version Control: Use a version control system like GitLab to manage your code. This allows you to track changes, collaborate with others, and revert back to previous versions if needed.
+
+- Secure Your Work: Use AWS's security best practices to protect your data and models. This includes using IAM roles for access control, encrypting sensitive data, and regularly reviewing your security settings.
+
+- Stay Updated: AWS regularly updates SageMaker with new features and improvements. Stay updated with the latest changes to make the most of your SageMaker environment.
+
+- Use SageMaker Studio: SageMaker Studio provides a single, web-based visual interface where you can perform all ML development steps. It enhances productivity by enabling you to create, train, debug, deploy, and monitor all your machine learning models in a single place.
+
+- Learn from Others: Make use of the extensive documentation, tutorials, and examples provided by AWS and the broader SageMaker community. These resources can provide valuable guidance and insights.
+
+Remember, the goal is to leverage the full potential of SageMaker to create robust, efficient, and scalable machine learning solutions.
+
 #### Distributed based [EMR]
 
 ##### Installing libraries
