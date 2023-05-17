@@ -6,40 +6,11 @@
 
 ## 1. Introduction
 
-This repository has been created to help and guide the different Data teams to use AWS Sagemaker and be able to develop and deploy Machine Learning models in production in an agile and efficient way. In this guide you will find almost everything you need to know to use this service, from an overview of the framework, through the Jupyter notebook adapted to Sagemaker (with some tricks), to the Pipelines to deploy models in production.
+This repository has been created to guide data teams in using AWS SageMaker to develop and deploy Machine Learning models in production in an efficient manner. It provides a comprehensive guide, from an overview of the framework to using the adapted Jupyter notebook and deploying models in production using pipelines. It's important to note that this template serves as a guide, and teams are free to use different project structures and guidelines as per their requirements.
 
-Clarify that this template is a guide made with the purpose of helping teams, if any team wants to work in a different way, with a different project structure and with their own guidelines, they are free to do it.
+Amazon SageMaker is a fully managed service that assists developers and data engineers in building, training, and deploying high-quality machine learning models. It offers a variety of tools and resources for easy integration of AI solutions into applications and systems. SageMaker offers cloud-based machine learning tools for data preparation, model building, training, and deployment. It also provides pre-trained machine learning models, integrates with other AWS services, and offers model lifecycle management tools, thereby providing scalability, security, and reliability of the AWS cloud platform.
 
-
-Amazon SageMaker is a fully managed service that helps developers and data engineers build, train, and deploy high-quality machine learning models. It offers a variety of tools and resources for companies to easily implement artificial intelligence (AI) solutions into their applications and systems.
-
-With SageMaker, developers can access a complete set of machine learning tools in the cloud, enabling them to perform tasks such as data preparation, model building, model training and model deployment. In addition, the service also provides pre-trained, out-of-the-box machine learning models for common tasks such as image classification and natural language processing (NLP).
-
-SageMaker integrates with a variety of other AWS services, allowing developers to take advantage of the scalability, security and reliability of the AWS cloud platform. Models trained on SageMaker can be easily deployed to web and mobile applications through AWS services such as Amazon API Gateway and AWS Lambda.
-
-In addition, SageMaker offers a variety of model lifecycle management tools and resources that enable developers to efficiently manage their models. Developers can track the performance of their models and adjust them as needed to ensure they remain accurate over time.
-
-Furthermore, SageMaker provides easy-to-use tools for developers to optimize and fine-tune their models for specific use cases, such as improving accuracy or reducing inference time. The service also offers a range of instance types and sizes to accommodate various workloads and budgets.
-
-Another advantage of using SageMaker is its ability to automate and streamline the machine learning workflow, allowing developers to focus on building better models instead of worrying about infrastructure and operational tasks. For example, SageMaker can automatically launch and manage instances for data processing and model training, as well as automate hyperparameter tuning and model selection.
-
-SageMaker also supports a variety of popular machine learning frameworks and libraries, such as TensorFlow, PyTorch, and Scikit-learn, making it easy for developers to work with their preferred tools and languages.
-
-Overall, Amazon SageMaker provides a comprehensive set of tools and resources for developers to build, train and deploy high-quality machine learning models with ease, while taking advantage of the scalability, security and reliability of the AWS cloud platform.
-
-This makes it a valuable service for companies of all sizes looking to implement AI solutions into their applications and systems. With SageMaker, developers can quickly and easily create custom models tailored to their specific business needs, and deploy them with confidence knowing that they are backed by the reliability and security of AWS.
-
-In addition to its technical capabilities, SageMaker also offers extensive documentation, tutorials, and support resources to help developers get started and troubleshoot issues. This makes it accessible to developers with varying levels of experience in machine learning and AI.
-
-Overall, Amazon SageMaker is a powerful tool for companies looking to leverage the benefits of machine learning and AI in their applications and systems. Its fully managed service, range of tools and resources, and integration with AWS services make it a reliable and efficient solution for building, training, and deploying high-quality machine learning models.
-
-Moreover, SageMaker provides a cost-effective approach to machine learning, allowing companies to pay only for the resources they use. With SageMaker, developers can easily scale up or down their computing resources based on the size and complexity of their machine learning workloads, helping to reduce costs and optimize performance.
-
-SageMaker also provides built-in security features to help protect data and models, such as encryption at rest and in transit, identity and access management, and compliance with industry standards and regulations.
-
-Finally, SageMaker is constantly evolving and expanding, with new features and capabilities being added regularly. This ensures that developers have access to the latest machine learning tools and technologies, and can continue to improve and innovate their models over time.
-
-In summary, Amazon SageMaker is a valuable service that provides developers and data engineers with the tools and resources needed to build, train, and deploy high-quality machine learning models. Its integration with AWS services, ease of use, and cost-effectiveness make it a compelling choice for companies looking to implement AI solutions into their applications and systems.
+In addition to technical capabilities, SageMaker offers extensive documentation, tutorials, and support resources to assist developers of varying experience levels. It is cost-effective, allowing companies to pay only for the resources used and scale resources based on workload. With built-in security features, it ensures data and model protection. SageMaker is continually evolving, adding new features and capabilities regularly, ensuring that developers have access to the latest machine learning tools and technologies. Consequently, it stands as a compelling choice for companies looking to implement AI solutions into their systems and applications.
 
 ## 2. Sagemaker overview
 
