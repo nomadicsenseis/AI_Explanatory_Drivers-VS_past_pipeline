@@ -43,7 +43,7 @@ def generate_pipeline(
     role: Optional[str],
     region: str,
     default_bucket: str,
-    default_bucket_key: str
+    default_bucket_prefix: str
 ) -> None:
     """Generate pipeline given in the pipeline_callable.
 
