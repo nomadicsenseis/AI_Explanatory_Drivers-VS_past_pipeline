@@ -38,7 +38,7 @@ def get_pipeline(
 
     # Get a Sagemaker session
     sagemaker_session = utils.get_session(region=region, default_bucket=default_bucket,
-                                          default_bucket_key=default_bucket_prefix)
+                                          default_bucket_prefix=default_bucket_prefix)
 
     # If the role is not provided, get the execution role
     if role is None:
