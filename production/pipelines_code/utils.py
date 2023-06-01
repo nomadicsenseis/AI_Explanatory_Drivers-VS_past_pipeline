@@ -84,7 +84,8 @@ def get_session(region: str, default_bucket: Optional[str]) -> Session:
         boto_session=boto_session,
         sagemaker_client=sagemaker_client,
         sagemaker_runtime_client=runtime_client,
-        default_bucket=default_bucket,
+        default_bucket='iberia-data-lake',
+        default_bucket_prefix='customer/esto_es_una_prueba/sagemaker_pipeline'
     )
     return sess
 
