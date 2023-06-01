@@ -27,6 +27,12 @@ def get_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--environment", type=str, help="Environment to deploy the results"
     )
+    parser.add_argument(
+        "--bucket", type=str, help="Bucket to deploy the results"
+    )
+    parser.add_argument(
+        "--prefix", type=str, help="Prefix to deploy the results"
+    )
     return parser.parse_args()
 
 
@@ -44,7 +50,7 @@ def generate_pipeline(
     Parameters
     ----------
         pipeline_callable: Pipeline to generate.
-        pipe_name: Name to generate the pipeline. 
+        pipe_name: Name to generate the pipeline.
         base_job_prefix: Job preffix of the steps in the pipeline.
         role: Aws role.
         region: Aws region.
@@ -69,6 +75,8 @@ def create_or_update_pipelines():
     logger.addHandler(logging.StreamHandler())
     args = get_arguments()
     env = args.environment
+    bucket = args.bucket
+    prefix = args.prefix
     environment = "prod" if env == "production" else "sbx"
     config = utils.read_config_data()
     model_version = config.get("MODEL_VERSION")
@@ -76,7 +84,6 @@ def create_or_update_pipelines():
     b3_session = boto3.Session()
     region = b3_session.region_name
     role = config.get("SAGEMAKER_ROLE")
-    default_bucket = sagemaker.session.Session().default_bucket()
 
     # GENERATE STEPS
     logger.info("userlog: Generating the pipeline definition...")
@@ -87,8 +94,8 @@ def create_or_update_pipelines():
         pipe_name=pipeline_name,
         base_job_prefix=pipeline_name,
         role=role,
-        default_bucket=default_bucket,
-        default_bucket_key=default_bucket_key,
+        default_bucket=bucket,
+        default_bucket_key=prefix,
         region=region
     )
     logger.info("userlog: Pipeline generated.")
