@@ -95,7 +95,7 @@ def create_or_update_pipelines():
         base_job_prefix=pipeline_name,
         role=role,
         default_bucket=bucket,
-        default_bucket_key=prefix,
+        default_bucket_prefix=prefix,
         region=region
     )
     logger.info("userlog: Pipeline generated.")
