@@ -44,7 +44,7 @@ def generate_pipeline(
     Parameters
     ----------
         pipeline_callable: Pipeline to generate.
-        pipe_name: Name to generate the pipeline.
+        pipe_name: Name to generate the pipeline. 
         base_job_prefix: Job preffix of the steps in the pipeline.
         role: Aws role.
         region: Aws region.
