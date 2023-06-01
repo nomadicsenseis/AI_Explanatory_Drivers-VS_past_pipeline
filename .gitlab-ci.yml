@@ -1,6 +1,6 @@
 stages:
   - build
-create_or_update_sagemaker_pipeline:
+create_or_update_sagemaker_pipeline_develop:
   stage: build
   image:
     name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
@@ -19,7 +19,7 @@ create_or_update_sagemaker_pipeline:
     - pip install boto3==1.26.144 sagemaker==2.160.0 PyYAML==6.0
     - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR/production
     - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT --bucket $BUCKET --prefix $PREFIX
-create_or_update_sagemaker_pipeline:
+create_or_update_sagemaker_pipeline_production:
   stage: build
   image:
     name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
