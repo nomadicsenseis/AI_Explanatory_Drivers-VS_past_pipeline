@@ -66,12 +66,13 @@ class Processors:
         )
 
 
-def get_session(region: str, default_bucket: Optional[str]) -> Session:
+def get_session(region: str, default_bucket: Optional[str], default_bucket_prefix: Optional[str]) -> Session:
     """Gets the sagemaker session based on the region.
 
     Args:
         region: the aws region to start the session
         default_bucket: the bucket to use for storing the artifacts
+        default_bucket_prefix: the key to use for storing the artifacts
 
     Returns:
         sagemaker.session.Session instance
@@ -84,8 +85,8 @@ def get_session(region: str, default_bucket: Optional[str]) -> Session:
         boto_session=boto_session,
         sagemaker_client=sagemaker_client,
         sagemaker_runtime_client=runtime_client,
-        default_bucket='iberia-data-lake',
-        default_bucket_prefix='customer/esto_es_una_prueba/sagemaker_pipeline'
+        default_bucket=default_bucket,
+        default_bucket_prefix=default_bucket_prefix
     )
     return sess
 

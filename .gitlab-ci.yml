@@ -1,12 +1,14 @@
 stages:
   - build
-create_or_update_sagemaker_ancilliaries_propension_bag_develop:
+create_or_update_sagemaker_pipeline:
   stage: build
   image:
     name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     entrypoint: [""]
   variables:
     ENVIRONMENT: develop
+    BUCKET: iberia-data-lake
+    PREFIX: customer/churn_model/sbx
   only:
     - develop
   before_script:
@@ -16,14 +18,16 @@ create_or_update_sagemaker_ancilliaries_propension_bag_develop:
   script:
     - pip install boto3==1.26.144 sagemaker==2.160.0 PyYAML==6.0
     - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR/production
-    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT
-create_or_update_sagemaker_ancilliaries_propension_bag_main:
+    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT --bucket $BUCKET --prefix $PREFIX
+create_or_update_sagemaker_pipeline:
   stage: build
   image:
     name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
     entrypoint: [""]
   variables:
     ENVIRONMENT: production
+    BUCKET: iberia-data-lake
+    PREFIX: customer/churn_model/prod
   only:
     - main
   before_script:
@@ -31,6 +35,6 @@ create_or_update_sagemaker_ancilliaries_propension_bag_main:
     - apt install python3.8 -y
     - apt install python3-pip -y
   script:
-    - pip install boto3==1.24.80 sagemaker==2.160.0 PyYAML==6.0
+    - pip install boto3==1.26.144 sagemaker==2.160.0 PyYAML==6.0
     - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR/production
-    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT
+    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT --bucket $BUCKET --prefix $PREFIX

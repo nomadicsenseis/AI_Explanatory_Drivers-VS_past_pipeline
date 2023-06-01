@@ -37,6 +37,7 @@ def generate_pipeline(
     role: Optional[str],
     region: str,
     default_bucket: str,
+    default_bucket_key: str
 ) -> None:
     """Generate pipeline given in the pipeline_callable.
 
@@ -47,7 +48,8 @@ def generate_pipeline(
         base_job_prefix: Job preffix of the steps in the pipeline.
         role: Aws role.
         region: Aws region.
-        default_bucket: Aws default s3 bucket.
+        default_bucket: Aws default s3 bucket
+        default_bucket_key: Aws default s3 key.
     """
     pipe_step = pipeline_callable(
         region=region,
@@ -55,6 +57,7 @@ def generate_pipeline(
         default_bucket=default_bucket,
         pipeline_name=pipe_name,
         base_job_prefix=base_job_prefix,
+        default_bucket_key=default_bucket_key
     )
     pipe_step.upsert(role_arn=role)
 
@@ -85,7 +88,8 @@ def create_or_update_pipelines():
         base_job_prefix=pipeline_name,
         role=role,
         default_bucket=default_bucket,
-        region=region,
+        default_bucket_key=default_bucket_key,
+        region=region
     )
     logger.info("userlog: Pipeline generated.")
 

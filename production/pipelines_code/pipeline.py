@@ -33,10 +33,12 @@ def get_pipeline(
     base_job_prefix: str,  # Prefix for the job names
     role: Optional[str] = None,  # IAM role
     default_bucket: Optional[str] = None,  # Default S3 bucket
+    default_bucket_key: Optional[str] = None,  # Default S3 key
 ) -> Pipeline:
 
     # Get a Sagemaker session
-    sagemaker_session = utils.get_session(region=region, default_bucket=default_bucket)
+    sagemaker_session = utils.get_session(region=region, default_bucket=default_bucket,
+                                          default_bucket_key=default_bucket_key)
 
     # If the role is not provided, get the execution role
     if role is None:
