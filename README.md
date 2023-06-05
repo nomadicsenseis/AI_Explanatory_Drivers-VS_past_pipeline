@@ -12,6 +12,130 @@ Amazon SageMaker is a fully managed service that assists developers and data eng
 
 In addition to technical capabilities, SageMaker offers extensive documentation, tutorials, and support resources to assist developers of varying experience levels. It is cost-effective, allowing companies to pay only for the resources used and scale resources based on workload. With built-in security features, it ensures data and model protection. SageMaker is continually evolving, adding new features and capabilities regularly, ensuring that developers have access to the latest machine learning tools and technologies. Consequently, it stands as a compelling choice for companies looking to implement AI solutions into their systems and applications.
 
+### Fast Launch Guide
+
+**Step 1: Clone the Repository**
+
+To begin with, you need to clone the repository containing the SageMaker template. You can do this by using the `git clone` command followed by the URL of the repository. Here is the command you should run:
+
+```bash
+git clone https://gitlab.com/iberia-data/data-science/sagemaker-template.git
+```
+
+This command will create a local copy of the repository on your machine. The repository contains the SageMaker template that you will be working with. Make sure you have Git installed on your machine to execute this command.
+
+**Step 2: Edit Configuration Files**
+
+Next, you will need to customize certain files to tailor the pipeline to your specific project. You need to change the pipeline's name in the following files: `gitlabci.yml` and `config.yml`. Here's how to do it:
+
+1. **Editing `gitlabci.yml`:**
+
+   Open the `gitlabci.yml` file in your preferred text editor. This file is the configuration file for GitLab CI/CD. Look for the place where the pipeline name is defined, and replace it with your new pipeline name. Save and close the file.
+
+2. **Editing `config.yml`:**
+
+   Similarly, open the `config.yml` file in your preferred text editor. This file is the configuration file for your SageMaker project. Change the pipeline name as needed, save, and close the file.
+
+Remember to choose a pipeline name that is descriptive and meaningful, helping you and your team to understand the purpose of the pipeline at a glance.
+
+**Step 3: Develop Generic Machine Learning Steps**
+
+Now, you should focus on developing the generic steps of a machine learning model within the `develop` folder. These steps typically include data collection, data preprocessing, model development, model training, model evaluation, and model deployment. Here's a rough idea of how you could structure your code:
+
+1. **Data Collection**
+
+   You'll need scripts or notebooks for loading or downloading your data. This might involve connecting to a database, making API requests, or loading files from a cloud storage bucket.
+
+2. **Data Preprocessing**
+
+   This is where you'll clean and format your data so it's ready for your machine learning model. This could involve handling missing or inconsistent data, encoding categorical variables, normalizing numerical data, and splitting the data into training and test sets.
+
+3. **Model Development**
+
+   Define the architecture of your machine learning model. This could be a pre-defined model provided by a library like scikit-learn or PyTorch, or a custom model that you've designed yourself.
+
+4. **Model Training**
+
+   Write scripts or notebooks that will use your training data to teach your model to make accurate predictions. This typically involves repeatedly running your model on your data and adjusting the model's parameters based on its performance.
+
+5. **Model Evaluation**
+
+   After your model has been trained, you'll need to evaluate its performance. This usually involves running your model on your test data and comparing its predictions to the actual outcomes.
+
+6. **Model Deployment**
+
+   Finally, you'll want to write scripts that allow you to deploy your trained model. This could involve saving your model to a file, setting up a web server that can make predictions using your model, or configuring a cloud-based deployment using a service like AWS SageMaker.
+
+Remember to keep your code modular and well-documented. Each step of the process should be clearly defined and easy for other developers to understand and modify.
+
+**Step 4: Move the Code to the Corresponding .py Files**
+
+It's important to organize your code properly for production. Python code is often moved from notebooks into .py files for this purpose. This makes the code easier to version control, test, and deploy. Here is how you might do it:
+
+1. **Create .py Files**: 
+
+   You should create separate .py files for each major step in your machine learning pipeline. For example, you could have `data_collection.py`, `data_preprocessing.py`, `model_development.py`, `model_training.py`, `model_evaluation.py`, and `model_deployment.py`.
+
+2. **Move the Code**: 
+
+   Open each .py file in your preferred text editor and paste in the relevant code from your notebooks. Ensure that the code is properly formatted and that all necessary imports are included at the top of the file. 
+
+3. **Test the Scripts**:
+
+   After moving your code, you should run each .py file individually to ensure that they work as expected. 
+
+4. **Document the Code**:
+
+   Add comments and docstrings to your .py files to explain what each part of the code does. This will make it easier for others to understand your code and contribute to it.
+
+Remember to keep your functions small and focused on a single task. This makes your code easier to understand and test. Also, make sure you follow the Python style guidelines (PEP 8) to ensure your code is clean and consistent.
+
+**Step 5: Generate requirements.txt for Each .py File**
+
+Having a `requirements.txt` file is important for reproducibility and ease of setup in any Python project. This file specifies what python packages are required to run the project. Here's how you can generate it:
+
+1. **Identify Dependencies:**
+
+   For each .py file, identify the external Python libraries that are used. You can find these in the import statements at the top of each file. For example, if your file imports pandas, numpy, and sklearn, then those are dependencies.
+
+2. **Create requirements.txt:**
+
+   In the root of your project, create a `requirements.txt` file. In this file, you should list all of the dependencies you identified.
+
+   Here's an example of what this file might look like:
+
+   ```
+   pandas==1.2.3
+   numpy==1.20.1
+   scikit-learn==0.24.1
+   ```
+
+   The `==` followed by a version number is used to specify the exact version of the package to install. Specifying the version ensures that your code will run the same way no matter where or when it is run. If you don't know the version number or if it doesn't matter, you can just list the package name without the `==`.
+
+3. **Generate requirements.txt Automatically (optional):**
+
+   Alternatively, if you have a Python virtual environment setup where you have installed all necessary packages and tested your code, you can automatically generate a `requirements.txt` file using `pip freeze > requirements.txt`. This command will output a list of all installed libraries and their respective versions in your virtual environment to a `requirements.txt` file.
+
+Once your `requirements.txt` file is created, anyone can set up the necessary environment for your code to run by using the command `pip install -r requirements.txt`.
+
+**Step 6: Edit the pipeline.py to Orchestrate the Different .py Files**
+
+In your `pipeline.py` file, you'll need to import the relevant functions from each of your .py files. Ensure each .py file has a main function that can be called from `pipeline.py`.
+
+Next, you'll need to create a main function within `pipeline.py` that calls each of the functions you've imported in the correct order of the Machine Learning workflow. 
+
+The order typically will be:
+
+1. Data Collection
+2. Data Preprocessing
+3. Model Development
+4. Model Training
+5. Model Evaluation
+6. Model Deployment
+
+Ensure that the output and input of each function are properly handled. For instance, the data collection function might return a DataFrame that's passed as an argument to the data preprocessing function.
+
+
 ## 2. Sagemaker overview
 
 ### How does it work?
