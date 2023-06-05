@@ -27,6 +27,12 @@ def get_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--environment", type=str, help="Environment to deploy the results"
     )
+    parser.add_argument(
+        "--bucket", type=str, help="Bucket to deploy the results"
+    )
+    parser.add_argument(
+        "--prefix", type=str, help="Prefix to deploy the results"
+    )
     return parser.parse_args()
 
 
@@ -37,6 +43,7 @@ def generate_pipeline(
     role: Optional[str],
     region: str,
     default_bucket: str,
+    default_bucket_prefix: str
 ) -> None:
     """Generate pipeline given in the pipeline_callable.
 
@@ -47,7 +54,8 @@ def generate_pipeline(
         base_job_prefix: Job preffix of the steps in the pipeline.
         role: Aws role.
         region: Aws region.
-        default_bucket: Aws default s3 bucket.
+        default_bucket: Aws default s3 bucket
+        default_bucket_prefix: Aws default s3 key.
     """
     pipe_step = pipeline_callable(
         region=region,
@@ -55,6 +63,7 @@ def generate_pipeline(
         default_bucket=default_bucket,
         pipeline_name=pipe_name,
         base_job_prefix=base_job_prefix,
+        default_bucket_prefix=default_bucket_prefix
     )
     pipe_step.upsert(role_arn=role)
 
@@ -66,6 +75,8 @@ def create_or_update_pipelines():
     logger.addHandler(logging.StreamHandler())
     args = get_arguments()
     env = args.environment
+    bucket = args.bucket
+    prefix = args.prefix
     environment = "prod" if env == "production" else "sbx"
     config = utils.read_config_data()
     model_version = config.get("MODEL_VERSION")
@@ -73,7 +84,6 @@ def create_or_update_pipelines():
     b3_session = boto3.Session()
     region = b3_session.region_name
     role = config.get("SAGEMAKER_ROLE")
-    default_bucket = sagemaker.session.Session().default_bucket()
 
     # GENERATE STEPS
     logger.info("userlog: Generating the pipeline definition...")
@@ -84,8 +94,9 @@ def create_or_update_pipelines():
         pipe_name=pipeline_name,
         base_job_prefix=pipeline_name,
         role=role,
-        default_bucket=default_bucket,
-        region=region,
+        default_bucket=bucket,
+        default_bucket_prefix=prefix,
+        region=region
     )
     logger.info("userlog: Pipeline generated.")
 
