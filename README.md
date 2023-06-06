@@ -135,6 +135,59 @@ The order typically will be:
 
 Ensure that the output and input of each function are properly handled. For instance, the data collection function might return a DataFrame that's passed as an argument to the data preprocessing function.
 
+**Step 7: Edit DAG to Orchestrate the Different Pipelines Using Airflow**
+
+In this step, you'll be leveraging Apache Airflow, an open-source platform used to programmatically author, schedule, and monitor workflows. Airflow uses Directed Acyclic Graphs (DAGs) to manage workflow orchestration. A DAG is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies.
+
+You'll need to create or edit a DAG file to orchestrate your pipelines. In this file, you'll define the execution order of your pipelines and set any dependencies between them. Here are the general steps to follow:
+
+1. **Import Necessary Libraries**
+
+   You'll need to import the necessary libraries to create your DAG. These typically include `DAG` and `PythonOperator` from the `airflow` library, as well as the functions from your pipelines.
+
+2. **Define Default Arguments**
+
+   Define the default arguments for your DAG, such as the `owner`, `start_date`, and any default email settings for task failure notifications.
+
+3. **Instantiate a DAG**
+
+   You'll create a new DAG instance, where you'll specify the `dag_id`, `default_args`, and `schedule_interval` among other parameters.
+
+4. **Define Tasks**
+
+   For each pipeline, you'll define a task. Each task is an instance of an operator class (like `PythonOperator`). In the task, you'll specify the function to execute (which would be the main function from each pipeline) and provide a task id.
+
+5. **Set Task Dependencies**
+
+   If there are dependencies between tasks, set them using the bitshift operators `<<` and `>>` (or the `set_upstream` and `set_downstream` methods).
+
+Once your DAG is defined, you can place it in the `dags` directory of your Airflow installation. After doing so, Airflow will automatically pick it up, and it will appear in the Airflow UI where you can switch it on/off, monitor it, and trigger runs manually.
+
+**Step 8: Remove All Instances of "Customer" from the Codebase**
+
+The provided template was developed specifically for a "Customer" vertical. However, as you're adapting this template for a different purpose, it's essential to remove all instances of the word "Customer" throughout your code and replace them with terminology that suits your specific project or context.
+
+Here are the main steps to follow:
+
+1. **Scan Your Codebase**
+
+   Thoroughly review your entire codebase, including all .py files, configuration files, and even file names for any instances of the word "Customer". Don't forget to also check comments, docstrings, and variable/function names.
+
+2. **Replace "Customer"**
+
+   When you find an instance of the word "Customer", replace it with the appropriate term for your project. Be careful to maintain the correct capitalization and ensure the replacement term makes sense in each context.
+
+3. **Check Your Changes**
+
+   After you've replaced all instances of "Customer", review your changes to ensure everything still makes sense and functions correctly. Test your code to make sure no errors were introduced during this process.
+
+4. **Documentation and Commit Messages**
+
+   Also, remember to update your project documentation and any related resources to reflect this change. When you commit these changes, include a clear and concise commit message such as "Replaced all instances of 'Customer' with 'NewTerm'" to maintain good version control practices.
+
+Remember, consistency and clarity in naming conventions are important in software development. It can significantly improve the readability of your code and make it easier for others (and future you) to understand and maintain the project.
+
+
 
 ## 2. Sagemaker overview
 
