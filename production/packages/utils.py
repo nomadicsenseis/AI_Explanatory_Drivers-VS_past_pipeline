@@ -49,6 +49,7 @@ def get_last_s3_partition(
     """
     preffix = " " if preffix is None else preffix
     print(preffix)
+    
     s3_client = b3_client("s3")
     s3_bucket = s3_dir.split("/", 1)[0]
     s3_prefix = s3_dir.split("/", 1)[-1]
