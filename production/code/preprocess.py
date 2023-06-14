@@ -210,9 +210,6 @@ def read_data(prefix) -> DataFrame:
     Pandas dataframe containing all features
     """
 
-    SAGEMAKER_LOGGER.info(f"Prefix: {prefix}")
-    a = s3_resource.Bucket(S3_BUCKET).objects.filter(Prefix=prefix)
-    SAGEMAKER_LOGGER.info(f"a: {a}")
     s3_keys = [item.key for item in s3_resource.Bucket(S3_BUCKET).objects.filter(Prefix=prefix) if item.key.endswith(".csv")]
     preprocess_paths = [f"s3://{S3_BUCKET}/{key}" for key in s3_keys]
     SAGEMAKER_LOGGER.info(f"preprocess_paths: {preprocess_paths}")
