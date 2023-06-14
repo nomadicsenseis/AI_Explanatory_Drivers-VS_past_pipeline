@@ -6,35 +6,188 @@
 
 ## 1. Introduction
 
-Amazon SageMaker is a fully managed service that helps developers and data engineers build, train, and deploy high-quality machine learning models. It offers a variety of tools and resources for companies to easily implement artificial intelligence (AI) solutions into their applications and systems.
+This repository has been created to guide data teams in using AWS SageMaker to develop and deploy Machine Learning models in production in an efficient manner. It provides a comprehensive guide, from an overview of the framework to using the adapted Jupyter notebook and deploying models in production using pipelines. It's important to note that this template serves as a guide, and teams are free to use different project structures and guidelines as per their requirements.
 
-With SageMaker, developers can access a complete set of machine learning tools in the cloud, enabling them to perform tasks such as data preparation, model building, model training and model deployment. In addition, the service also provides pre-trained, out-of-the-box machine learning models for common tasks such as image classification and natural language processing (NLP).
+Amazon SageMaker is a fully managed service that assists developers and data engineers in building, training, and deploying high-quality machine learning models. It offers a variety of tools and resources for easy integration of AI solutions into applications and systems. SageMaker offers cloud-based machine learning tools for data preparation, model building, training, and deployment. It also provides pre-trained machine learning models, integrates with other AWS services, and offers model lifecycle management tools, thereby providing scalability, security, and reliability of the AWS cloud platform.
 
-SageMaker integrates with a variety of other AWS services, allowing developers to take advantage of the scalability, security and reliability of the AWS cloud platform. Models trained on SageMaker can be easily deployed to web and mobile applications through AWS services such as Amazon API Gateway and AWS Lambda.
+In addition to technical capabilities, SageMaker offers extensive documentation, tutorials, and support resources to assist developers of varying experience levels. It is cost-effective, allowing companies to pay only for the resources used and scale resources based on workload. With built-in security features, it ensures data and model protection. SageMaker is continually evolving, adding new features and capabilities regularly, ensuring that developers have access to the latest machine learning tools and technologies. Consequently, it stands as a compelling choice for companies looking to implement AI solutions into their systems and applications.
 
-In addition, SageMaker offers a variety of model lifecycle management tools and resources that enable developers to efficiently manage their models. Developers can track the performance of their models and adjust them as needed to ensure they remain accurate over time.
+### Fast Launch Guide
 
-Furthermore, SageMaker provides easy-to-use tools for developers to optimize and fine-tune their models for specific use cases, such as improving accuracy or reducing inference time. The service also offers a range of instance types and sizes to accommodate various workloads and budgets.
+**Step 1: Clone the Repository**
 
-Another advantage of using SageMaker is its ability to automate and streamline the machine learning workflow, allowing developers to focus on building better models instead of worrying about infrastructure and operational tasks. For example, SageMaker can automatically launch and manage instances for data processing and model training, as well as automate hyperparameter tuning and model selection.
+To begin with, you need to clone the repository containing the SageMaker template. You can do this by using the `git clone` command followed by the URL of the repository. Here is the command you should run:
 
-SageMaker also supports a variety of popular machine learning frameworks and libraries, such as TensorFlow, PyTorch, and Scikit-learn, making it easy for developers to work with their preferred tools and languages.
+```bash
+git clone https://gitlab.com/iberia-data/data-science/sagemaker-template.git
+```
 
-Overall, Amazon SageMaker provides a comprehensive set of tools and resources for developers to build, train and deploy high-quality machine learning models with ease, while taking advantage of the scalability, security and reliability of the AWS cloud platform.
+This command will create a local copy of the repository on your machine. The repository contains the SageMaker template that you will be working with. Make sure you have Git installed on your machine to execute this command.
 
-This makes it a valuable service for companies of all sizes looking to implement AI solutions into their applications and systems. With SageMaker, developers can quickly and easily create custom models tailored to their specific business needs, and deploy them with confidence knowing that they are backed by the reliability and security of AWS.
+**Step 2: Edit Configuration Files**
 
-In addition to its technical capabilities, SageMaker also offers extensive documentation, tutorials, and support resources to help developers get started and troubleshoot issues. This makes it accessible to developers with varying levels of experience in machine learning and AI.
+Next, you will need to customize certain files to tailor the pipeline to your specific project. You need to change the pipeline's name in the following files: `gitlabci.yml` and `config.yml`. Here's how to do it:
 
-Overall, Amazon SageMaker is a powerful tool for companies looking to leverage the benefits of machine learning and AI in their applications and systems. Its fully managed service, range of tools and resources, and integration with AWS services make it a reliable and efficient solution for building, training, and deploying high-quality machine learning models.
+1. **Editing `gitlabci.yml`:**
 
-Moreover, SageMaker provides a cost-effective approach to machine learning, allowing companies to pay only for the resources they use. With SageMaker, developers can easily scale up or down their computing resources based on the size and complexity of their machine learning workloads, helping to reduce costs and optimize performance.
+   Open the `gitlabci.yml` file in your preferred text editor. This file is the configuration file for GitLab CI/CD. Look for the place where the pipeline name is defined, and replace it with your new pipeline name. Save and close the file.
 
-SageMaker also provides built-in security features to help protect data and models, such as encryption at rest and in transit, identity and access management, and compliance with industry standards and regulations.
+2. **Editing `config.yml`:**
 
-Finally, SageMaker is constantly evolving and expanding, with new features and capabilities being added regularly. This ensures that developers have access to the latest machine learning tools and technologies, and can continue to improve and innovate their models over time.
+   Similarly, open the `config.yml` file in your preferred text editor. This file is the configuration file for your SageMaker project. Change the pipeline name as needed, save, and close the file.
 
-In summary, Amazon SageMaker is a valuable service that provides developers and data engineers with the tools and resources needed to build, train, and deploy high-quality machine learning models. Its integration with AWS services, ease of use, and cost-effectiveness make it a compelling choice for companies looking to implement AI solutions into their applications and systems.
+Remember to choose a pipeline name that is descriptive and meaningful, helping you and your team to understand the purpose of the pipeline at a glance.
+
+**Step 3: Develop Generic Machine Learning Steps**
+
+Now, you should focus on developing the generic steps of a machine learning model within the `develop` folder. These steps typically include data collection, data preprocessing, model development, model training, model evaluation, and model deployment. Here's a rough idea of how you could structure your code:
+
+1. **Data Collection**
+
+   You'll need scripts or notebooks for loading or downloading your data. This might involve connecting to a database, making API requests, or loading files from a cloud storage bucket.
+
+2. **Data Preprocessing**
+
+   This is where you'll clean and format your data so it's ready for your machine learning model. This could involve handling missing or inconsistent data, encoding categorical variables, normalizing numerical data, and splitting the data into training and test sets.
+
+3. **Model Development**
+
+   Define the architecture of your machine learning model. This could be a pre-defined model provided by a library like scikit-learn or PyTorch, or a custom model that you've designed yourself.
+
+4. **Model Training**
+
+   Write scripts or notebooks that will use your training data to teach your model to make accurate predictions. This typically involves repeatedly running your model on your data and adjusting the model's parameters based on its performance.
+
+5. **Model Evaluation**
+
+   After your model has been trained, you'll need to evaluate its performance. This usually involves running your model on your test data and comparing its predictions to the actual outcomes.
+
+6. **Model Deployment**
+
+   Finally, you'll want to write scripts that allow you to deploy your trained model. This could involve saving your model to a file, setting up a web server that can make predictions using your model, or configuring a cloud-based deployment using a service like AWS SageMaker.
+
+Remember to keep your code modular and well-documented. Each step of the process should be clearly defined and easy for other developers to understand and modify.
+
+**Step 4: Move the Code to the Corresponding .py Files**
+
+It's important to organize your code properly for production. Python code is often moved from notebooks into .py files for this purpose. This makes the code easier to version control, test, and deploy. Here is how you might do it:
+
+1. **Create .py Files**: 
+
+   You should create separate .py files for each major step in your machine learning pipeline. For example, you could have `data_collection.py`, `data_preprocessing.py`, `model_development.py`, `model_training.py`, `model_evaluation.py`, and `model_deployment.py`.
+
+2. **Move the Code**: 
+
+   Open each .py file in your preferred text editor and paste in the relevant code from your notebooks. Ensure that the code is properly formatted and that all necessary imports are included at the top of the file. 
+
+3. **Test the Scripts**:
+
+   After moving your code, you should run each .py file individually to ensure that they work as expected. 
+
+4. **Document the Code**:
+
+   Add comments and docstrings to your .py files to explain what each part of the code does. This will make it easier for others to understand your code and contribute to it.
+
+Remember to keep your functions small and focused on a single task. This makes your code easier to understand and test. Also, make sure you follow the Python style guidelines (PEP 8) to ensure your code is clean and consistent.
+
+**Step 5: Generate requirements.txt for Each .py File**
+
+Having a `requirements.txt` file is important for reproducibility and ease of setup in any Python project. This file specifies what python packages are required to run the project. Here's how you can generate it:
+
+1. **Identify Dependencies:**
+
+   For each .py file, identify the external Python libraries that are used. You can find these in the import statements at the top of each file. For example, if your file imports pandas, numpy, and sklearn, then those are dependencies.
+
+2. **Create requirements.txt:**
+
+   In the root of your project, create a `requirements.txt` file. In this file, you should list all of the dependencies you identified.
+
+   Here's an example of what this file might look like:
+
+   ```
+   pandas==1.2.3
+   numpy==1.20.1
+   scikit-learn==0.24.1
+   ```
+
+   The `==` followed by a version number is used to specify the exact version of the package to install. Specifying the version ensures that your code will run the same way no matter where or when it is run. If you don't know the version number or if it doesn't matter, you can just list the package name without the `==`.
+
+3. **Generate requirements.txt Automatically (optional):**
+
+   Alternatively, if you have a Python virtual environment setup where you have installed all necessary packages and tested your code, you can automatically generate a `requirements.txt` file using `pip freeze > requirements.txt`. This command will output a list of all installed libraries and their respective versions in your virtual environment to a `requirements.txt` file.
+
+Once your `requirements.txt` file is created, anyone can set up the necessary environment for your code to run by using the command `pip install -r requirements.txt`.
+
+**Step 6: Edit the pipeline.py to Orchestrate the Different .py Files**
+
+In your `pipeline.py` file, you'll need to import the relevant functions from each of your .py files. Ensure each .py file has a main function that can be called from `pipeline.py`.
+
+Next, you'll need to create a main function within `pipeline.py` that calls each of the functions you've imported in the correct order of the Machine Learning workflow. 
+
+The order typically will be:
+
+1. Data Collection
+2. Data Preprocessing
+3. Model Development
+4. Model Training
+5. Model Evaluation
+6. Model Deployment
+
+Ensure that the output and input of each function are properly handled. For instance, the data collection function might return a DataFrame that's passed as an argument to the data preprocessing function.
+
+**Step 7: Edit DAG to Orchestrate the Different Pipelines Using Airflow**
+
+In this step, you'll be leveraging Apache Airflow, an open-source platform used to programmatically author, schedule, and monitor workflows. Airflow uses Directed Acyclic Graphs (DAGs) to manage workflow orchestration. A DAG is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies.
+
+You'll need to create or edit a DAG file to orchestrate your pipelines. In this file, you'll define the execution order of your pipelines and set any dependencies between them. Here are the general steps to follow:
+
+1. **Import Necessary Libraries**
+
+   You'll need to import the necessary libraries to create your DAG. These typically include `DAG` and `PythonOperator` from the `airflow` library, as well as the functions from your pipelines.
+
+2. **Define Default Arguments**
+
+   Define the default arguments for your DAG, such as the `owner`, `start_date`, and any default email settings for task failure notifications.
+
+3. **Instantiate a DAG**
+
+   You'll create a new DAG instance, where you'll specify the `dag_id`, `default_args`, and `schedule_interval` among other parameters.
+
+4. **Define Tasks**
+
+   For each pipeline, you'll define a task. Each task is an instance of an operator class (like `PythonOperator`). In the task, you'll specify the function to execute (which would be the main function from each pipeline) and provide a task id.
+
+5. **Set Task Dependencies**
+
+   If there are dependencies between tasks, set them using the bitshift operators `<<` and `>>` (or the `set_upstream` and `set_downstream` methods).
+
+Once your DAG is defined, you can place it in the `dags` directory of your Airflow installation. After doing so, Airflow will automatically pick it up, and it will appear in the Airflow UI where you can switch it on/off, monitor it, and trigger runs manually.
+
+**Step 8: Remove All Instances of "Customer" from the Codebase**
+
+The provided template was developed specifically for a "Customer" vertical. However, as you're adapting this template for a different purpose, it's essential to remove all instances of the word "Customer" throughout your code and replace them with terminology that suits your specific project or context.
+
+Here are the main steps to follow:
+
+1. **Scan Your Codebase**
+
+   Thoroughly review your entire codebase, including all .py files, configuration files, and even file names for any instances of the word "Customer". Don't forget to also check comments, docstrings, and variable/function names.
+
+2. **Replace "Customer"**
+
+   When you find an instance of the word "Customer", replace it with the appropriate term for your project. Be careful to maintain the correct capitalization and ensure the replacement term makes sense in each context.
+
+3. **Check Your Changes**
+
+   After you've replaced all instances of "Customer", review your changes to ensure everything still makes sense and functions correctly. Test your code to make sure no errors were introduced during this process.
+
+4. **Documentation and Commit Messages**
+
+   Also, remember to update your project documentation and any related resources to reflect this change. When you commit these changes, include a clear and concise commit message such as "Replaced all instances of 'Customer' with 'NewTerm'" to maintain good version control practices.
+
+Remember, consistency and clarity in naming conventions are important in software development. It can significantly improve the readability of your code and make it easier for others (and future you) to understand and maintain the project.
+
+
 
 ## 2. Sagemaker overview
 
@@ -720,6 +873,23 @@ The `develop` directory in a data science project plays a vital role in housing 
 Remember, the `develop` folder is a dynamic space that evolves over time as the project progresses. It allows data scientists to iterate on their work, improving the project's final outcomes, and providing a history of the thought process and progression of the project.
 
 #### Production
+
+The `production` folder is a crucial part of any data science project. It signifies the transition from development and testing to real-world application. This directory typically contains the final, refined versions of all code, scripts, and other files used in the project. Here's an in-depth look at what it might include:
+
+- **Final Code**: This is the cleaned-up and optimized version of all the scripts used in the project, including data preprocessing, modeling, validation, and deployment scripts. The code here is ready for production and can handle new data efficiently.
+
+- **Packages**: This directory contains any additional packages or libraries that are used by the code. These can be custom packages developed specifically for the project, or third-party packages that aren't readily available through standard package managers.
+
+- **Model Files**: The `production` folder would also typically contain the final, trained versions of the machine learning models used in the project. These models are ready to be deployed and used for making predictions on new data.
+
+- **Data Pipelines**: The production folder contains the finalized versions of data pipelines. These pipelines automate the process of data ingestion, cleaning, transformation, model training, validation, and prediction generation. They are designed to handle new data efficiently and reliably.
+
+- **Configuration Files**: Any configuration files required to run the scripts or set up the environment would be part of the production folder. This includes files specifying the correct versions of libraries to use, paths to data or model files, and other configuration details.
+
+- **Documentation**: Finally, the `production` folder should contain thorough documentation explaining how to use the scripts, what each part of the code does, how to set up and use the data pipelines, and how to deploy and use the models. This documentation is crucial for ensuring that the project can be used and maintained effectively in the future.
+
+Remember, the `production` folder is the culmination of all the work done throughout the project. It should contain everything needed to deploy the project in a real-world environment and generate actionable insights from new data.
+
 
 Before deploying your model to Amazon SageMaker, it's essential to prepare it properly. In this section, we will cover the required steps in detail, along with code examples.
 
