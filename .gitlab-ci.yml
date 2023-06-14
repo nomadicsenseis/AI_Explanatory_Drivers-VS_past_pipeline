@@ -2,9 +2,8 @@ stages:
   - build
 create_or_update_sagemaker_pipeline_develop:
   stage: build
-  image:
-    name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
-    entrypoint: [""]
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  tags: [ $IBDATA_CICD_RUNNER_TAGS ]
   variables:
     ENVIRONMENT: develop
     BUCKET: iberia-data-lake
@@ -21,9 +20,8 @@ create_or_update_sagemaker_pipeline_develop:
     - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT --bucket $BUCKET --prefix $PREFIX
 create_or_update_sagemaker_pipeline_production:
   stage: build
-  image:
-    name: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
-    entrypoint: [""]
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  tags: [ $IBDATA_CICD_RUNNER_TAGS ]
   variables:
     ENVIRONMENT: production
     BUCKET: iberia-data-lake
