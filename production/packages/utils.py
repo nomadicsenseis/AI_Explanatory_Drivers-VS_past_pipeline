@@ -48,12 +48,17 @@ def get_last_s3_partition(
     :return: Complete path of the last partition to read.
     """
     preffix = " " if preffix is None else preffix
+    print(preffix)
+    
     s3_client = b3_client("s3")
     s3_bucket = s3_dir.split("/", 1)[0]
     s3_prefix = s3_dir.split("/", 1)[-1]
+    print(f's3_bucket: {s3_bucket}')
+    print(f's3_prefix: {s3_prefix}')
     s3_contents = s3_client.list_objects_v2(
         Bucket=s3_bucket, Prefix=s3_prefix, Delimiter="/"
     ).get("CommonPrefixes")
+    print(f's3_contents: {s3_contents}')
     partition_date_aux = [
         int(
             content["Prefix"]
