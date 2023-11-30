@@ -6,7 +6,7 @@
 
 ## 1. Introduction
 
-![Sagemaker framework Template](src/sagemaker_workflow.png)
+![Sagemaker framework Template](src/sagemaker-workflow.png)
 
 This repository has been created to guide data teams in using AWS SageMaker to develop and deploy Machine Learning models in production in an efficient manner. It provides a comprehensive guide, from an overview of the framework to using the adapted Jupyter notebook and deploying models in production using pipelines. It's important to note that this template serves as a guide, and teams are free to use different project structures and guidelines as per their requirements.
 
