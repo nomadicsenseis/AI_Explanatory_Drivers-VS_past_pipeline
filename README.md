@@ -6,6 +6,8 @@
 
 ## 1. Introduction
 
+![Sagemaker framework Template](src/sagemaker_workflow.png)
+
 This repository has been created to guide data teams in using AWS SageMaker to develop and deploy Machine Learning models in production in an efficient manner. It provides a comprehensive guide, from an overview of the framework to using the adapted Jupyter notebook and deploying models in production using pipelines. It's important to note that this template serves as a guide, and teams are free to use different project structures and guidelines as per their requirements.
 
 Amazon SageMaker is a fully managed service that assists developers and data engineers in building, training, and deploying high-quality machine learning models. It offers a variety of tools and resources for easy integration of AI solutions into applications and systems. SageMaker offers cloud-based machine learning tools for data preparation, model building, training, and deployment. It also provides pre-trained machine learning models, integrates with other AWS services, and offers model lifecycle management tools, thereby providing scalability, security, and reliability of the AWS cloud platform.
