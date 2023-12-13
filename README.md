@@ -3,7 +3,7 @@
 #### Table of contents
 [[_TOC_]]
 
-
+ 
 ## 1. Introduction
 
 ![Sagemaker framework Template](src/sagemaker-workflow.png)
