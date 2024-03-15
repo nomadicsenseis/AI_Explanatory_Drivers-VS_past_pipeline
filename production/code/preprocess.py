@@ -1,3 +1,8 @@
+### This step is going to apply a preprocesing to my 2 dataframes (surveys_data_df and lod_factor_df)
+### and then is going to merge them into a single df.
+### After this is done it 
+
+
 from subprocess import check_call
 from sys import executable
 
@@ -5,7 +10,6 @@ STEP = "PREPROCESS"
 
 check_call([executable, "-m", "pip", "install", "-r", f"./{STEP.lower()}.txt"])
 
-import category_encoders as ce
 import sklearn.preprocessing as prep
 import warnings
 from sklearn.pipeline import Pipeline
@@ -17,6 +21,10 @@ from sklearn import set_config
 import pandas as pd
 import numpy as np
 import pickle
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.pipeline import make_pipeline
+import matplotlib.pyplot as plt
 
 warnings.filterwarnings("ignore")
 
@@ -29,8 +37,6 @@ from pandas import DataFrame
 
 import boto3
 import utils
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
 
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
 SAGEMAKER_LOGGER.setLevel(logging.INFO)
@@ -86,70 +92,115 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
     save_path = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}'
     save_path_read = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/'
 
+    # Convert 'date_flight_local' to datetime and extract 'month' and 'year' if not already done
+    df['date_flight_local'] = pd.to_datetime(df['date_flight_local'])
+    df['month'] = df['date_flight_local'].dt.month
+    df['year'] = df['date_flight_local'].dt.year
+
     # In prediction mode
     if use_type == 'predict':
         # Get the path to the saved transformation pipeline
-        # model_path, _, _, _ = utils.get_path_to_read_and_date(
-        #     read_last_date=bool(int(IS_LAST_DATE)),
-        #     bucket=S3_BUCKET,
-        #     key=save_path_read,
-        #     partition_date=STR_EXECUTION_DATE,
-        # )
+        model_path, _, _, _ = utils.get_path_to_read_and_date(
+            read_last_date=bool(int(IS_LAST_DATE)),
+            bucket=S3_BUCKET,
+            key=save_path_read,
+            partition_date=STR_EXECUTION_DATE,
+        )
         # # Remove s3 info path
-        # if 's3://' in model_path:
-        #     model_path = model_path.split('//')[1].replace(f"{S3_BUCKET}/", '')
-        # SAGEMAKER_LOGGER.info(f"userlog: path for models: {model_path + '/models/'}")
-        #
-        # # Read the transformation pipeline
-        # pipeline = (
-        #     s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}")
-        #     .get()
-        # )
-        #
-        # # Load the pipeline and apply transformation
-        # pipe = pickle.loads(pipeline["Body"].read())
-        time.sleep(10)
-        # X = pipe.transform(df)
-        X = df # pd.DataFrame(X, columns=get_names_from_pipeline(pipe.named_steps['preprocessor']))
+        if 's3://' in model_path:
+            model_path = model_path.split('//')[1].replace(f"{S3_BUCKET}/", '')
+        SAGEMAKER_LOGGER.info(f"userlog: path for models: {model_path + '/models/'}")
+
+        # Loop over each month to reead the transformation pipeline
+        for m in sorted(df['month'].unique()):
+            # Filter the data for the specific month
+            df_month = df[df['month'] == m]
+            # Split data into features and target
+            X = df_month.drop(columns=['ticket_price', 'date_flight_local', 'month', 'year'])
+            y = df_month['ticket_price']
+        
+            # Read the transformation pipeline
+            pipeline = (
+                s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}/{m}")
+                .get()
+            )
+
+            # Load the pipeline and apply transformation
+            pipe = pickle.loads(pipeline["Body"].read())
+            time.sleep(10)
+            
+            # Identify indices where ticket_price is NaN for imputation
+            idx_missing = y[y.isna()].index
+                
+            # Predict missing ticket_price values
+            X_missing = X.loc[idx_missing]
+            if len(X_missing) > 0:
+                imputed_values = pipeline.predict(X_missing)
+                # Fill in the missing values in the original DataFrame
+                df.loc[idx_missing, 'ticket_price'] = imputed_values
 
     # In training mode
     else:
-        y_train = pd.DataFrame(y_train, columns=[config.get("VARIABLES_ETL").get('TARGET')])
+        # Complex 2019 ticket_price inputer
+        # Identify categorical and numerical columns; make sure 'month' and 'year' are not in these lists
+        categorical_features = df.select_dtypes(include=['object', 'bool']).columns.tolist()
+        numerical_features = df.select_dtypes(include=['int64', 'float64']).columns.drop(['ticket_price', 'month', 'year']).tolist()
+
+        # Define the preprocessing for numerical and categorical data
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('num', SimpleImputer(strategy='median'), numerical_features),
+                ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features),
+            ]
+        )
+
+        # Define the model pipeline
+        pipeline = make_pipeline(
+            preprocessor,
+            GradientBoostingRegressor(random_state=42)
+        )
+
+        # Loop over each month to train a model and impute missing values
+        for m in sorted(df['month'].unique()):
+            # Filter the data for the specific month
+            df_month = df[df['month'] == m]
+            
+            # Split data into features and target
+            X = df_month.drop(columns=['ticket_price', 'date_flight_local', 'month', 'year'])
+            y = df_month['ticket_price']
+            
+            # Further split your data into training and missing data (for imputation)
+            X_train = X.loc[y.notna()]
+            y_train = y.loc[y.notna()]
+            
+            if len(X_train) > 0:
+                # Train the model
+                pipeline.fit(X_train, y_train)
+
+                # Save model/pipeline for predict step.
+                s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}/{m}").put(
+                    Body=pickle.dumps(pipeline)
+                )
+
+                
+                # Identify indices where ticket_price is NaN for imputation
+                idx_missing = y[y.isna()].index
+                
+                # Predict missing ticket_price values
+                X_missing = X.loc[idx_missing]
+                if len(X_missing) > 0:
+                    imputed_values = pipeline.predict(X_missing)
+                    
+                    # Fill in the missing values in the original DataFrame
+                    df.loc[idx_missing, 'ticket_price'] = imputed_values
+
         SAGEMAKER_LOGGER.info(f'Processing X_train {X_train.shape} ')
         SAGEMAKER_LOGGER.info(f'Processing y_train {y_train.shape} ')
-
-        # Define transformations for the columns
-        # numeric_features = ['Age', 'Fare']
-        # numeric_transformer = Pipeline(steps=[
-        #     ('imputer', SimpleImputer(strategy='median')),
-        #     ('scaler', StandardScaler())])
-        #
-        # categorical_features = ['Embarked', 'Sex', 'Pclass', 'Cabin']
-        # categorical_transformer = Pipeline(steps=[
-        #     ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-        #     ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-        #
-        # # Combine all transformations using ColumnTransformer
-        # preprocessor = ColumnTransformer(
-        #     transformers=[
-        #         ('num', numeric_transformer, numeric_features),
-        #         ('cat', categorical_transformer, categorical_features)])
-
-        # Fit and apply the transformation pipeline, then save it
-        # pipe = Pipeline(steps=[('preprocessor', preprocessor)])
-        X = df
-        # s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}").put(
-        #     Body=pickle.dumps(pipe)
-        # )
-        # X = pd.DataFrame(X, columns=get_names_from_pipeline(preprocessor)
         SAGEMAKER_LOGGER.info(f'Procesed X_train {X.shape} ')
-        #SAGEMAKER_LOGGER.info(f'Columns names out prep {get_names_from_pipeline(preprocessor)}')
 
-    #X.reset_index(drop=True, inplace=True)
-    #df.reset_index(drop=True, inplace=True)
-    #X[config['VARIABLES_ETL']['ID']] = df[config['VARIABLES_ETL']['ID']].copy()
+    df.reset_index(drop=True, inplace=True)
 
-    return X
+    return df
 
 
 def get_names_from_pipeline(preprocessor):
@@ -246,23 +297,25 @@ if __name__ == "__main__":
     s3_resource = boto3.resource("s3")
 
     # path
-    prefix = f"{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
-    src_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
+    src_path_historic = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/historic.csv"
+    src_path_incremental = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/incremental.csv"
+
     out_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}"
 
-    # Read data
-    df_features = read_data(prefix)
+
 
     # Execute preprocess
     in_features_train = config.get("VARIABLES_ETL").get('COLUMNS_TO_SAVE') + \
                         [config.get("VARIABLES_ETL").get('ID')]
 
     if USE_TYPE == 'train':
+        # Read data
+        df_features = read_data(src_path_historic)
+        labels = config.get("VARIABLES_ETL").get('LABELS')
 
         # Divide train and test
         X_train, X_test, X_val, y_train, y_test, y_val = split_train_val_test(df_features[in_features_train],
-                                                                              df_features[config.get("VARIABLES_ETL").get(
-                                                                                  'TARGET')])
+                                                                              labels)
         # Features encoder
         SAGEMAKER_LOGGER.info(f"X_train, X_test, X_val, y_train, y_test, y_val: {X_train.shape}, {X_test.shape}, "
                               f"{X_val.shape}, {y_train.shape}, {y_test.shape}, {y_val.shape}")
@@ -278,13 +331,24 @@ if __name__ == "__main__":
         X_test.to_csv(f"{out_path}/data_test/X_test.csv", index=False)
         X_val.to_csv(f"{out_path}/data_val/X_val.csv", index=False)
 
-        y_train.to_csv(f"{out_path}/data_train/y_train.csv", index=False)
-        y_test.to_csv(f"{out_path}/data_test/y_test.csv", index=False)
-        y_val.to_csv(f"{out_path}/data_val/y_val.csv", index=False)
+        for target in labels:
+            y_train[target].to_csv(f"{out_path}/data_train/y_train_{target}.csv", index=False)
+            y_test[target].to_csv(f"{out_path}/data_test/y_test_{target}.csv", index=False)
+            y_val[target].to_csv(f"{out_path}/data_val/y_val_{target}.csv", index=False)
+
+        # Pass on full historic data for prediction.
+        X_pred = df_features[in_features_train]
+        SAGEMAKER_LOGGER.info(f"userlog: feature_processer_historic_predict pre: {str(X_pred.shape)}")
+        X_pred = feature_processer(X_pred)
+        SAGEMAKER_LOGGER.info(f"userlog: feature_processer_historic_predict post: {str(X_pred.shape)}")
+        X_pred.to_csv(f"{out_path}/data_for_historic_prediction.csv", index=False)
 
     else:
+        # Read data
+        df_features = read_data(src_path_incremental)
+        # Pass on incremental data for prediction.
         X_pred = df_features[in_features_train]
-        SAGEMAKER_LOGGER.info(f"userlog: feature_processer_predict pre: {str(X_pred.shape)}")
+        SAGEMAKER_LOGGER.info(f"userlog: feature_processer_incremental_predict pre: {str(X_pred.shape)}")
         X_pred = feature_processer(X_pred)
-        SAGEMAKER_LOGGER.info(f"userlog: feature_processer_predict post: {str(X_pred.shape)}")
+        SAGEMAKER_LOGGER.info(f"userlog: feature_processer_incremental_predict post: {str(X_pred.shape)}")
         X_pred.to_csv(f"{out_path}/data_for_prediction.csv", index=False)

@@ -257,6 +257,38 @@ def get_pipeline(
         code=predict_step_args.code,  # Code to execute for the step
     )
 
+    # PREDICT HISTORIC
+    framework_processor = processors.framework()
+    predict_step_args = framework_processor.get_run_args(
+        code=path_join(BASE_DIR, "code", "predict_historic.py"),  # Path to the predict.py script
+        dependencies=[
+            path_join(BASE_DIR, "packages", "utils.py"),  # Path to the utils.py file
+            path_join(BASE_DIR, "packages", "config.yml"),  # Path to the config.yml file
+            path_join(BASE_DIR, "packages", "requirements", "predict.txt"),  # Path to the predict.txt file
+        ],
+        arguments=[
+            "--s3_bucket",
+            param_s3_bucket,
+            "--s3_path_write",
+            param_s3_path_write,
+            "--str_execution_date",
+            param_str_execution_date,
+            "--is_last_date",
+            param_is_last_date,
+        ],
+    )
+
+    #PREDICT HISTORIC STEP
+    predict_step = ProcessingStep(
+        name="predict_historic_step",
+        depends_on=["train_step"],  # Depends on the previous step "train_step"
+        processor=framework_processor,  # Processor to use for the step
+        inputs=predict_step_args.inputs,  # Input data for the step
+        outputs=predict_step_args.outputs,  # Output data for the step
+        job_arguments=predict_step_args.arguments,  # Additional job arguments
+        code=predict_step_args.code,  # Code to execute for the step
+    )
+
     # CONDITION STEP
     condition_step = ConditionStep(
         name="condition_step",

@@ -7,7 +7,7 @@ create_or_update_sagemaker_pipeline_develop:
   variables:
     ENVIRONMENT: develop
     BUCKET: iberia-data-lake
-    PREFIX: customer/sagemaker_template/sbx/pipeline
+    PREFIX: customer/nps_client_model/sbx/pipeline
   only:
     - develop
   before_script:
@@ -25,7 +25,7 @@ create_or_update_sagemaker_pipeline_production:
   variables:
     ENVIRONMENT: production
     BUCKET: iberia-data-lake
-    PREFIX: customer/sagemaker_template/prod/pipeline
+    PREFIX: customer/nps_client_model/prod/pipeline
   only:
     - main
   before_script:

@@ -1,43 +1,77 @@
-import json
-import re
 from subprocess import check_call
 from sys import executable
-import gc
-import pandas as pd
-import pickle
-import boto3
 
 STEP = "TRAIN"
 FIRST_TIME = True
 
 check_call([executable, "-m", "pip", "install", "-r", f"./{STEP.lower()}.txt"])
 
+# General
+import pandas as pd
+from pandas.tseries.offsets import MonthEnd
+from datetime import datetime, timedelta
+pd.set_option('display.max_columns', None)
+pd.set_option('display.float_format', lambda x: '%.3f' % x)
+import os
+import numpy as np
+import xlsxwriter
+import datetime
+import boto3
+import s3fs
+from itertools import combinations
+import pickle
+import json
+import re
+import gc
 import argparse
 import logging
 from os import environ
 import utils
 from boto3 import resource
 from pandas import read_csv
-from lightgbm import LGBMClassifier
-import joblib
-from imblearn.ensemble import (
-    BalancedRandomForestClassifier,
-    EasyEnsembleClassifier,
-    RUSBoostClassifier,
-    BalancedBaggingClassifier,
-)
 
-
+# Sklearn
+from sklearn.model_selection import train_test_split, KFold
+from sklearn import metrics
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import (
     recall_score,
     precision_score,
     f1_score,
     accuracy_score,
     roc_auc_score,
+    log_loss,
     classification_report,
     confusion_matrix,
     make_scorer,
 )
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+
+# Models
+from catboost import CatBoostClassifier, cv, Pool
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import GradientBoostingRegressor
+
+
+# Plots
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# SHAP
+import shap
+
+# Random
+import random
+
+#Warnings
+import warnings
+warnings.filterwarnings("ignore")
+
 
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
 SAGEMAKER_LOGGER.setLevel(logging.INFO)
@@ -147,17 +181,17 @@ def cast_variables_types(df):
     return df  # Return the dataframe with casted variables
 
 # Function to save the model and its metrics to S3
-def dumpModel(model,metrics_json):
+def dumpModel(model,metrics_json, name):
     SAGEMAKER_LOGGER.info(f"Dumping model...")  # Log the start of the model dumping process
     fitted_clf_model = pickle.dumps(model)  # Serialize the model
     s3_resource.Object(
         S3_BUCKET,
-        f"{save_path}/model/{config['TRAIN']['MODEL_NAME']}",
+        f"{save_path[name]}/model/CatBoostClassifier_cv",
     ).put(Body=fitted_clf_model)  # Save the serialized model to S3
     SAGEMAKER_LOGGER.info(f"Dumping metrics...")  # Log the start of the metrics dumping process
     s3_resource.Object(
         S3_BUCKET,
-        f"{save_path}/metrics/clf_metrics.json",
+        f"{save_path[name]}/metrics/clf_metrics.json",
     ).put(Body=(bytes(json.dumps(metrics_json).encode("UTF-8"))))  # Save the metrics to S3
 
 
@@ -177,6 +211,35 @@ def eval_set(X_set, y_set, model, features, set_name):  # Define function with i
     return metrics_set  # Return the calculated metrics
 
 
+
+def train_cv_ctb(X_train, y_train, labels, n_splits=5):
+
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=1)
+    
+    cat_features=['otp15_takeoff']
+    # cat_features=['otp15_takeoff'] + [col for col in df_nps_tkt.columns if 'country_agg' in col]
+    # cat_features=[]
+    
+    clf = {}
+    for target in labels:
+        clf[target] = CatBoostClassifier(cat_features=cat_features, random_seed=0, verbose=0)
+        
+        cv_scores = []
+        for train_index, val_index in kf.split(X_train):
+            X_train_fold, X_val_fold = X_train.iloc[train_index], X_train.iloc[val_index]
+            y_train_fold, y_val_fold = y_train[target].iloc[train_index], y_train[target].iloc[val_index]
+            
+            # Creando el Pool con las características categóricas especificadas
+
+            train_pool = Pool(X_train_fold, y_train_fold, cat_features=cat_features)
+            val_pool = Pool(X_val_fold, y_val_fold, cat_features=cat_features)
+
+            clf.fit(train_pool, eval_set=val_pool, early_stopping_rounds=10, verbose=False)
+            cv_scores.append(clf.get_best_score())
+    
+    return clf
+
+
 if __name__ == "__main__":
 
     """Main functionality of the script."""
@@ -194,41 +257,56 @@ if __name__ == "__main__":
 
     # Variables
     features = list(config['TRAIN']['FEATURES'])
+    labels = ['promoter_binary', 'detractor_binary']
+    labels = list(config['VARIABLES ETL']['LABELS'])
+    model_names = list(config['TRAIN']['MODEL_NAME'])
 
     # Paths
     read_path = f"{S3_PATH_WRITE}/01_preprocess_step/train/{year}{month}{day}"
-    save_path = f"{S3_PATH_WRITE}/02_train_step/{year}{month}{day}"
+    save_path = {}
+    for name in model_names:
+        save_path[name] = f"{S3_PATH_WRITE}/02_train_step/{name}/{year}{month}{day}"
     SAGEMAKER_LOGGER.info("userlog: Read date path %s.", read_path)
+
 
     # Read data
     X_train = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_train/X_train.csv")
-    y_train = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_train/y_train.csv")
+    y_train={}
+    for target in labels:
+        y_train[target] = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_train/y_train_{target}.csv")
     X_train = cast_variables_types(X_train)
     SAGEMAKER_LOGGER.info(f"X_TRAIN SHAPE {X_train.shape} ; {y_train.shape}")
     SAGEMAKER_LOGGER.info(f"WARNING X_TRAIN: rows with na {X_train[features].isnull().any(axis=1).sum()}")
     missing_rows = X_train[features].isnull().any(axis=1)
     X_train = X_train[~missing_rows]
-    y_train = y_train[~missing_rows]
-    SAGEMAKER_LOGGER.info(f"X_TRAIN SHAPE {X_train.shape} ; {y_train.shape}")
+    for target in labels:
+        y_train[target] = y_train[target][~missing_rows]
+        SAGEMAKER_LOGGER.info(f"X_TRAIN SHAPE {X_train.shape} ; {y_train[target].shape}")
 
     # Estimator
     SAGEMAKER_LOGGER.info(f"userlog: INPUT COLS: {str(features)}")
-    model = LGBMClassifier(random_state=42)
-    model = model.fit(X_train[features], y_train)
-    metrics_train = get_metrics(model, X_train[features], y_train, 'train')
-    SAGEMAKER_LOGGER.info(f"Trained model: {str(model)}")
+    models = train_cv_ctb(X_train, y_train, labels, n_splits=5)
+    for target in labels:
+        metrics_train = get_metrics(models[target], X_train[features], y_train[target], 'train')
+        SAGEMAKER_LOGGER.info(f"Trained model: {str(models[target])}")
 
     del X_train
     del y_train
     gc.collect()
 
     X_test = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_test/X_test.csv")
-    y_test = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_test/y_test.csv")
-    metrics_test = eval_set(X_test, y_test, model, features, 'test')
+    y_test = {}
+    metrics_test = {}
+    for target in labels:
+        y_test[target] = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_test/y_test_{target}.csv")
+        metrics_test[target] = eval_set(X_test, y_test[target], models[target], features, 'test')
 
     X_val = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_val/X_val.csv")
-    y_val = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_val/y_val.csv")
-    metrics_val = eval_set(X_val, y_val, model, features, 'validation')
+    y_val = {}
+    metrics_val = {}
+    for target in labels:
+        y_val[target] = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_val/y_val_{target}.csv")
+        metrics_val[target] = eval_set(X_val, y_val[target], models[target], features, 'test')
 
     # Initialize Amazon S3 as a resource
     s3_resource = resource("s3")
@@ -237,7 +315,9 @@ if __name__ == "__main__":
     SAGEMAKER_LOGGER.info(f"Dumping metrics...")
 
     # Combine all metrics from different datasets (train, test, validation, and out of sample)
-    clf_metrics = {**metrics_train, **metrics_test, **metrics_val}
+    clf_metrics = {}
+    for name, target in zip(model_names, labels):
+        clf_metrics[name] = {**metrics_train[target], **metrics_test[target], **metrics_val[target]}
 
     # Log the combined metrics
     SAGEMAKER_LOGGER.info(f"METRICS: {clf_metrics}")
@@ -247,74 +327,77 @@ if __name__ == "__main__":
 
     # If it's not the first run
     if not FIRST_TIME:
-        # Retrieve the current model from the S3 bucket
-        my_bucket = s3_resource.Bucket(S3_BUCKET)
-        model_paths = []
+        for target, name in zip(labels, model_names):
+            model = models[target]
+            # Retrieve the current model from the S3 bucket
+            my_bucket = s3_resource.Bucket(S3_BUCKET)
+            model_paths = []
 
-        # Filter objects in the bucket under the specified prefix
-        for obj in my_bucket.objects.filter(Prefix=f'{S3_PATH_WRITE}/02_train_step/'):
-            # Extract the version number (or any numerical value) from the object key
-            match = re.search(r'(\d+)/', obj.key)
-            if match:
-                # Store the keys with numerical values
-                model_paths.append(obj.key)
+            # Filter objects in the bucket under the specified prefix
+            for obj in my_bucket.objects.filter(Prefix=f'{S3_PATH_WRITE}/02_train_step/{name}'):
+                # Extract the version number (or any numerical value) from the object key
+                match = re.search(r'(\d+)/', obj.key)
+                if match:
+                    # Store the keys with numerical values
+                    model_paths.append(obj.key)
 
-        # Assume there is only one numeric folder and get the latest model path
-        latest_model_path = sorted(model_paths)[-1]
-        SAGEMAKER_LOGGER.info(f"latest_model_path: {latest_model_path}")
+            # Assume there is only one numeric folder and get the latest model path
+            latest_model_path = sorted(model_paths)[-1]
+            SAGEMAKER_LOGGER.info(f"latest_model_path: {latest_model_path}")
 
-        # Get the object (model) from the bucket and deserialize it
-        prod_model = (
-            my_bucket.Object(f"{latest_model_path}").get()
-        )
-        prod_model = pickle.loads(prod_model["Body"].read())
+            # Get the object (model) from the bucket and deserialize it
+            prod_model = (
+                my_bucket.Object(f"{latest_model_path}").get()
+            )
+            prod_model = pickle.loads(prod_model["Body"].read())
 
-        # Define a function to get the number of features used in the model
-        def get_number_of_training_variables(model):
-            if hasattr(model, 'n_features_in_'):
-                return model.n_features_in_
-            if hasattr(model, 'n_features_'):
-                return model.n_features_
-            else:
-                return None
+            # Define a function to get the number of features used in the model
+            def get_number_of_training_variables(model):
+                if hasattr(model, 'n_features_in_'):
+                    return model.n_features_in_
+                if hasattr(model, 'n_features_'):
+                    return model.n_features_
+                else:
+                    return None
 
-        # Get the number of features used in the model
-        number_of_training_variables = get_number_of_training_variables(model)
+            # Get the number of features used in the model
+            number_of_training_variables = get_number_of_training_variables(model)
 
-        # If the number of features used is equal to the number of features in the dataset
-        if number_of_training_variables == len(features):
-            # Get the metrics of the model
-            prod_model_metrics_test = get_metrics(prod_model, X_test[features], y_test, 'test')
+            # If the number of features used is equal to the number of features in the dataset
+            if number_of_training_variables == len(features):
+                # Get the metrics of the model
+                prod_model_metrics_test = get_metrics(prod_model, X_test[features], y_test[target], 'test')
 
-            # Define metrics for comparison and minimum thresholds for model update
-            compare_metrics = ["Recall"]
-            min_increase = 0.05
-            min_thresholds = {"AUC": 0.9, "Recall": 0.8, "Precision": 0.2, "Accuracy": 0.8, "F1-Score": 0.25}
+                # Define metrics for comparison and minimum thresholds for model update
+                compare_metrics = ["Recall"]
+                min_increase = 0.05
+                min_thresholds = {"AUC": 0.9, "Recall": 0.8, "Precision": 0.2, "Accuracy": 0.8, "F1-Score": 0.25}
 
-            # Decide whether to update the model based on the defined metrics
-            result = should_update_model(prod_model_metrics_test, clf_metrics, compare_metrics, min_increase,
-                                         min_thresholds)
+                # Decide whether to update the model based on the defined metrics
+                result = should_update_model(prod_model_metrics_test, clf_metrics[name], compare_metrics, min_increase,
+                                            min_thresholds)
 
-            # Log the result of whether to update the model
-            print("Actualizar modelo:", result)
-            clf_metrics_json = json.dumps(clf_metrics)
+                # Log the result of whether to update the model
+                print("Actualizar modelo:", result)
+                clf_metrics_json = json.dumps(clf_metrics[name])
 
-            # If the model should be updated
-            if result:
-                # Update the model
-                dumpModel(model, clf_metrics)
-            else:
-                path = f"{S3_PATH_WRITE}/02_train_step/not_deployed"
-                SAGEMAKER_LOGGER.info(f"Dumping FAILED MODEL metrics...")
-                s3_resource.Object(
-                    S3_BUCKET,
-                    # Define the path for storing the metrics of the model that was not updated
-                    f"{path}/{year}{month}{day}_metrics.json",
-                    # Write the metrics in JSON format to the specified location in the S3 bucket
-                ).put(Body=(bytes(json.dumps(clf_metrics_json).encode("UTF-8"))))
+                # If the model should be updated
+                if result:
+                    # Update the model
+                    dumpModel(model, clf_metrics[name], name)
+                else:
+                    path = f"{S3_PATH_WRITE}/02_train_step/not_deployed"
+                    SAGEMAKER_LOGGER.info(f"Dumping FAILED MODEL metrics...")
+                    s3_resource.Object(
+                        S3_BUCKET,
+                        # Define the path for storing the metrics of the model that was not updated
+                        f"{path}/{year}{month}{day}_metrics.json",
+                        # Write the metrics in JSON format to the specified location in the S3 bucket
+                    ).put(Body=(bytes(json.dumps(clf_metrics_json).encode("UTF-8"))))
         else:
             # If the number of features used is not equal to the number of features in the dataset, update the model
-            dumpModel(model, clf_metrics)
+            dumpModel(model, clf_metrics[name], name)
     else:
         # If it's the first run, dump (save) the model and its metrics
-        dumpModel(model, clf_metrics)
+        for model, name in zip(models, model_names):
+            dumpModel(model, clf_metrics[name], name)

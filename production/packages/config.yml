@@ -21,14 +21,18 @@ VARIABLES_ETL:
     - Pclass
     - Sex
     - Embarked
-  TARGET: Survived
-  ID: PassengerId
+  LABELS: 
+    - promoter_binary
+    - detractor_binary
+  ID: respondent_id
 
 PREPROCESS:
   PIPELINE_NAME: pipeline.pkl
 
 TRAIN:
-  MODEL_NAME: CatBoostClassifier
+  MODEL_NAME: 
+    - Promoters
+    - Detractors
   FEATURES:
     - Pclass
     - Name
@@ -40,6 +44,7 @@ TRAIN:
     - Fare
     - Cabin
     - Embarked
+  
 
 PREDICT:
   COLUMNS_SAVE:
