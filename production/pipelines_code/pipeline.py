@@ -292,10 +292,10 @@ def get_pipeline(
     # CONDITION STEP
     condition_step = ConditionStep(
         name="condition_step",
-        depends_on=["etl_step"],  # Depends on the previous step "etl_step"
+        depends_on=["preprocess_step"],  # Depends on the previous step "etl_step"
         conditions=[train_predict_condition],  # Condition for branching
-        if_steps=[train_preprocess_step, train_step],  # Steps to execute if the condition is true
-        else_steps=[predict_preprocess_step, predict_step]  # Steps to execute if the condition is false
+        if_steps=[train_step],  # Steps to execute if the condition is true
+        else_steps=[predict_step]  # Steps to execute if the condition is false
     )
 
     # PIPELINE
