@@ -118,7 +118,7 @@ def get_pipeline(
         code=etl_step_pyspark_args.code,  # Code to be executed
     )
 
-    # PREPROCESS TRAIN
+    # PREPROCESS
     # Instantiate the processor
     framework_processor = processors.framework()
 
@@ -148,9 +148,9 @@ def get_pipeline(
     )
 
     # Define the processing step
-    train_preprocess_step = ProcessingStep(
+    preprocess_step = ProcessingStep(
         # Step name
-        name="train_preprocess_step",# Processor to use
+        name="preprocess_step",# Processor to use
         processor=framework_processor,# Input data
         inputs=train_preprocess_step_args.inputs,# Output configuration
         outputs=train_preprocess_step_args.outputs,# Arguments for the job
@@ -158,41 +158,7 @@ def get_pipeline(
         code=train_preprocess_step_args.code,
     )
 
-    # PREPROCESS PREDICT
-    # Create the framework processor
-    framework_processor = processors.framework()
-
-    # Get the run arguments for the predict preprocessing step
-    predict_preprocess_step_args = framework_processor.get_run_args(
-        code=path_join(BASE_DIR, "code", "preprocess.py"),  # Specify the path to the preprocessing code
-        dependencies=[
-            path_join(BASE_DIR, "packages", "utils.py"),  # Specify the path to the utils.py file
-            path_join(BASE_DIR, "packages", "config.yml"),  # Specify the path to the config.yml file
-            path_join(BASE_DIR, "packages", "requirements", "preprocess.txt"),
-            # Specify the path to the preprocess requirements file
-        ],
-        arguments=[
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_write",
-            param_s3_path_write,
-            "--str_execution_date",
-            param_str_execution_date,
-            "--use_type",
-            param_use_type,
-        ],  # Specify the command-line arguments for the preprocessing code
-    )
-
-    # Create a processing step for prediction preprocessing
-    predict_preprocess_step = ProcessingStep(
-        name="predict_preprocess_step",  # Set the name of the step as "predict_preprocess_step"
-        processor=framework_processor,  # Use the framework processor for running the code
-        inputs=predict_preprocess_step_args.inputs,  # Specify the inputs for the step
-        outputs=predict_preprocess_step_args.outputs,  # Specify the outputs for the step
-        job_arguments=predict_preprocess_step_args.arguments,  # Specify the job arguments for the step
-        code=predict_preprocess_step_args.code,  # Specify the code to be executed for the step
-    )
-
+    
     # TRAIN
     # Create a framework processor for training
     framework_processor = processors.framework()
@@ -216,7 +182,7 @@ def get_pipeline(
     # Define the training step in the pipeline
     train_step = ProcessingStep(
         name="train_step",  # Set a name for the step
-        depends_on=["train_preprocess_step"],
+        depends_on=["preprocess_step"],
         # Specify that this step depends on the completion of the "train_preprocess_step"
         processor=framework_processor,  # Use the framework processor
         inputs=train_step_args.inputs,  # Specify the inputs for this step
@@ -249,7 +215,7 @@ def get_pipeline(
     #PREDICT STEP
     predict_step = ProcessingStep(
         name="predict_step",
-        depends_on=["predict_preprocess_step"],  # Depends on the previous step "predict_preprocess_step"
+        depends_on=["preprocess_step"],  # Depends on the previous step "predict_preprocess_step"
         processor=framework_processor,  # Processor to use for the step
         inputs=predict_step_args.inputs,  # Input data for the step
         outputs=predict_step_args.outputs,  # Output data for the step
