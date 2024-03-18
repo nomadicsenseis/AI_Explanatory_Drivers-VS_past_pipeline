@@ -1,26 +1,47 @@
 VARIABLES_ETL:
   COLUMNS_TO_SAVE:
-    - PassengerId
-    - Pclass
-    - Name
-    - Sex
-    - Age
-    - SibSp
-    - Parch
-    - Ticket
-    - Fare
-    - Cabin
-    - Embarked
+    - respondent_id
+    - date_fligh_local
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone
   DOUBLE_CAST:
-    - PassengerId
-    - Age
-    - SibSp
-    - Parch
-    - Fare
+    - respondent_id
+    - date_fligh_local
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone
   STR_CAST:
-    - Pclass
-    - Sex
-    - Embarked
   LABELS: 
     - promoter_binary
     - detractor_binary
@@ -34,19 +55,62 @@ TRAIN:
     - Promoters
     - Detractors
   FEATURES:
-    - Pclass
-    - Name
-    - Sex
-    - Age
-    - SibSp
-    - Parch
-    - Ticket
-    - Fare
-    - Cabin
-    - Embarked
-  
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone 
 
 PREDICT:
   COLUMNS_SAVE:
-    - insert_date_ci
-    - Survived_probability
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone
+    - ticket_price_nps
+    - load_factor_nps
+    - otp15_takeoff_nps 
+    - bkg_200_journey_preparation_nps
+    - pfl_100_checkin_nps
+    - pfl_200_security_nps
+    - pfl_300_lounge_nps
+    - pfl_500_boarding_nps
+    - ifl_300_cabin_nps
+    - ifl_200_flight_crew_annoucements_nps
+    - ifl_600_wifi_nps
+    - ifl_500_ife_nps
+    - ifl_400_food_drink_nps
+    - ifl_100_cabin_crew_nps
+    - arr_100_arrivals_nps
+    - con_100_connections_nps
+    - loy_200_loyalty_programme_nps
+    - img_310_ease_contact_phone_nps
+    - base_val_nps
+    - out_prob_nps

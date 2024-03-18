@@ -48,7 +48,8 @@ def get_pipeline(
     processing_instance_count = ParameterInteger(name="processing_instance_count", default_value=3)
     param_str_execution_date = ParameterString(name="str_execution_date", default_value="2023-03-01")
     param_s3_bucket = ParameterString(name="s3_bucket", default_value="iberia-data-lake")
-    param_s3_path_read = ParameterString(name="s3_path_read")
+    param_s3_path_read_nps = ParameterString(name="s3_path_read_nps")
+    param_s3_path_read_lf = ParameterString(name="s3_path_read_lf")
     param_s3_path_write = ParameterString(name="s3_path_write")
     param_is_last_date = ParameterString(name="is_last_date", default_value="1")
     param_use_type = ParameterString(name="use_type")
@@ -61,17 +62,6 @@ def get_pipeline(
     # Read the configuration file
     configuration = utils.read_config_data()
 
-    # Prepare PySpark properties from the configuration
-    pyspark_properties = {
-        key.replace("_", "."): value
-        for key, value in configuration.get("PYSPARK").items()
-    }
-
-    # Define PySpark configuration
-    pyspark_config = [
-        {"Classification": "spark-defaults", "Properties": pyspark_properties}
-    ]
-
     # Initialize the processors used in the pipeline executions
     processors = utils.Processors(
         base_job_prefix=base_job_prefix,
@@ -83,20 +73,26 @@ def get_pipeline(
 
     # ETL
     # Initialize the PySpark processor
-    pyspark_processor = processors.pyspark()
+    framework_processor = processors.framework()
 
     # Define the arguments for running a PySpark job
-    etl_step_pyspark_args = pyspark_processor.get_run_args(
-        submit_app=path_join(BASE_DIR, "code", "etl.py"),  # Path to the PySpark script
-        submit_py_files=[  # Python files to be submitted with the job
+    etl_step_args = framework_processor.get_run_args(
+        # Path to the preprocessing script
+        code=path_join(BASE_DIR, "code", "etl.py"),
+
+        # List of dependencies required by the preprocessing script
+        dependencies=[
             path_join(BASE_DIR, "packages", "utils.py"),
+            path_join(BASE_DIR, "packages", "config.yml"),
+            path_join(BASE_DIR, "packages", "requirements", "etl.txt")
         ],
-        submit_files=[path_join(BASE_DIR, "packages", "config.yml")],  # Other files to be submitted with the job
-        arguments=[  # Command line arguments to the PySpark script
+        arguments=[  # Command line arguments to the framework script
             "--s3_bucket",
             param_s3_bucket,
             "--s3_path_read",
-            param_s3_path_read,
+            param_s3_path_read_nps,
+            "--s3_path_read",
+            param_s3_path_read_lf,
             "--s3_path_write",
             param_s3_path_write,
             "--str_execution_date",
@@ -104,18 +100,16 @@ def get_pipeline(
             "--use_type",
             param_use_type,
         ],
-        outputs=[],  # List of output configurations
-        configuration=pyspark_config,  # PySpark configuration options
     )
 
     # Create a processing step
     etl_step = ProcessingStep(
         name="etl_step",  # Name of the step
-        processor=pyspark_processor,  # Processor to be used (Pyspark in this case)
-        inputs=etl_step_pyspark_args.inputs,  # Inputs for the processor
-        outputs=etl_step_pyspark_args.outputs,  # Where to store the outputs
-        job_arguments=etl_step_pyspark_args.arguments,  # Arguments for the processor
-        code=etl_step_pyspark_args.code,  # Code to be executed
+        processor=framework_processor,  # Processor to be used (framework in this case)
+        inputs=etl_step_args.inputs,  # Inputs for the processor
+        outputs=etl_step_args.outputs,  # Where to store the outputs
+        job_arguments=etl_step_args.arguments,  # Arguments for the processor
+        code=etl_step_args.code,  # Code to be executed
     )
 
     # PREPROCESS
@@ -271,7 +265,8 @@ def get_pipeline(
             processing_instance_count,  # Number of instances for data processing
             param_str_execution_date,  # Execution date as a string
             param_s3_bucket,  # S3 bucket name
-            param_s3_path_read,  # S3 path for reading data
+            param_s3_path_read_nps,  # S3 path for reading the nps data
+            param_s3_path_read_lf,  # S3 path for reading the lf data
             param_s3_path_write,  # S3 path for writing data
             param_is_last_date,  # Flag indicating if it is the last date for data processing
             param_use_type,  # Type of data to be processed
