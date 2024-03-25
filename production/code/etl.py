@@ -1,3 +1,10 @@
+from subprocess import check_call
+from sys import executable
+
+
+STEP = "ETL"
+check_call([executable, "-m", "pip", "install", "-r", f"./{STEP.lower()}.txt"])
+
 import argparse
 import utils
 import logging
@@ -5,12 +12,14 @@ import json
 import pandas as pd
 import boto3
 import s3fs
+import yaml 
+from datetime import datetime, timedelta
+
 
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
 SAGEMAKER_LOGGER.setLevel(logging.INFO)
 SAGEMAKER_LOGGER.addHandler(logging.StreamHandler())
 
-STEP = "ETL"
 
 
 # We define the Arguments class that inherits from the AbstractArguments abstract class.
@@ -67,6 +76,16 @@ if __name__ == "__main__":
     STR_EXECUTION_DATE = args.str_execution_date
     date = STR_EXECUTION_DATE.split("/")[-1].split("=")[-1].replace("-", "")
     year, month, day = date[:4], date[4:6], date[6:]
+    
+    # Convert to datetime object
+    execution_date = datetime.strptime(STR_EXECUTION_DATE, "%Y-%m-%d")
+
+    # Calculate yesterday's date
+    yesterday_date = execution_date - timedelta(days=1)
+    # Format dates as strings for S3 prefixes
+    today_date_str = execution_date.strftime("%Y-%m-%d")
+    yesterday_date_str = yesterday_date.strftime("%Y-%m-%d")
+    
 
     # Config file read
     # config = utils.read_config_data(path=SparkFiles.get(filename="config.yml"))
@@ -78,7 +97,7 @@ if __name__ == "__main__":
     s3_resource = boto3.resource("s3")
 
     # READ TODAY DATA (HISTORIC NPS)
-    today_nps_surveys_prefix = f'{S3_BUCKET_NPS}/{S3_PATH_READ_NPS}/insert_date_ci={year}-{month}-{day}/'
+    today_nps_surveys_prefix = f'{S3_PATH_READ_NPS}/insert_date_ci={today_date_str}/'
     s3_keys = [item.key for item in s3_resource.Bucket(S3_BUCKET_NPS).objects.filter(Prefix=today_nps_surveys_prefix)]
     preprocess_paths = [f"s3://{S3_BUCKET_NPS}/{key}" for key in s3_keys]
 
@@ -90,7 +109,7 @@ if __name__ == "__main__":
     df_nps_historic = df_nps_historic.reset_index(drop=True)
 
     # READ PREVIOUS NPS DATA (FOR INCREMENTAL)
-    yesterday_nps_surveys_prefix = f'{S3_BUCKET_NPS}/{S3_PATH_READ_NPS}/insert_date_ci={year}-{month}-{day-1}/'
+    yesterday_nps_surveys_prefix = f'{S3_PATH_READ_NPS}/insert_date_ci={yesterday_date_str}/'
     yesterday_s3_keys = [item.key for item in s3_resource.Bucket(S3_BUCKET_NPS).objects.filter(Prefix=yesterday_nps_surveys_prefix)]
     yesterday_preprocess_paths = [f"s3://{S3_BUCKET_NPS}/{key}" for key in yesterday_s3_keys]
 
@@ -101,7 +120,9 @@ if __name__ == "__main__":
         df_nps_yesterday = pd.concat([df_nps_yesterday, df], axis=0)
     df_nps_yesterday = df_nps_yesterday.reset_index(drop=True)
 
-    # INCREMENTAL NPS
+    # INCREMENTAL NPS  
+    SAGEMAKER_LOGGER.info("Pre-merge shapes - Historic: %s, Yesterday: %s", df_nps_historic.shape, df_nps_yesterday.shape)
+
     df_nps_incremental = pd.merge(df_nps_historic, df_nps_yesterday, how='left', indicator=True, on=df_nps_historic.columns.tolist())
     df_nps_incremental = df_nps_incremental[df_nps_incremental['_merge'] == 'left_only']
     df_nps_incremental = df_nps_incremental.drop(columns=['_merge'])
@@ -110,7 +131,7 @@ if __name__ == "__main__":
     
     # READ LF DATA SOURCE
     # lf_dir = 's3://ibdata-prod-ew1-s3-customer/customer/load_factor_to_s3_nps_model/'    
-    load_factor_prefix = f'{S3_BUCKET_LF}/{S3_PATH_READ_LF}/'
+    load_factor_prefix = f's3://{S3_BUCKET_LF}/{S3_PATH_READ_LF}/'
 
     # Assume rol for prod
     sts_client = boto3.client('sts')
@@ -126,14 +147,37 @@ if __name__ == "__main__":
     
     SAGEMAKER_LOGGER.info("userlog: Read historic load_factor data path %s.", load_factor_prefix)
     dataframes = []
-    for file in load_factor_list:
-        with fs.open(f's3://{file}') as f:
-            if f'{year}-{month}-{day}' in f:
-                df_lf_incremental = pd.read_csv(f)
-            df = pd.read_csv(f)
-            dataframes.append(df)
-    df_lf_historic = pd.concat(dataframes, ignore_index=True)
+    for file_path in load_factor_list:
+        try:
+            file_info = fs.info(file_path)
+            if file_info['Size'] == 0:
+                SAGEMAKER_LOGGER.info(f"Skipping empty file: {file_path}")
+                continue
 
+            with fs.open(f's3://{file_path}') as f:
+                if today_date_str in file_path:
+                    df_lf_incremental = pd.read_csv(f)
+                    SAGEMAKER_LOGGER.info(f"Loading incremental: {df_lf_incremental.shape}")
+                df = pd.read_csv(f)
+                dataframes.append(df)
+        except pd.errors.EmptyDataError:
+            SAGEMAKER_LOGGER.info(f"Caught EmptyDataError for file: {file_path}, skipping...")
+        except Exception as e:
+            SAGEMAKER_LOGGER.error(f"Error reading file {file_path}: {e}")
+
+    if dataframes:
+        df_lf_historic = pd.concat(dataframes, ignore_index=True)
+    else:
+        df_lf_historic = pd.DataFrame()
+        
+    # # Assume rol for aip again
+    # sts_client = boto3.client('sts')
+    # assumed_role = sts_client.assume_role(
+    #     RoleArn="arn:aws:iam::077156906314:role/ibdata-aip-role-sagemaker-customer-user",
+    #     RoleSessionName="test"
+    # )
+    # credentials = assumed_role['Credentials']
+    # fs = s3fs.S3FileSystem(key=credentials['AccessKeyId'], secret=credentials['SecretAccessKey'], token=credentials['SessionToken'])
     # ETL Code
 
     # 1. Filter dataframes by carrier code.
@@ -161,6 +205,14 @@ if __name__ == "__main__":
 
     # 2. Transform date column to datetime format
     SAGEMAKER_LOGGER.info("userlog: ETL 2.0 Transform date column to datetime format.")
+    delay_features = ['real_departure_time_local', 'scheduled_departure_time_local']
+    for feat in delay_features:
+        df_nps_historic[feat] = pd.to_datetime(df_nps_historic[feat], format="%Y%m%d %H:%M:%S", errors = 'coerce')
+        df_nps_incremental[feat] = pd.to_datetime(df_nps_incremental[feat], format="%Y%m%d %H:%M:%S", errors = 'coerce')
+            
+    df_nps_historic['delay_departure'] = (df_nps_historic['real_departure_time_local'] - df_nps_historic['scheduled_departure_time_local']).dt.total_seconds()/60
+    df_nps_incremental['delay_departure'] = (df_nps_incremental['real_departure_time_local'] - df_nps_incremental['scheduled_departure_time_local']).dt.total_seconds()/60
+    
     # NPS
     df_nps_historic['date_flight_local'] = pd.to_datetime(df_nps_historic['date_flight_local'])
     df_nps_incremental['date_flight_local'] = pd.to_datetime(df_nps_incremental['date_flight_local'])
@@ -242,14 +294,15 @@ if __name__ == "__main__":
     df_historic = df_historic[['respondent_id' , 'date_flight_local'] + features_dummy + labels]
     df_incremental = df_incremental[['respondent_id' , 'date_flight_local'] + features_dummy + labels]
 
-
+    SAGEMAKER_LOGGER.info("userlog: Size of resulting df_historic:", df_historic.shape)
+    SAGEMAKER_LOGGER.info("userlog: Size of resulting df_incremental:", df_incremental.shape)
     # Save data for training
     # Historic
-    save_path = f"s3://{S3_BUCKET_NPS}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
+    save_path = f"s3://{S3_BUCKET_NPS}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}"
     SAGEMAKER_LOGGER.info("userlog: Saving information for etl step in %s.", save_path)
     df_historic.to_csv(f'{save_path}/historic.csv', index=False)
     # Incremental
-    save_path = f"s3://{S3_BUCKET_NPS}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}/"
+    save_path = f"s3://{S3_BUCKET_NPS}/{S3_PATH_WRITE}/00_etl_step/{USE_TYPE}/{year}{month}{day}"
     SAGEMAKER_LOGGER.info("userlog: Saving information for etl step in %s.", save_path)
     df_historic.to_csv(f'{save_path}/incremental.csv', index=False)
 

@@ -10,6 +10,7 @@ from typing import Dict, Optional
 from boto3 import client as b3_client
 from yaml import safe_load
 import pandas as pd
+import numpy as np
 import shap
 
 

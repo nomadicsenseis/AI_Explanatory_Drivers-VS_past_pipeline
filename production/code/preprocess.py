@@ -24,10 +24,10 @@ import pickle
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.pipeline import make_pipeline
-import matplotlib.pyplot as plt
+import yaml 
 
 warnings.filterwarnings("ignore")
-
+from datetime import datetime, timedelta
 import argparse
 import logging
 import pandas as pd
@@ -37,6 +37,7 @@ from pandas import DataFrame
 
 import boto3
 import utils
+from io import StringIO
 
 SAGEMAKER_LOGGER = logging.getLogger("sagemaker")
 SAGEMAKER_LOGGER.setLevel(logging.INFO)
@@ -90,7 +91,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
     DataFrame: The processed DataFrame.
     """
     save_path = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/{year}{month}{day}'
-    save_path_read = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}/'
+    save_path_read = f'{S3_PATH_WRITE}/01_preprocess_step/{USE_TYPE}'
 
     # Convert 'date_flight_local' to datetime and extract 'month' and 'year' if not already done
     df['date_flight_local'] = pd.to_datetime(df['date_flight_local'])
@@ -103,7 +104,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         model_path, _, _, _ = utils.get_path_to_read_and_date(
             read_last_date=bool(int(IS_LAST_DATE)),
             bucket=S3_BUCKET,
-            key=save_path_read,
+            key=f'{S3_PATH_WRITE}/01_preprocess_step/train',
             partition_date=STR_EXECUTION_DATE,
         )
         # # Remove s3 info path
@@ -121,7 +122,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
         
             # Read the transformation pipeline
             pipeline = (
-                s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}/{m}")
+                s3_resource.Object(S3_BUCKET, f"{model_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}_{m}.pkl")
                 .get()
             )
 
@@ -135,7 +136,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
             # Predict missing ticket_price values
             X_missing = X.loc[idx_missing]
             if len(X_missing) > 0:
-                imputed_values = pipeline.predict(X_missing)
+                imputed_values = pipe.predict(X_missing)
                 # Fill in the missing values in the original DataFrame
                 df.loc[idx_missing, 'ticket_price'] = imputed_values
 
@@ -178,7 +179,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
                 pipeline.fit(X_train, y_train)
 
                 # Save model/pipeline for predict step.
-                s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}/{m}").put(
+                s3_resource.Object(S3_BUCKET, f"{save_path}/models/{config['PREPROCESS']['PIPELINE_NAME']}_{m}.pkl").put(
                     Body=pickle.dumps(pipeline)
                 )
 
@@ -193,6 +194,7 @@ def feature_processer(df: DataFrame, use_type='predict', y_train=None) -> DataFr
                     
                     # Fill in the missing values in the original DataFrame
                     df.loc[idx_missing, 'ticket_price'] = imputed_values
+                    
 
         SAGEMAKER_LOGGER.info(f'Processing X_train {X_train.shape} ')
         SAGEMAKER_LOGGER.info(f'Processing y_train {y_train.shape} ')
@@ -275,6 +277,21 @@ def read_data(prefix) -> DataFrame:
 
     return df_features
 
+def read_csv_from_s3(bucket_name, object_key):
+    # Create a boto3 S3 client
+    s3_client = boto3.client('s3')
+    
+    # Get the object from S3
+    response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+    
+    # Read the CSV content
+    csv_string = response['Body'].read().decode('utf-8')
+    
+    # Convert to a Pandas DataFrame
+    df = pd.read_csv(StringIO(csv_string))
+    
+    return df
+
 
 if __name__ == "__main__":
 
@@ -292,6 +309,12 @@ if __name__ == "__main__":
     IS_LAST_DATE = 1
     date = STR_EXECUTION_DATE.split("/")[-1].split("=")[-1].replace("-", "")
     year, month, day = date[:4], date[4:6], date[6:]
+    
+    # Convert to datetime object
+    execution_date = datetime.strptime(STR_EXECUTION_DATE, "%Y-%m-%d")
+
+    # Format dates as strings for S3 prefixes
+    today_date_str = execution_date.strftime("%Y-%m-%d")
 
     # s3 object
     s3_resource = boto3.resource("s3")
@@ -305,17 +328,19 @@ if __name__ == "__main__":
 
 
     # Execute preprocess
-    in_features_train = config.get("VARIABLES_ETL").get('COLUMNS_TO_SAVE') + \
-                        [config.get("VARIABLES_ETL").get('ID')]
+    in_features_train = config.get("VARIABLES_ETL").get('COLUMNS_TO_SAVE')
+    # in_features_train = config.get("TRAIN").get('FEATURES') 
+    # + [config.get("VARIABLES_ETL").get('ID')]
 
     if USE_TYPE == 'train':
         # Read data
-        df_features = read_data(src_path_historic)
+        # df_features = read_csv_from_s3(S3_BUCKET, src_path_historic)
+        df_features = pd.read_csv(src_path_historic)
         labels = config.get("VARIABLES_ETL").get('LABELS')
 
         # Divide train and test
         X_train, X_test, X_val, y_train, y_test, y_val = split_train_val_test(df_features[in_features_train],
-                                                                              labels)
+                                                                              df_features[labels])
         # Features encoder
         SAGEMAKER_LOGGER.info(f"X_train, X_test, X_val, y_train, y_test, y_val: {X_train.shape}, {X_test.shape}, "
                               f"{X_val.shape}, {y_train.shape}, {y_test.shape}, {y_val.shape}")
@@ -345,7 +370,7 @@ if __name__ == "__main__":
 
     else:
         # Read data
-        df_features = read_data(src_path_incremental)
+        df_features = pd.read_csv(src_path_incremental)
         # Pass on incremental data for prediction.
         X_pred = df_features[in_features_train]
         SAGEMAKER_LOGGER.info(f"userlog: feature_processer_incremental_predict pre: {str(X_pred.shape)}")

@@ -14,7 +14,6 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 import os
 import numpy as np
-import xlsxwriter
 import datetime
 import boto3
 import s3fs
@@ -29,6 +28,7 @@ from os import environ
 import utils
 from boto3 import resource
 from pandas import read_csv
+import yaml 
 
 # Sklearn
 from sklearn.model_selection import train_test_split, KFold
@@ -57,10 +57,6 @@ from catboost import CatBoostClassifier, cv, Pool
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import GradientBoostingRegressor
 
-
-# Plots
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # SHAP
 import shap
@@ -186,7 +182,7 @@ def dumpModel(model,metrics_json, name):
     fitted_clf_model = pickle.dumps(model)  # Serialize the model
     s3_resource.Object(
         S3_BUCKET,
-        f"{save_path[name]}/model/CatBoostClassifier_cv",
+        f"{save_path[name]}/model/CatBoostClassifier_cv.pkl",
     ).put(Body=fitted_clf_model)  # Save the serialized model to S3
     SAGEMAKER_LOGGER.info(f"Dumping metrics...")  # Log the start of the metrics dumping process
     s3_resource.Object(
@@ -213,7 +209,7 @@ def eval_set(X_set, y_set, model, features, set_name):  # Define function with i
 
 
 def train_cv_ctb(X_train, y_train, labels, n_splits=5):
-
+    
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=1)
     
     cat_features=['otp15_takeoff']
@@ -221,21 +217,25 @@ def train_cv_ctb(X_train, y_train, labels, n_splits=5):
     # cat_features=[]
     
     clf = {}
+    cv_scores = {}  # Diccionario para almacenar los scores por cada target
+
     for target in labels:
         clf[target] = CatBoostClassifier(cat_features=cat_features, random_seed=0, verbose=0)
-        
-        cv_scores = []
+        cv_scores[target] = []  # Inicializa la lista de scores para el target actual
+
         for train_index, val_index in kf.split(X_train):
             X_train_fold, X_val_fold = X_train.iloc[train_index], X_train.iloc[val_index]
             y_train_fold, y_val_fold = y_train[target].iloc[train_index], y_train[target].iloc[val_index]
-            
-            # Creando el Pool con las características categóricas especificadas
 
+            # Creando el Pool con las características categóricas especificadas
             train_pool = Pool(X_train_fold, y_train_fold, cat_features=cat_features)
             val_pool = Pool(X_val_fold, y_val_fold, cat_features=cat_features)
 
-            clf.fit(train_pool, eval_set=val_pool, early_stopping_rounds=10, verbose=False)
-            cv_scores.append(clf.get_best_score())
+            # Aquí se corrige a clf[target] para referirse al modelo correcto
+            clf[target].fit(train_pool, eval_set=val_pool, early_stopping_rounds=10, verbose=False)
+
+            # Guarda el mejor score para el target actual
+            cv_scores[target].append(clf[target].get_best_score())
     
     return clf
 
@@ -258,14 +258,14 @@ if __name__ == "__main__":
     # Variables
     features = list(config['TRAIN']['FEATURES'])
     labels = ['promoter_binary', 'detractor_binary']
-    labels = list(config['VARIABLES ETL']['LABELS'])
+    labels = config.get("VARIABLES_ETL").get('LABELS')
     model_names = list(config['TRAIN']['MODEL_NAME'])
 
     # Paths
     read_path = f"{S3_PATH_WRITE}/01_preprocess_step/train/{year}{month}{day}"
     save_path = {}
     for name in model_names:
-        save_path[name] = f"{S3_PATH_WRITE}/02_train_step/{name}/{year}{month}{day}"
+        save_path[name] = f"{S3_PATH_WRITE}/02_train_step/{name}/{year}-{month}-{day}"
     SAGEMAKER_LOGGER.info("userlog: Read date path %s.", read_path)
 
 
@@ -275,7 +275,7 @@ if __name__ == "__main__":
     for target in labels:
         y_train[target] = read_csv(f"s3://{S3_BUCKET}/{read_path}/data_train/y_train_{target}.csv")
     X_train = cast_variables_types(X_train)
-    SAGEMAKER_LOGGER.info(f"X_TRAIN SHAPE {X_train.shape} ; {y_train.shape}")
+    SAGEMAKER_LOGGER.info(f"X_TRAIN SHAPE {X_train.shape} ; {y_train[labels[0]].shape} ;  {y_train[labels[1]].shape}")
     SAGEMAKER_LOGGER.info(f"WARNING X_TRAIN: rows with na {X_train[features].isnull().any(axis=1).sum()}")
     missing_rows = X_train[features].isnull().any(axis=1)
     X_train = X_train[~missing_rows]
@@ -285,9 +285,10 @@ if __name__ == "__main__":
 
     # Estimator
     SAGEMAKER_LOGGER.info(f"userlog: INPUT COLS: {str(features)}")
-    models = train_cv_ctb(X_train, y_train, labels, n_splits=5)
+    models = train_cv_ctb(X_train[features], y_train, labels, n_splits=5)
+    metrics_train = {}
     for target in labels:
-        metrics_train = get_metrics(models[target], X_train[features], y_train[target], 'train')
+        metrics_train[target] = get_metrics(models[target], X_train[features], y_train[target], 'train')
         SAGEMAKER_LOGGER.info(f"Trained model: {str(models[target])}")
 
     del X_train
@@ -399,5 +400,6 @@ if __name__ == "__main__":
             dumpModel(model, clf_metrics[name], name)
     else:
         # If it's the first run, dump (save) the model and its metrics
-        for model, name in zip(models, model_names):
-            dumpModel(model, clf_metrics[name], name)
+        for target, name in zip(labels, model_names):
+            SAGEMAKER_LOGGER.info(f"Type of model being dumped: {type(models[target])}")
+            dumpModel(models[target], clf_metrics[name], name)

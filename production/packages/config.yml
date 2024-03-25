@@ -1,7 +1,7 @@
 VARIABLES_ETL:
   COLUMNS_TO_SAVE:
     - respondent_id
-    - date_fligh_local
+    - date_flight_local
     - ticket_price
     - load_factor
     - otp15_takeoff 
@@ -45,10 +45,12 @@ VARIABLES_ETL:
   LABELS: 
     - promoter_binary
     - detractor_binary
-  ID: respondent_id
+  ID: 
+    - respondent_id
+    - date_flight_local
 
 PREPROCESS:
-  PIPELINE_NAME: pipeline.pkl
+  PIPELINE_NAME: ticket_price_inputer
 
 TRAIN:
   MODEL_NAME: 
@@ -76,6 +78,9 @@ TRAIN:
 
 PREDICT:
   COLUMNS_SAVE:
+    - model_version
+    - respondent_id
+    - date_flight_local
     - ticket_price
     - load_factor
     - otp15_takeoff 
@@ -112,5 +117,7 @@ PREDICT:
     - con_100_connections_nps
     - loy_200_loyalty_programme_nps
     - img_310_ease_contact_phone_nps
-    - base_val_nps
+    - base_prob_nps
     - out_prob_nps
+    - insert_date_ci
+    

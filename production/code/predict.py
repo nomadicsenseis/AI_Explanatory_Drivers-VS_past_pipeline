@@ -13,7 +13,6 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.float_format', lambda x: '%.3f' % x)
 import os
 import numpy as np
-import xlsxwriter
 import datetime
 import boto3
 import s3fs
@@ -28,7 +27,7 @@ from os import environ
 import utils
 from boto3 import resource
 from pandas import read_csv
-
+import yaml 
 # Sklearn
 from sklearn.model_selection import train_test_split, KFold
 from sklearn import metrics
@@ -55,11 +54,6 @@ from sklearn.compose import ColumnTransformer
 from catboost import CatBoostClassifier, cv, Pool
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import GradientBoostingRegressor
-
-
-# Plots
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # SHAP
 import shap
@@ -131,7 +125,7 @@ if __name__ == "__main__":
         path_read_train = f"{S3_PATH_WRITE}/02_train_step/{name}"
 
         # Determine the path to read the model from
-        model_path, _, _, _ = utils.get_path_to_read_and_date(
+        model_path, model_year, model_month, model_day = utils.get_path_to_read_and_date(
             read_last_date=bool(int(IS_LAST_DATE)),
             bucket=S3_BUCKET,
             key=path_read_train,
@@ -147,7 +141,7 @@ if __name__ == "__main__":
         s3_resource = resource("s3")
         fitted_clf_model = (
             s3_resource.Bucket(S3_BUCKET)
-            .Object(f"{model_path}/model/{config['TRAIN']['MODEL_NAME']}")
+            .Object(f"{model_path}/model/CatBoostClassifier_cv.pkl")
             .get()
         )
         clf_model[name] = pickle.loads(fitted_clf_model["Body"].read())
@@ -163,7 +157,10 @@ if __name__ == "__main__":
 
     # Rename columns, add insert date and select columns to save
     df_probabilities['insert_date_ci'] = STR_EXECUTION_DATE
+    df_probabilities['model_version']=f'{model_year}-{model_month}-{model_day}'
     df_probabilities = df_probabilities[config['PREDICT']['COLUMNS_SAVE']]
+    SAGEMAKER_LOGGER.info(f"userlog: {df_probabilities.info()}")
+    
 
     # Save the prediction results to S3
     save_path = f"s3://{S3_BUCKET}/{S3_PATH_WRITE}/03_predict_step/{year}{month}{day}/predictions.csv"

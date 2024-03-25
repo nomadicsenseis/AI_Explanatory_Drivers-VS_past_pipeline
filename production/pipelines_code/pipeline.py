@@ -47,7 +47,8 @@ def get_pipeline(
     # Define pipeline parameters
     processing_instance_count = ParameterInteger(name="processing_instance_count", default_value=3)
     param_str_execution_date = ParameterString(name="str_execution_date", default_value="2023-03-01")
-    param_s3_bucket = ParameterString(name="s3_bucket", default_value="iberia-data-lake")
+    param_s3_bucket_nps = ParameterString(name="s3_bucket_nps", default_value="iberia-data-lake")
+    param_s3_bucket_lf = ParameterString(name="s3_bucket_lf", default_value="ibdata-prod-ew1-s3-customer")
     param_s3_path_read_nps = ParameterString(name="s3_path_read_nps")
     param_s3_path_read_lf = ParameterString(name="s3_path_read_lf")
     param_s3_path_write = ParameterString(name="s3_path_write")
@@ -87,11 +88,13 @@ def get_pipeline(
             path_join(BASE_DIR, "packages", "requirements", "etl.txt")
         ],
         arguments=[  # Command line arguments to the framework script
-            "--s3_bucket",
-            param_s3_bucket,
-            "--s3_path_read",
+            "--s3_bucket_nps",
+            param_s3_bucket_nps,
+            "--s3_bucket_lf",
+            param_s3_bucket_lf,
+            "--s3_path_read_nps",
             param_s3_path_read_nps,
-            "--s3_path_read",
+            "--s3_path_read_lf",
             param_s3_path_read_lf,
             "--s3_path_write",
             param_s3_path_write,
@@ -131,7 +134,7 @@ def get_pipeline(
         # Arguments to pass to the preprocessing script
         arguments=[
             "--s3_bucket",
-            param_s3_bucket,  # S3 bucket for data storage
+            param_s3_bucket_nps,  # S3 bucket for data storage
             "--s3_path_write",
             param_s3_path_write,  # Path for writing outputs
             "--str_execution_date",
@@ -145,6 +148,7 @@ def get_pipeline(
     preprocess_step = ProcessingStep(
         # Step name
         name="preprocess_step",# Processor to use
+        # depends_on=["etl_step"],
         processor=framework_processor,# Input data
         inputs=train_preprocess_step_args.inputs,# Output configuration
         outputs=train_preprocess_step_args.outputs,# Arguments for the job
@@ -166,7 +170,7 @@ def get_pipeline(
             path_join(BASE_DIR, "packages", "utils.py"),
         ],
         arguments=[
-            "--s3_bucket", param_s3_bucket,  # Pass the S3 bucket as an argument
+            "--s3_bucket", param_s3_bucket_nps,  # Pass the S3 bucket as an argument
             "--s3_path_write", param_s3_path_write,  # Pass the S3 path for writing as an argument
             "--str_execution_date", param_str_execution_date,  # Pass the execution date as an argument
             "--is_last_date", param_is_last_date,  # Pass the flag for last date as an argument
@@ -176,7 +180,6 @@ def get_pipeline(
     # Define the training step in the pipeline
     train_step = ProcessingStep(
         name="train_step",  # Set a name for the step
-        depends_on=["preprocess_step"],
         # Specify that this step depends on the completion of the "train_preprocess_step"
         processor=framework_processor,  # Use the framework processor
         inputs=train_step_args.inputs,  # Specify the inputs for this step
@@ -196,7 +199,7 @@ def get_pipeline(
         ],
         arguments=[
             "--s3_bucket",
-            param_s3_bucket,
+            param_s3_bucket_nps,
             "--s3_path_write",
             param_s3_path_write,
             "--str_execution_date",
@@ -208,8 +211,7 @@ def get_pipeline(
 
     #PREDICT STEP
     predict_step = ProcessingStep(
-        name="predict_step",
-        depends_on=["preprocess_step"],  # Depends on the previous step "predict_preprocess_step"
+        name="predict_step", # Depends on the previous step "predict_preprocess_step"
         processor=framework_processor,  # Processor to use for the step
         inputs=predict_step_args.inputs,  # Input data for the step
         outputs=predict_step_args.outputs,  # Output data for the step
@@ -219,16 +221,16 @@ def get_pipeline(
 
     # PREDICT HISTORIC
     framework_processor = processors.framework()
-    predict_step_args = framework_processor.get_run_args(
+    predict_historic_step_args = framework_processor.get_run_args(
         code=path_join(BASE_DIR, "code", "predict_historic.py"),  # Path to the predict.py script
         dependencies=[
             path_join(BASE_DIR, "packages", "utils.py"),  # Path to the utils.py file
             path_join(BASE_DIR, "packages", "config.yml"),  # Path to the config.yml file
-            path_join(BASE_DIR, "packages", "requirements", "predict.txt"),  # Path to the predict.txt file
+            path_join(BASE_DIR, "packages", "requirements", "predict_historic.txt"),  # Path to the predict_historic.txt file
         ],
         arguments=[
             "--s3_bucket",
-            param_s3_bucket,
+            param_s3_bucket_nps,
             "--s3_path_write",
             param_s3_path_write,
             "--str_execution_date",
@@ -239,22 +241,22 @@ def get_pipeline(
     )
 
     #PREDICT HISTORIC STEP
-    predict_step = ProcessingStep(
+    predict_historic_step = ProcessingStep(
         name="predict_historic_step",
-        depends_on=["train_step"],  # Depends on the previous step "train_step"
+        # depends_on=["train_step"],  # Depends on the previous step "train_step"
         processor=framework_processor,  # Processor to use for the step
-        inputs=predict_step_args.inputs,  # Input data for the step
-        outputs=predict_step_args.outputs,  # Output data for the step
-        job_arguments=predict_step_args.arguments,  # Additional job arguments
-        code=predict_step_args.code,  # Code to execute for the step
+        inputs=predict_historic_step_args.inputs,  # Input data for the step
+        outputs=predict_historic_step_args.outputs,  # Output data for the step
+        job_arguments=predict_historic_step_args.arguments,  # Additional job arguments
+        code=predict_historic_step_args.code,  # Code to execute for the step
     )
 
     # CONDITION STEP
     condition_step = ConditionStep(
         name="condition_step",
-        depends_on=["preprocess_step"],  # Depends on the previous step "etl_step"
+        # depends_on=["preprocess_step"],  # Depends on the previous step "etl_step"
         conditions=[train_predict_condition],  # Condition for branching
-        if_steps=[train_step],  # Steps to execute if the condition is true
+        if_steps=[predict_historic_step],  # Steps to execute if the condition is true
         else_steps=[predict_step]  # Steps to execute if the condition is false
     )
 
@@ -264,7 +266,8 @@ def get_pipeline(
         parameters=[
             processing_instance_count,  # Number of instances for data processing
             param_str_execution_date,  # Execution date as a string
-            param_s3_bucket,  # S3 bucket name
+            param_s3_bucket_nps,  # S3 bucket name
+            param_s3_bucket_lf,  # S3 bucket name
             param_s3_path_read_nps,  # S3 path for reading the nps data
             param_s3_path_read_lf,  # S3 path for reading the lf data
             param_s3_path_write,  # S3 path for writing data
@@ -273,7 +276,11 @@ def get_pipeline(
             param_trials,  # Number of trials for model training
             param_is_retrain_required,  # Flag indicating if retraining is required
         ],
-        steps=[etl_step, condition_step],  # List of pipeline steps
+        steps=[
+               # etl_step,
+               # preprocess_step, 
+               condition_step
+              ],  # List of pipeline steps
         sagemaker_session=sagemaker_session,  # Sagemaker session object
     )
     return pipeline
