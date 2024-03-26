@@ -1,0 +1,38 @@
+stages:
+  - build
+create_or_update_sagemaker_pipeline_develop:
+  stage: build
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  tags: [ $IBDATA_CICD_RUNNER_TAGS ]
+  variables:
+    ENVIRONMENT: develop
+    BUCKET: iberia-data-lake
+    PREFIX: customer/nps_client_model/sbx/pipeline
+  only:
+    - develop
+  before_script:
+    - apt update
+    - apt install python3.8 -y
+    - apt install python3-pip -y
+  script:
+    - pip install boto3==1.26.144 sagemaker==2.160.0 PyYAML==6.0
+    - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR/production
+    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT --bucket $BUCKET --prefix $PREFIX
+create_or_update_sagemaker_pipeline_production:
+  stage: build
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  tags: [ $IBDATA_CICD_RUNNER_TAGS ]
+  variables:
+    ENVIRONMENT: production
+    BUCKET: iberia-data-lake
+    PREFIX: customer/nps_client_model/prod/pipeline
+  only:
+    - main
+  before_script:
+    - apt update
+    - apt install python3.8 -y
+    - apt install python3-pip -y
+  script:
+    - pip install boto3==1.26.144 sagemaker==2.160.0 PyYAML==6.0
+    - export PYTHONPATH=$PYTHONPATH:$CI_PROJECT_DIR/production
+    - python3.8 $CI_PROJECT_DIR/create_pipeline.py --environment $ENVIRONMENT --bucket $BUCKET --prefix $PREFIX

@@ -1,0 +1,123 @@
+VARIABLES_ETL:
+  COLUMNS_TO_SAVE:
+    - respondent_id
+    - date_flight_local
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone
+  DOUBLE_CAST:
+    - respondent_id
+    - date_fligh_local
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone
+  STR_CAST:
+  LABELS: 
+    - promoter_binary
+    - detractor_binary
+  ID: 
+    - respondent_id
+    - date_flight_local
+
+PREPROCESS:
+  PIPELINE_NAME: ticket_price_inputer
+
+TRAIN:
+  MODEL_NAME: 
+    - Promoters
+    - Detractors
+  FEATURES:
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone 
+
+PREDICT:
+  COLUMNS_SAVE:
+    - model_version
+    - respondent_id
+    - date_flight_local
+    - ticket_price
+    - load_factor
+    - otp15_takeoff 
+    - bkg_200_journey_preparation
+    - pfl_100_checkin
+    - pfl_200_security
+    - pfl_300_lounge
+    - pfl_500_boarding
+    - ifl_300_cabin
+    - ifl_200_flight_crew_annoucements
+    - ifl_600_wifi
+    - ifl_500_ife
+    - ifl_400_food_drink
+    - ifl_100_cabin_crew
+    - arr_100_arrivals
+    - con_100_connections
+    - loy_200_loyalty_programme
+    - img_310_ease_contact_phone
+    - ticket_price_nps
+    - load_factor_nps
+    - otp15_takeoff_nps 
+    - bkg_200_journey_preparation_nps
+    - pfl_100_checkin_nps
+    - pfl_200_security_nps
+    - pfl_300_lounge_nps
+    - pfl_500_boarding_nps
+    - ifl_300_cabin_nps
+    - ifl_200_flight_crew_annoucements_nps
+    - ifl_600_wifi_nps
+    - ifl_500_ife_nps
+    - ifl_400_food_drink_nps
+    - ifl_100_cabin_crew_nps
+    - arr_100_arrivals_nps
+    - con_100_connections_nps
+    - loy_200_loyalty_programme_nps
+    - img_310_ease_contact_phone_nps
+    - base_prob_nps
+    - out_prob_nps
+    - insert_date_ci
+    
