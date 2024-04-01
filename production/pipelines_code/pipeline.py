@@ -148,7 +148,7 @@ def get_pipeline(
     preprocess_step = ProcessingStep(
         # Step name
         name="preprocess_step",# Processor to use
-        # depends_on=["etl_step"],
+        depends_on=["etl_step"],
         processor=framework_processor,# Input data
         inputs=train_preprocess_step_args.inputs,# Output configuration
         outputs=train_preprocess_step_args.outputs,# Arguments for the job
@@ -243,7 +243,7 @@ def get_pipeline(
     #PREDICT HISTORIC STEP
     predict_historic_step = ProcessingStep(
         name="predict_historic_step",
-        # depends_on=["train_step"],  # Depends on the previous step "train_step"
+        depends_on=["train_step"],  # Depends on the previous step "train_step"
         processor=framework_processor,  # Processor to use for the step
         inputs=predict_historic_step_args.inputs,  # Input data for the step
         outputs=predict_historic_step_args.outputs,  # Output data for the step
@@ -254,9 +254,9 @@ def get_pipeline(
     # CONDITION STEP
     condition_step = ConditionStep(
         name="condition_step",
-        # depends_on=["preprocess_step"],  # Depends on the previous step "etl_step"
+        depends_on=["preprocess_step"],  # Depends on the previous step "etl_step"
         conditions=[train_predict_condition],  # Condition for branching
-        if_steps=[predict_historic_step],  # Steps to execute if the condition is true
+        if_steps=[train_step, predict_historic_step],  # Steps to execute if the condition is true
         else_steps=[predict_step]  # Steps to execute if the condition is false
     )
 
@@ -277,8 +277,8 @@ def get_pipeline(
             param_is_retrain_required,  # Flag indicating if retraining is required
         ],
         steps=[
-               # etl_step,
-               # preprocess_step, 
+               etl_step,
+               preprocess_step, 
                condition_step
               ],  # List of pipeline steps
         sagemaker_session=sagemaker_session,  # Sagemaker session object
