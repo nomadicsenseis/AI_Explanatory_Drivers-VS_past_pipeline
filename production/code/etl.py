@@ -108,25 +108,9 @@ if __name__ == "__main__":
         df_nps_historic = pd.concat([df_nps_historic, df], axis=0)
     df_nps_historic = df_nps_historic.reset_index(drop=True)
 
-    # READ PREVIOUS NPS DATA (FOR INCREMENTAL)
-    yesterday_nps_surveys_prefix = f'{S3_PATH_READ_NPS}/insert_date_ci={yesterday_date_str}/'
-    yesterday_s3_keys = [item.key for item in s3_resource.Bucket(S3_BUCKET_NPS).objects.filter(Prefix=yesterday_nps_surveys_prefix)]
-    yesterday_preprocess_paths = [f"s3://{S3_BUCKET_NPS}/{key}" for key in yesterday_s3_keys]
-
-    SAGEMAKER_LOGGER.info("userlog: Read historic nps_surveys data path %s.", yesterday_nps_surveys_prefix)
-    df_nps_yesterday = pd.DataFrame()
-    for file in yesterday_preprocess_paths:
-        df = pd.read_csv(file)
-        df_nps_yesterday = pd.concat([df_nps_yesterday, df], axis=0)
-    df_nps_yesterday = df_nps_yesterday.reset_index(drop=True)
-
     # INCREMENTAL NPS  
-    SAGEMAKER_LOGGER.info("Pre-merge shapes - Historic: %s, Yesterday: %s", df_nps_historic.shape, df_nps_yesterday.shape)
-
-    df_nps_incremental = pd.merge(df_nps_historic, df_nps_yesterday, how='left', indicator=True, on=df_nps_historic.columns.tolist())
-    df_nps_incremental = df_nps_incremental[df_nps_incremental['_merge'] == 'left_only']
-    df_nps_incremental = df_nps_incremental.drop(columns=['_merge'])
-    df_nps_incremental = df_nps_incremental.reset_index(drop=True)
+    SAGEMAKER_LOGGER.info("Pre-merge shape - Historic: %s", df_nps_historic.shape)
+    df_nps_incremental=df_nps_historic[df_nps_historic['insert_date_ci']==today_date_str]
 
     
     # READ LF DATA SOURCE
@@ -155,9 +139,6 @@ if __name__ == "__main__":
                 continue
 
             with fs.open(f's3://{file_path}') as f:
-                if today_date_str in file_path:
-                    df_lf_incremental = pd.read_csv(f)
-                    SAGEMAKER_LOGGER.info(f"Loading incremental: {df_lf_incremental.shape}")
                 df = pd.read_csv(f)
                 dataframes.append(df)
         except pd.errors.EmptyDataError:
@@ -201,9 +182,6 @@ if __name__ == "__main__":
     # LOAD FACTOR HISTORIC
     df_lf_historic = df_lf_historic.loc[(df_lf_historic['operating_carrier'].isin(['IB', 'YW']))]
 
-    # LOAD FACTOR INCREMENTAL
-    df_lf_incremental = df_lf_incremental.loc[(df_lf_incremental['operating_carrier'].isin(['IB', 'YW']))]
-
 
     # 2. Transform date column to datetime format
     SAGEMAKER_LOGGER.info("userlog: ETL 2.0 Transform date column to datetime format.")
@@ -221,7 +199,6 @@ if __name__ == "__main__":
 
     # Load Factor
     df_lf_historic['flight_date_local'] = pd.to_datetime(df_lf_historic['flight_date_local'])
-    df_lf_incremental['flight_date_local'] = pd.to_datetime(df_lf_incremental['flight_date_local'])
 
     # 3. Filter out covid years
     SAGEMAKER_LOGGER.info("userlog: ETL 3.0 Filter out covid years.")
@@ -251,9 +228,6 @@ if __name__ == "__main__":
     df_lf_historic['load_factor_premium_ec'] = df_lf_historic['pax_premium_ec'] / df_lf_historic['capacity_premium_ec']
     df_lf_historic['load_factor_economy'] = df_lf_historic['pax_economy'] / df_lf_historic['capacity_economy']
 
-    df_lf_incremental['load_factor_business'] = df_lf_incremental['pax_business'] / df_lf_incremental['capacity_business']
-    df_lf_incremental['load_factor_premium_ec'] = df_lf_incremental['pax_premium_ec'] / df_lf_incremental['capacity_premium_ec']
-    df_lf_incremental['load_factor_economy'] = df_lf_incremental['pax_economy'] / df_lf_incremental['capacity_economy']
 
     # 5. Merge dataframes.
     SAGEMAKER_LOGGER.info("userlog: ETL 5.0 Merge dataframes.")
@@ -295,28 +269,7 @@ if __name__ == "__main__":
                         on=['date_flight_local', 'surveyed_flight_number', 'cabin_in_surveyed_flight'])
 
     # INCREMENTAL
-    df_lf_incremental.columns = ['date_flight_local' if x=='flight_date_local' else 
-                                    'operating_airline_code' if x=='operating_carrier' else
-                                    'surveyed_flight_number' if x=='op_flight_num' else
-                                    x for x in df_lf_incremental.columns]
     # List of columns to transform
-    load_factor_columns = ['load_factor_business', 'load_factor_premium_ec', 'load_factor_economy']
-
-    # Automatically determine id_vars by excluding load_factor_columns from all columns
-    id_vars = [col for col in df_lf_incremental.columns if col not in load_factor_columns]
-
-    # Reshaping the DataFrame while dynamically keeping all other columns
-    df_lf_incremental = pd.melt(df_lf_incremental, id_vars=id_vars, 
-                      value_vars=load_factor_columns,
-                      var_name='cabin_in_surveyed_flight', value_name='load_factor')
-
-    # Replacing the column names in 'cabin_in_surveyed_flight' with the desired cabin types
-    df_lf_incremental['cabin_in_surveyed_flight'] = df_lf_incremental['cabin_in_surveyed_flight'].map({
-        'load_factor_business': 'Business',
-        'load_factor_premium_ec': 'Premium Economy',
-        'load_factor_economy': 'Economy'
-    })
-
     df_incremental = pd.merge(df_nps_incremental, df_lf_historic, 
                         how='left', 
                         on=['date_flight_local',  'surveyed_flight_number', 'cabin_in_surveyed_flight'])
