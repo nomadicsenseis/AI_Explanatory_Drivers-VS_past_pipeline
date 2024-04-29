@@ -61,6 +61,9 @@ from sklearn.ensemble import GradientBoostingRegressor
 # SHAP
 import shap
 
+# Optuna
+import optuna
+
 # Random
 import random
 
@@ -239,6 +242,45 @@ def train_cv_ctb(X_train, y_train, labels, n_splits=5):
     
     return clf
 
+def objective(trial, X_train, y_train, cat_features, target, n_splits):
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=1)
+    param = {
+        'l2_leaf_reg': trial.suggest_loguniform('l2_leaf_reg', 1e-2, 10.0),
+        'learning_rate': trial.suggest_loguniform('learning_rate', 0.01, 0.3),
+        'depth': trial.suggest_int('depth', 4, 10),
+        'iterations': 1000,
+        'cat_features': cat_features,
+        'verbose': False,
+        'random_seed': 0
+    }
+
+    cv_scores = []
+    for train_index, val_index in kf.split(X_train):
+        X_train_fold, X_val_fold = X_train.iloc[train_index], X_train.iloc[val_index]
+        y_train_fold, y_val_fold = y_train[target].iloc[train_index], y_train[target].iloc[val_index]
+
+        train_pool = Pool(X_train_fold, y_train_fold, cat_features=cat_features)
+        val_pool = Pool(X_val_fold, y_val_fold, cat_features=cat_features)
+
+        clf = CatBoostClassifier(**param)
+        clf.fit(train_pool, eval_set=val_pool, early_stopping_rounds=10)
+
+        cv_scores.append(clf.get_best_score()['validation']['Logloss'])  # Adapt metric as needed
+
+    return np.mean(cv_scores)
+
+def train_model_with_optuna(X_train, y_train, target, cat_features, n_splits=5, n_trials=50):
+    study = optuna.create_study(direction='minimize')
+    study.optimize(lambda trial: objective(trial, X_train, y_train, cat_features, target, n_splits), n_trials=n_trials)
+
+    best_params = study.best_params
+    print(f"Best parameters for {target}:", best_params)
+
+    model = CatBoostClassifier(**best_params, cat_features=cat_features, verbose=0)
+    model.fit(X_train, y_train[target], cat_features=cat_features)
+
+    return model
+
 
 if __name__ == "__main__":
 
@@ -280,7 +322,9 @@ if __name__ == "__main__":
 
     # Estimator
     SAGEMAKER_LOGGER.info(f"userlog: INPUT COLS: {str(features)}")
-    models = train_cv_ctb(X_train[features], y_train, labels, n_splits=5)
+    models={}
+    for label in labels:
+        models[label] = train_model_with_optuna(X_train[features_dummy], y_train, label, ['otp15_takeoff'], n_splits=5, n_trials=50)
     metrics_train = {}
     for target in labels:
         metrics_train[target] = get_metrics(models[target], X_train[features], y_train[target], 'train')
