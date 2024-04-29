@@ -324,7 +324,7 @@ if __name__ == "__main__":
     SAGEMAKER_LOGGER.info(f"userlog: INPUT COLS: {str(features)}")
     models={}
     for label in labels:
-        models[label] = train_model_with_optuna(X_train[features_dummy], y_train, label, ['otp15_takeoff'], n_splits=5, n_trials=50)
+        models[label] = train_model_with_optuna(X_train[features], y_train, label, ['otp15_takeoff'], n_splits=5, n_trials=50)
     metrics_train = {}
     for target in labels:
         metrics_train[target] = get_metrics(models[target], X_train[features], y_train[target], 'train')
