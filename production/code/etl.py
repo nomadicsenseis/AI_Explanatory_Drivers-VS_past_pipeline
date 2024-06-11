@@ -288,8 +288,8 @@ if __name__ == "__main__":
     df_historic = df_historic[['respondent_id' , 'date_flight_local'] + features_dummy + labels]
     df_incremental = df_incremental[['respondent_id' , 'date_flight_local'] + features_dummy + labels]
 
-    df_historic = df_historic.drop_duplicates()
-    df_incremental = df_incremental.drop_duplicates()
+    df_historic = df_historic.drop_duplicates(subset='respondent_id', keep='first')
+    df_incremental = df_incremental.drop_duplicates(subset='respondent_id', keep='first')
     
     SAGEMAKER_LOGGER.info("userlog: Size of resulting df_historic:", df_historic.shape)
     SAGEMAKER_LOGGER.info("userlog: Size of resulting df_incremental:", df_incremental.shape)
