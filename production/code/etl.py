@@ -214,8 +214,8 @@ if __name__ == "__main__":
     # 4. Create otp, promoter, detractor and load factor columns.
     SAGEMAKER_LOGGER.info("userlog: ETL 4.0 Create otp, promoter, detractor and load factor columns.")
     # OTP
-    df_nps_historic['otp15_takeoff'] = (df_nps_historic['delay_departure'] > 15).astype(int)
-    df_nps_incremental['otp15_takeoff'] = (df_nps_incremental['delay_departure'] > 15).astype(int)
+    df_nps_historic['otp15_takeoff'] = (df_nps_historic['delay'] > 15).astype(int)
+    df_nps_incremental['otp15_takeoff'] = (df_nps_incremental['delay'] > 15).astype(int)
 
     # Promoter and Detractor columns
     df_nps_historic["promoter_binary"] = df_nps_historic["nps_category"].apply(lambda x: 1 if x == "Promoter" else 0)
