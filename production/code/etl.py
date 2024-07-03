@@ -88,9 +88,11 @@ if __name__ == "__main__":
     
 
     # Config file read
-    # config = utils.read_config_data(path=SparkFiles.get(filename="config.yml"))
+    config = utils.read_config_data()
     # config_variables = config.get("VARIABLES")
     # config_etl = config.get(STEP)
+    variables_to_save = config.get("VARIABLES_ETL").get('COLUMNS_TO_SAVE')
+    labels = config.get("VARIABLES_ETL").get('LABELS')
 
     # READ NPS DATA SOURCE
     # Read df_nps_surveys
@@ -263,6 +265,8 @@ if __name__ == "__main__":
         'load_factor_premium_ec': 'Premium Economy',
         'load_factor_economy': 'Economy'
     })
+    
+    SAGEMAKER_LOGGER.info("userlog: ETL 5.0.1 finished pre-Merge dataframes.")
 
     df_historic = pd.merge(df_nps_historic, df_lf_historic, 
                         how='left', 
@@ -277,16 +281,18 @@ if __name__ == "__main__":
 
     # 6. Filter out final columns for the model
     SAGEMAKER_LOGGER.info("userlog: ETL 6.0 Filter out final columns for the model")
-    features_dummy = ['ticket_price', 'load_factor', 'otp15_takeoff'] + ['bkg_200_journey_preparation', 'pfl_100_checkin', 
-                  'pfl_200_security', 'pfl_300_lounge', 'pfl_500_boarding', 'ifl_300_cabin', 
-                  'ifl_200_flight_crew_annoucements', 'ifl_600_wifi', 'ifl_500_ife', 'ifl_400_food_drink', 
-                  'ifl_100_cabin_crew', 'arr_100_arrivals', 'con_100_connections', 
-                  'loy_200_loyalty_programme', 'img_310_ease_contact_phone']
+#     features_dummy = ['ticket_price', 'load_factor'] + ['pun_100_punctuality', 'bkg_200_journey_preparation', 'pfl_100_checkin', 
+#                   'pfl_200_security', 'pfl_300_lounge', 'pfl_500_boarding', 'ifl_300_cabin', 
+#                   'ifl_200_flight_crew_annoucements', 'ifl_600_wifi', 'ifl_500_ife', 'ifl_400_food_drink', 
+#                   'ifl_100_cabin_crew', 'arr_100_arrivals', 'con_100_connections', 
+#                   'loy_200_loyalty_programme', 'img_310_ease_contact_phone']
 
-    labels = ['promoter_binary', 'detractor_binary']
+#     labels = ['promoter_binary', 'detractor_binary']
+    
 
-    df_historic = df_historic[['respondent_id' , 'date_flight_local'] + features_dummy + labels]
-    df_incremental = df_incremental[['respondent_id' , 'date_flight_local'] + features_dummy + labels]
+
+    df_historic = df_historic[variables_to_save + labels]
+    df_incremental = df_incremental[variables_to_save + labels]
 
     df_historic = df_historic.drop_duplicates(subset='respondent_id', keep='first')
     df_incremental = df_incremental.drop_duplicates(subset='respondent_id', keep='first')

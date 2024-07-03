@@ -4,7 +4,7 @@ VARIABLES_ETL:
     - date_flight_local
     - ticket_price
     - load_factor
-    - otp15_takeoff 
+    - pun_100_punctuality 
     - bkg_200_journey_preparation
     - pfl_100_checkin
     - pfl_200_security
@@ -25,7 +25,7 @@ VARIABLES_ETL:
     - date_fligh_local
     - ticket_price
     - load_factor
-    - otp15_takeoff 
+    - pun_100_punctuality 
     - bkg_200_journey_preparation
     - pfl_100_checkin
     - pfl_200_security
@@ -59,7 +59,7 @@ TRAIN:
   FEATURES:
     - ticket_price
     - load_factor
-    - otp15_takeoff 
+    - pun_100_punctuality 
     - bkg_200_journey_preparation
     - pfl_100_checkin
     - pfl_200_security
@@ -83,7 +83,7 @@ PREDICT:
     - date_flight_local
     - ticket_price
     - load_factor
-    - otp15_takeoff 
+    - pun_100_punctuality 
     - bkg_200_journey_preparation
     - pfl_100_checkin
     - pfl_200_security
@@ -101,7 +101,7 @@ PREDICT:
     - img_310_ease_contact_phone
     - ticket_price_nps
     - load_factor_nps
-    - otp15_takeoff_nps 
+    - pun_100_punctuality_nps 
     - bkg_200_journey_preparation_nps
     - pfl_100_checkin_nps
     - pfl_200_security_nps

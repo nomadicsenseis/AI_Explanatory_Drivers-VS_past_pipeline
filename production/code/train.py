@@ -215,9 +215,9 @@ def train_cv_ctb(X_train, y_train, labels, n_splits=5):
     
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=1)
     
-    cat_features=['otp15_takeoff']
+    # cat_features=['otp15_takeoff']
     # cat_features=['otp15_takeoff'] + [col for col in df_nps_tkt.columns if 'country_agg' in col]
-    # cat_features=[]
+    cat_features=[]
     
     clf = {}
     cv_scores = {}  # Diccionario para almacenar los scores por cada target
@@ -326,8 +326,10 @@ if __name__ == "__main__":
     # Estimator
     SAGEMAKER_LOGGER.info(f"userlog: INPUT COLS: {str(features)}")
     models={}
+    # cat_features=['otp15_takeoff']
+    cat_features = []
     for label in labels:
-        models[label] = train_model_with_optuna(X_train[features], y_train, label, ['otp15_takeoff'], n_splits=5, n_trials=50)
+        models[label] = train_model_with_optuna(X_train[features], y_train, label, cat_features, n_splits=5, n_trials=50)
     metrics_train = {}
     for target in labels:
         metrics_train[target] = get_metrics(models[target], X_train[features], y_train[target], 'train')
