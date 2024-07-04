@@ -265,10 +265,10 @@ def inv_logit(x):
 
 def calculate_SHAP_and_probability_binary(model_promoter, model_detractor, df):
     # Extraer ID y fechas, manteniendo el índice
-    id_df = df[['respondent_id', 'date_flight_local']]
+    id_df = df[['respondent_id', 'date_flight_local','otp15_takeoff']]
     
     # Preparar el conjunto de datos para predicciones, excluyendo ID y fechas
-    test_set = df.drop(['respondent_id', 'date_flight_local'], axis=1, errors='ignore')
+    test_set = df.drop(['respondent_id', 'date_flight_local','otp15_takeoff'], axis=1, errors='ignore')
     
     # Predicciones y probabilidades para promotores
     promoter_test_set = test_set.drop(['promoter_binary'], axis=1, errors='ignore')
@@ -323,7 +323,7 @@ def from_shap_to_probability_binary(df, features_dummy, label_binary):
         output_df[col] = inv_logit(output_df[col])
     
     # Asegurarse de incluir solo las columnas relevantes en el DataFrame final
-    relevant_columns = ['respondent_id', 'date_flight_local'] + shap_columns + [f'base_prob{class_suffix}'] + features_dummy
+    relevant_columns = ['respondent_id', 'date_flight_local','otp15_takeoff'] + shap_columns + [f'base_prob{class_suffix}'] + features_dummy
     output_df = output_df[relevant_columns]
     print(output_df)
     return output_df
@@ -362,7 +362,7 @@ def from_shap_to_probability_binary(df, features_dummy, label_binary):
         output_df.loc[index, shap_columns] = adjusted_shap_values
 
     # Incluir solo las columnas relevantes en el DataFrame final
-    relevant_columns = ['respondent_id', 'date_flight_local'] + shap_columns + [f'base_prob{class_suffix}', out_prob_col] + features_dummy
+    relevant_columns = ['respondent_id', 'date_flight_local','otp15_takeoff'] + shap_columns + [f'base_prob{class_suffix}', out_prob_col] + features_dummy
     print(output_df)
     output_df = output_df[relevant_columns]
     

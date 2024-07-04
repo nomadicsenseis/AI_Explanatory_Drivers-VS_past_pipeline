@@ -338,7 +338,7 @@ if __name__ == "__main__":
     # Execute preprocess
     in_features_train = config.get("VARIABLES_ETL").get('COLUMNS_TO_SAVE')
     # in_features_train = config.get("TRAIN").get('FEATURES') 
-    # + [config.get("VARIABLES_ETL").get('ID')]
+    # columns_not_in_trainning = [config.get("VARIABLES_ETL").get('ID')]
 
     if USE_TYPE == 'train':
         # Read data

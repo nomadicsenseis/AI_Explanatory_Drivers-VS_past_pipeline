@@ -1,7 +1,8 @@
 VARIABLES_ETL:
   COLUMNS_TO_SAVE:
     - respondent_id
-    - date_flight_local
+    - date_flight_local    
+    - otp15_takeoff
     - ticket_price
     - load_factor
     - pun_100_punctuality 
@@ -20,34 +21,14 @@ VARIABLES_ETL:
     - con_100_connections
     - loy_200_loyalty_programme
     - img_310_ease_contact_phone
-  DOUBLE_CAST:
-    - respondent_id
-    - date_fligh_local
-    - ticket_price
-    - load_factor
-    - pun_100_punctuality 
-    - bkg_200_journey_preparation
-    - pfl_100_checkin
-    - pfl_200_security
-    - pfl_300_lounge
-    - pfl_500_boarding
-    - ifl_300_cabin
-    - ifl_200_flight_crew_annoucements
-    - ifl_600_wifi
-    - ifl_500_ife
-    - ifl_400_food_drink
-    - ifl_100_cabin_crew
-    - arr_100_arrivals
-    - con_100_connections
-    - loy_200_loyalty_programme
-    - img_310_ease_contact_phone
-  STR_CAST:
+    
   LABELS: 
     - promoter_binary
     - detractor_binary
   ID: 
     - respondent_id
     - date_flight_local
+    - otp15_takeoff
 
 PREPROCESS:
   PIPELINE_NAME: ticket_price_inputer
@@ -80,7 +61,8 @@ PREDICT:
   COLUMNS_SAVE:
     - model_version
     - respondent_id
-    - date_flight_local
+    - date_flight_local    
+    - otp15_takeoff
     - ticket_price
     - load_factor
     - pun_100_punctuality 
