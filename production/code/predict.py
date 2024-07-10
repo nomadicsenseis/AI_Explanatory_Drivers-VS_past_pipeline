@@ -153,7 +153,7 @@ if __name__ == "__main__":
     features = list(config['TRAIN']['FEATURES'])
     # missing_rows = df_predict[features].isnull().any(axis=1)
     # df_predict = df_predict[~missing_rows]
-    df_probabilities = utils.predict_and_explain(clf_model[model_names[0]], clf_model[model_names[1]], df_predict, features)
+    df_probabilities = utils.predict_and_explain(clf_model[model_names[0]], clf_model[model_names[1]], df_predict, features, K_uncertainty=5)
 
     # Rename columns, add insert date and select columns to save
     df_probabilities['insert_date_ci'] = STR_EXECUTION_DATE

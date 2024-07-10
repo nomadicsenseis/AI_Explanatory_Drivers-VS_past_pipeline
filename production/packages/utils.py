@@ -368,7 +368,28 @@ def from_shap_to_probability_binary(df, features_dummy, label_binary):
     
     return output_df
 
-def predict_and_explain(model_prom, model_det, df, features_dummy):
+# Function to create virtual ensembles
+def create_virtual_ensemble(model, total_trees, K):
+    # Start taking snapshots only from half the total trees and take every K-th model
+    start_at = total_trees // 2
+    ensemble_models = []
+    for i in range(start_at, total_trees, K):
+        sub_model = model.copy()
+        sub_model.shrink(ntree_start=0, ntree_end=i)
+        ensemble_models.append(sub_model)
+    return ensemble_models
+
+
+# Function to predict with uncertainty
+def predict_with_uncertainty(ensemble_models, X):
+    predictions = np.array([model.predict_proba(X)[:, 1] for model in ensemble_models])
+    mean_predictions = np.mean(predictions, axis=0)
+    std_dev_predictions = np.std(predictions, axis=0)
+    
+    return mean_predictions, std_dev_predictions
+
+
+def predict_and_explain(model_prom, model_det, df, features_dummy, K_uncertainty):
     """
     Realiza predicciones y genera explicaciones para modelos de promotores y detractores
     para todo el dataframe.
@@ -388,6 +409,25 @@ def predict_and_explain(model_prom, model_det, df, features_dummy):
     # 3. Convertir valores SHAP a probabilidad
     df_probability_prom = from_shap_to_probability_binary(df_contrib, features_dummy, 'promoter_binary')
     df_probability_det = from_shap_to_probability_binary(df_contrib, features_dummy, 'detractor_binary')
+    
+    # 3.5 Calcular incertidumbre para ambos models
+    # Generate virtual ensemble
+    total_trees_prom = model_prom.tree_count_  # or any predefined number if you already know the model's tree count
+    total_trees_det = model_det.tree_count_
+    virtual_ensemble_prom = create_virtual_ensemble(model_prom, total_trees_prom, K_uncertainty)
+    virtual_ensemble_det = create_virtual_ensemble(model_det, total_trees_det, K_uncertainty)
+    
+    # Use the ensemble to predict on new data
+    mean_proba_prom, uncertainty_prom = predict_with_uncertainty(virtual_ensemble_prom, df_probability_prom[features_dummy])
+    mean_proba_det, uncertainty_det = predict_with_uncertainty(virtual_ensemble_det, df_probability_det[features_dummy])
+    
+    # Add the mean prediction probabilities and uncertainty to the original DataFrame
+    df_probability_prom['mean_proba_prom'] = mean_proba_prom
+    df_probability_prom['uncertainty_prom'] = uncertainty_prom
+
+    df_probability_det['mean_proba_det'] = mean_proba_det
+    df_probability_det['uncertainty_det'] = uncertainty_det    
+    
 
     # 4. Concatenar DataFrames para ambos modelos
     df_probability_prom = df_probability_prom.reset_index(drop=True)
@@ -402,7 +442,14 @@ def predict_and_explain(model_prom, model_det, df, features_dummy):
             det_column = f'{base_name}_det'
             if det_column in df_probability_binary.columns:
                 nps_column = f'{base_name}_nps'
-                df_probability_binary[nps_column] = df_probability_binary[column] - df_probability_binary[det_column]
-
+                if base_name == 'uncertainty':
+                    df_probability_binary[nps_column] = df_probability_binary[column] + df_probability_binary[det_column]
+                else:
+                    df_probability_binary[nps_column] = df_probability_binary[column] - df_probability_binary[det_column]                
+                    
     return df_probability_binary
+
+
+
+
 

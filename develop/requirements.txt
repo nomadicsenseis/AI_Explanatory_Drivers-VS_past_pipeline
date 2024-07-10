@@ -148,7 +148,7 @@ krb5 @ file:///home/conda/feedstock_root/build_artifacts/pykrb5_1708557570437/wo
 lazy-object-proxy @ file:///home/conda/feedstock_root/build_artifacts/lazy-object-proxy_1702663550721/work
 libmambapy @ file:///home/conda/feedstock_root/build_artifacts/mamba-split_1702310393080/work/libmambapy
 lief==0.14.1
-lightgbm==4.3.0
+lightgbm==4.4.0
 linkify-it-py @ file:///home/conda/feedstock_root/build_artifacts/linkify-it-py_1707129103613/work
 llvmlite==0.42.0
 locket @ file:///home/conda/feedstock_root/build_artifacts/locket_1650660393415/work
@@ -293,7 +293,7 @@ seaborn @ file:///home/conda/feedstock_root/build_artifacts/seaborn-split_170634
 SecretStorage @ file:///home/conda/feedstock_root/build_artifacts/secretstorage_1695551734488/work
 Send2Trash @ file:///home/conda/feedstock_root/build_artifacts/send2trash_1712584999685/work
 service-identity @ file:///home/conda/feedstock_root/build_artifacts/service-identity-build_1700936484042/work
-shap==0.45.1
+shap==0.46.0
 shellingham==1.5.4
 sip @ file:///home/conda/feedstock_root/build_artifacts/sip_1697300428978/work
 six @ file:///home/conda/feedstock_root/build_artifacts/six_1620240208055/work
@@ -349,7 +349,7 @@ uc-micro-py @ file:///home/conda/feedstock_root/build_artifacts/uc-micro-py_1707
 ujson @ file:///home/conda/feedstock_root/build_artifacts/ujson_1702256697606/work
 unicodedata2 @ file:///home/conda/feedstock_root/build_artifacts/unicodedata2_1695847980273/work
 uri-template @ file:///home/conda/feedstock_root/build_artifacts/uri-template_1688655812972/work/dist
-urllib3==1.26.18
+urllib3==1.26.19
 w3lib @ file:///home/conda/feedstock_root/build_artifacts/w3lib_1691236459676/work
 watchdog @ file:///home/conda/feedstock_root/build_artifacts/watchdog_1707295131798/work
 wcwidth @ file:///home/conda/feedstock_root/build_artifacts/wcwidth_1704731205417/work

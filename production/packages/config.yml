@@ -101,5 +101,6 @@ PREDICT:
     - img_310_ease_contact_phone_nps
     - base_prob_nps
     - out_prob_nps
+    - uncertainty_nps
     - insert_date_ci
     
