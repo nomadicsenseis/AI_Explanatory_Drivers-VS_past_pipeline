@@ -242,6 +242,7 @@ if __name__ == "__main__":
     # HISTORIC
     df_lf_historic.columns = ['date_flight_local' if x=='flight_date_local' else 
                                     'operating_airline_code' if x=='operating_carrier' else
+                                    'operating_airline_code' if x=='op_carrier' else
                                     'surveyed_flight_number' if x=='op_flight_num' else
                                     x for x in df_lf_historic.columns]
     
