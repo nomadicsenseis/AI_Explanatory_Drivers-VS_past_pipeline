@@ -182,7 +182,7 @@ if __name__ == "__main__":
     df_nps_incremental = df_nps_incremental.loc[condition_1 & (condition_2 & condition_3)]
 
     # LOAD FACTOR HISTORIC
-    df_lf_historic = df_lf_historic.loc[(df_lf_historic['operating_carrier'].isin(['IB', 'YW']))]
+    # df_lf_historic = df_lf_historic.loc[(df_lf_historic['operating_carrier'].isin(['IB', 'YW']))]
 
 
     # 2. Transform date column to datetime format
