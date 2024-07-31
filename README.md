@@ -75,11 +75,31 @@ BUT, even if all factors were perfect, the non-linear nature of the model still 
 
 ![VS Past Teacher Analogy](src/VS_past_teacher_analogy.png)
 
+There are two key takeaways from the teacher analogy:
+
+- The contribution of each grading parameter to the final result is influenced by the quality of that parameter and the quality of the others. For example, excellent grammar can stand out more in the absence of good vocabulary.
+- The scale of quality also affects the contribution. There is a saturation effect for higher grades.
+
+In summary, it is entirely possible with a non-linear function that, while the value of a certain variable may increase, its importance may be reduced by the contribution of the other variables and by its scale.
+
 ## Adjustments
-![VS Past Adjustments schema](src/VS_past_adjustments.png)
+Building a data analysis tool requires careful consideration of the needs and desires of the business teams that will use it. Therefore, addressing and either explaining or adjusting for MAE and flipped values is essential. Various adjustments are proposed to achieve this.
+![VS Past Adjustments Schema](src/VS_past_adjustments.png)
+
+There are three adjustments:
+
+### 1) Flipped Shaps Adjustment
+This adjustment involves setting the Shapley value to 0 if there is a flipped value and then distributing the missed contribution among the Shapley values with the same sign.
 ![VS Past Flipped Shaps Adjustment](src/flipped_shaps.png)
+
+### 2.0) MAE Adjustment: Direct
+This is a basic normalization that aligns the predictions with the actual NPS value by normalizing the Shapley values.
 ![VS Past MAE Adjustment: Direct](src/VS_past_direct_adjust.png)
-![VS Past MAE Adjustment: Indirect](src/VS_past_VS_past_indirect_adjust.png)
+
+### 2.1) MAE Adjustment: Indirect
+When there is a flip in the sign of the difference between predictions and actual values, this extreme adjustment is implemented. It shrinks the values of the proper sign and stretches the values of the opposite sign.
+![VS Past MAE Adjustment: Indirect](src/VS_past_indirect_adjust.png)
+
 
 ## Uncertainty propagation
 ![VS Past Uncertainty Propagation](src/VS_past_uncertainty_propagation.png)
