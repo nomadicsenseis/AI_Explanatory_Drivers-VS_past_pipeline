@@ -1,4 +1,9 @@
 # AI Explanatory Drivers - VS Past Pipeline
+The VS Past Pipeline is part of the broader AI Explanatory Drivers tool.
+
+![AI Explanatory Drivers](src/AI_Explanatory_Drivers.png)
+
+![AI Explanatory Drivers Pipelines](src/AI_Explanatory_Drivers_pipeline.png)
 
 ## Methodology
 
@@ -64,9 +69,15 @@ In this layer, considerations include:
 
 Since variables that define a sample of clients are represented, there is statistical uncertainty that depends on the sample itself.
 
-All three layers contribute to the final prediction uncertainty and error, resulting in larger MAEs and less precise Shapley values, which can lead to the flipping of these values. Even if all factors were perfect, the non-linear nature of the model still needs to be addressed, as it could also cause the flipping of Shapley values (though not the MAE).
+All three layers contribute to the final prediction uncertainty and error, resulting in larger MAEs and less precise Shapley values, which can lead to the flipping of these values. 
+
+BUT, even if all factors were perfect, the non-linear nature of the model still needs to be addressed, as it could also cause the flipping of Shapley values (though not the MAE).
 
 ![VS Past Teacher Analogy](src/VS_past_teacher_analogy.png)
+
+## Adjustments
+
+## Uncertainty propagation
 
 
 
