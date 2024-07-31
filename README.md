@@ -11,9 +11,9 @@ The VS Past Pipeline is part of the broader AI Explanatory Drivers tool.
 
 The AI Explanatory Drivers tool explains the NPS, which is computed as the difference in probabilities of being a promoter and being a detractor within a sample of clients, based on their response to a generic satisfaction question (nps_100).
 
-The pipeline contains two binary classifier models, both operating on a client level:
+The pipeline contains two binary classifier models, both operating on a client level, and both excluding the generic nps_100 question:
 - One model outputs the probability of being a promoter.
-- The other model outputs the probability of being a detractor given a certain survey, excluding the generic question.
+- The other model outputs the probability of being a detractor.
 
 These probabilities are used to compute the NPS per client as their difference in probabilities. The NPS of a sample of clients is then predicted as the mean client NPS within the sample.
 
@@ -101,7 +101,20 @@ When there is a flip in the sign of the difference between predictions and actua
 ![VS Past MAE Adjustment: Indirect](src/VS_past_indirect_adjust.png)
 
 
-## Uncertainty propagation
+## Uncertainty Propagation
+
+Finally, the question arises of whether a given explanation can be trusted or not. Given the sources of uncertainty, an uncertainty estimation framework similar to that of a physics experiment is proposed: a combination of systematic error and random error as a measure of the uncertainty.
+
 ![VS Past Uncertainty Propagation](src/VS_past_uncertainty_propagation.png)
+
+In this setup, the measurement tools are the combination of classifier models and Shapley explainers. For simplicity, and since only a proxy is desired for this final exercise, only the models are considered. There is a certain systematic error with any measurement tool. How is this computed for machine learning models? Usually, uncertainty is measured as the instability of the model due to changes in hyperparameters and training. With the philosophy of the model being a function approximator, and the belief in the underlying existence of that function, the idea is to get many approximators to create an uncertainty space for each prediction. While this would imply having multiple models in production, another proxy is used: virtual ensembles.
+
+Instead of training multiple models, the underlying nature of the boosted tree algorithm is utilized. Starting from T/2 (T being the iteration number), different models are taken from the inner iterations of the model, with a certain K steps difference between them to reduce correlation.
+
+As for the random error, it is simply computed as the SEM of the sample.
+
+In the end, the final error is computed as the square root of the quadratic sum of both terms. This results in different lengths of error bars within which the true NPS value should hopefully fall. If it does not, or if the indirect MAE adjustment has to be applied, it can be concluded that the particular explanation is not to be trusted. For the remaining predictions, a scale can be developed based on the distribution of the lengths of the error bars.
+
 ![VS Past Uncertainty Propagation Results](src/VS_past_uncertainty_propagation_2.png)
+
 
