@@ -76,8 +76,12 @@ BUT, even if all factors were perfect, the non-linear nature of the model still 
 ![VS Past Teacher Analogy](src/VS_past_teacher_analogy.png)
 
 ## Adjustments
+![VS Past Adjustments schema](src/VS_past_adjustments.png)
+![VS Past Flipped Shaps Adjustment](src/flipped_shaps.png)
+![VS Past MAE Adjustment: Direct](src/VS_past_direct_adjust.png)
+![VS Past MAE Adjustment: Indirect](src/VS_past_VS_past_indirect_adjust.png)
 
 ## Uncertainty propagation
-
-
+![VS Past Uncertainty Propagation](src/VS_past_uncertainty_propagation.png)
+![VS Past Uncertainty Propagation Results](src/VS_past_uncertainty_propagation_2.png)
 
