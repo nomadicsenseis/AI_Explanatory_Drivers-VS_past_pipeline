@@ -32,6 +32,41 @@ After computing the NPS and its explainability with the above procedure for two 
 
 One thing that is quickly noticeable using this approach is how, due to both the non-linear nature of the model and the uncertainty in the explanations, there are sometimes variables that have a positive change and are known to have a positive impact but are counterintuitively translated into negative Shapley values.
 
-## Uncertainty: MAE and flipped shaps.
+## Uncertainty: MAE and Flipped Shaps
 
-![VS Past Sources of Uncertainty](src/VS_sources_uncertainty.png)
+There are two main indicators that can trigger alarms in the procedure. The first is how close the NPS prediction is to the actual NPS. The second is the occurrence of flipped Shapley values. Before exploring solutions, it is essential to understand the tool, the sources of uncertainty within it, and how they may affect both the MAE and the nature of the Shapley values.
+
+![VS Past Sources of Uncertainty](src/VS_past_sources_uncertainty.png)
+
+The tool comprises three layers:
+1. The Predictions Layer.
+2. The Explainability Layer.
+3. The Aggregation Layer.
+
+### 1. Predictions Layer
+In this layer, key questions include:
+- Is the NPS driven by the variables?
+- Are the models “statistically good” enough (whatever that may mean in this use case)?
+
+If the NPS for a certain period is driven by variables not accounted for, it is understandable that both the MAE and the explanations could be significantly off. Additionally, if the models do not have good classification metrics, the outputted logistic values will be inaccurate.
+
+### 2. Explainability Layer
+This layer depends on Shapley values and includes questions such as:
+- Are the variables independent enough for SHAP?
+- Are the Shapley values being transformed too roughly into the probabilistic space?
+
+The first question is addressed by using models and explainers robust to independence, although some studies question this assumption. For the second question, as previously mentioned, an approximation is used when transforming the logistic values outputted by SHAP into the probabilistic space.
+
+### 3. Aggregation Layer
+In this layer, considerations include:
+- Is the mean user representative of the sample? If not, why? Is it due to issues in the Predictions or Explainability layers, or is it a natural occurrence?
+- Is the satisfaction (as represented in the dashboard) representative of the sample?
+
+Since variables that define a sample of clients are represented, there is statistical uncertainty that depends on the sample itself.
+
+All three layers contribute to the final prediction uncertainty and error, resulting in larger MAEs and less precise Shapley values, which can lead to the flipping of these values. Even if all factors were perfect, the non-linear nature of the model still needs to be addressed, as it could also cause the flipping of Shapley values (though not the MAE).
+
+![VS Past Teacher Analogy](src/VS_past_teacher_analogy.png)
+
+
+
